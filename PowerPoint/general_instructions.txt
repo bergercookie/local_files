@@ -1,0 +1,22 @@
+- No more than 6 bullets/slide
+- No more than 6 words/bullet
+- Always go with two colors, 1st Main, 2nd Sup:
+  -- Light Blue - Orange
+  -- Red Green
+
+- Animations:
+  - Overview Section: 
+    -- Blink the subject at hand
+       1x
+       Delay: 0.5s
+       With Previous
+    -- Open the bracket & show the subcontents
+       Delay: 0.5s
+       After Previous
+    -- Blink the content at hand 
+       2x
+       Delay: 0.5s
+
+- Transitions:
+  - When I have the same title -> Fade, Duration = 0.5s
+  - When I have not the same title -> Just appear (default)

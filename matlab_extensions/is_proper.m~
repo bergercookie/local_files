@@ -1,0 +1,31 @@
+function [it_is] = is_proper(varargin)
+%IS_PROPER Investigate if a transfer function is of proper form (more poles 
+% than zeros). If the 'strict' argument is given IS_PROPER returns true for 
+% equal number of poles and zeros.
+
+if ~strcmp((vargin{1}), 'tf')
+    [r, c] = size(varargin{1});
+    if r > 1 || c > 1
+        error('is_proper:InputValidation', ...
+            'Method not iplemented yet for tf matrices');
+    end
+else
+    error('is_proper:InputValidation', ...
+        'Function takes a tf object as first arguement');
+end
+
+G = varargin{1};
+Gprop = zpk(G);
+
+if nargin == 1
+    % More poles than zeros.
+    if Gprop.z > Gprop.p
+    
+elseif nargin == 2
+    % Equal poles and zeros Case included.
+else
+    error('is_proper:InputValidation:InvalidNoArguements', ...
+        'Invalid number of arguements. The user should input at most 2 arguements');
+end
+
+end
