@@ -1,11 +1,12 @@
 % nickkouk - 03-Apr-2015
 % Startup file
 
-%% INITIALIZATION 
-edit startup.m
-edit to_know.m
-edit shortcuts.m
+%%% INITIALIZATION 
+%edit to_know.m
+%edit shortcuts.m
+%edit startup.m
 
+clc;
 
 % motivational message of the day
 quotes;
@@ -60,7 +61,12 @@ set(0,'DefaultFigureWindowStyle','docked')
 
 % get the desktop handle
 desktop = com.mathworks.mde.desk.MLDesktop.getInstance;
- desktop.restoreLayout('personal');
+desktop.restoreLayout('personal');
+
+
+%% CONTROL THEORY
+s = tf('s');
+double_int = 1/s^2;
 
 %% ENDING ARGS
 clear i;

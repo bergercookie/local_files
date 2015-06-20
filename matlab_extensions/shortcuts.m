@@ -18,7 +18,7 @@
 % NTUA, National Technical University of Athens                  %
 % School of Mechanical Engineering                               %
 % Laboratory of Automatic Control & Machine and Plant Regulation %
-% nickkouk, January 2014                                         %
+% nickkouk, June 2015                                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% FIGURES
@@ -195,9 +195,13 @@ colors_array = [red;
 % plot with RGB colors
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 plot(x,y,'Color',[0 0 1],'Marker','+')
-hold on
+hold on;
 plot(x,z,'Color',[1 0 1],'Marker','+'); 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% show figure now
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+shg
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % custom subplot configuration
@@ -416,6 +420,9 @@ sys(1,2) % get a submatrix of the system
 sys_ss = ss(sys,'minimal') % produces a state-space realization with no uncontrollable or unobservable states.
 sys_ss = ss(sys,'explicit')% computes an explicit realization (E = I) of the dynamic system model sys. If sys is improper, ss returns an error.
 
+% compute transfer function/matrix at certain point!
+evalfr(G1, 1/2+0j)
+
 %%%%%%%%%%%%%%%%%%%%%%%
 % CLASS OF OBJECT     %
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -529,3 +536,10 @@ curTime = strrep(curTime, ':', '-');
 fname = strcat(path_to_controllers, sprintf('UPDATED ON %s', curTime), ...
     '.txt');
 fopen(fname, 'w+');
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FROM MAC TERMINAL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+matlab -nodesktop -nosplash

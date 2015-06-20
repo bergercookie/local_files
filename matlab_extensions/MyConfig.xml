@@ -51,6 +51,10 @@
          <Stroke code="VK_KP_RIGHT" shift="on"/>
          <Stroke code="VK_L" ctrl="on" shift="on"/>
       </Action>
+      <Action id="clear-text-at-prompt">
+         <Stroke code="VK_ESCAPE"/>
+         <Stroke code="VK_OPEN_BRACKET" ctrl="on"/>
+      </Action>
       <Action id="selection-up">
          <Stroke code="VK_UP" shift="on"/>
          <Stroke code="VK_KP_UP" shift="on"/>
@@ -78,23 +82,23 @@
       </Action>
    </Context>
    <Context id="MATLABEditor">
-      <Action id="caret-up">
-         <Stroke code="VK_UP"/>
-         <Stroke code="VK_KP_UP"/>
-      </Action>
       <Action id="caret-down">
          <Stroke code="VK_DOWN"/>
          <Stroke code="VK_KP_DOWN"/>
       </Action>
-   </Context>
-   <Context id="CommandWindow">
-      <Action follows="None" id="caret-up">
+      <Action id="caret-up">
          <Stroke code="VK_UP"/>
          <Stroke code="VK_KP_UP"/>
       </Action>
+   </Context>
+   <Context id="CommandWindow">
       <Action follows="None" id="caret-down">
          <Stroke code="VK_DOWN"/>
          <Stroke code="VK_KP_DOWN"/>
+      </Action>
+      <Action follows="None" id="caret-up">
+         <Stroke code="VK_UP"/>
+         <Stroke code="VK_KP_UP"/>
       </Action>
    </Context>
 </CustomKeySet>
