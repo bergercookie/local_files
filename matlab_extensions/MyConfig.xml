@@ -3,6 +3,7 @@
    <Context id="Global">
       <Action id="caret-previous-word">
          <Stroke alt="on" code="VK_H" ctrl="on"/>
+         <Stroke code="VK_H" ctrl="on" meta="on"/>
          <Stroke code="VK_LEFT" ctrl="on"/>
          <Stroke code="VK_KP_LEFT" ctrl="on"/>
       </Action>
@@ -12,7 +13,8 @@
          <Stroke code="VK_H" ctrl="on" shift="on"/>
       </Action>
       <Action id="kill-line">
-         <Stroke code="VK_BACK_SPACE" meta="on" shift="on" sysctrl="on"/>
+         <Stroke alt="on" code="VK_BACK_SPACE" ctrl="on" shift="on"/>
+         <Stroke code="VK_BACK_SPACE" ctrl="on" meta="on" shift="on"/>
       </Action>
       <Action id="move-track-down">
          <Stroke code="VK_J" ctrl="on"/>
@@ -21,30 +23,55 @@
          <Stroke code="VK_UP"/>
          <Stroke code="VK_KP_UP"/>
       </Action>
+      <Action id="select-all">
+         <Stroke alt="on" code="VK_A" ctrl="on"/>
+         <Stroke code="VK_A" ctrl="on" meta="on"/>
+      </Action>
+      <Action id="remove-word-previous">
+         <Stroke code="VK_W" ctrl="on"/>
+      </Action>
+      <Action id="caret-down">
+         <Stroke code="VK_J" ctrl="on"/>
+      </Action>
+      <Action id="selection-begin-line">
+         <Stroke code="VK_A" ctrl="on" shift="on"/>
+      </Action>
+      <Action id="selection-up">
+         <Stroke code="VK_UP" shift="on"/>
+         <Stroke code="VK_KP_UP" shift="on"/>
+         <Stroke code="VK_K" ctrl="on" shift="on"/>
+      </Action>
+      <Action id="caret-next-word">
+         <Stroke alt="on" code="VK_L" ctrl="on"/>
+         <Stroke code="VK_L" ctrl="on" meta="on"/>
+      </Action>
+      <Action id="goto-position"/>
+      <Action id="caret-forward">
+         <Stroke code="VK_L" ctrl="on"/>
+         <Stroke code="VK_RIGHT"/>
+         <Stroke code="VK_KP_RIGHT"/>
+      </Action>
+      <Action id="page-down"/>
+      <Action id="clear-command-window"/>
+      <Action id="goto-line"/>
       <Action id="caret-backward">
          <Stroke code="VK_H" ctrl="on"/>
          <Stroke code="VK_LEFT"/>
          <Stroke code="VK_KP_LEFT"/>
       </Action>
-      <Action id="goto-line"/>
-      <Action id="clear-command-window"/>
       <Action id="next-cell">
          <Stroke alt="on" code="VK_J" ctrl="on"/>
+         <Stroke code="VK_J" ctrl="on" meta="on"/>
       </Action>
       <Action id="prev-cell">
          <Stroke alt="on" code="VK_K" ctrl="on"/>
+         <Stroke code="VK_K" ctrl="on" meta="on"/>
       </Action>
-      <Action id="select-all">
-         <Stroke code="VK_A" ctrl="on" meta="on" sysctrl="on"/>
-      </Action>
-      <Action id="remove-word-previous">
-         <Stroke code="VK_W" ctrl="on"/>
+      <Action id="caret-begin-line">
+         <Stroke code="VK_A" ctrl="on"/>
       </Action>
       <Action id="caret-up">
          <Stroke code="VK_K" ctrl="on"/>
-      </Action>
-      <Action id="caret-down">
-         <Stroke code="VK_J" ctrl="on"/>
       </Action>
       <Action id="selection-forward">
          <Stroke code="VK_RIGHT" shift="on"/>
@@ -55,17 +82,7 @@
          <Stroke code="VK_ESCAPE"/>
          <Stroke code="VK_OPEN_BRACKET" ctrl="on"/>
       </Action>
-      <Action id="selection-up">
-         <Stroke code="VK_UP" shift="on"/>
-         <Stroke code="VK_KP_UP" shift="on"/>
-         <Stroke code="VK_K" ctrl="on" shift="on"/>
-      </Action>
-      <Action id="caret-next-word">
-         <Stroke alt="on" code="VK_L" ctrl="on"/>
-         <Stroke code="VK_RIGHT" ctrl="on"/>
-         <Stroke code="VK_KP_RIGHT" ctrl="on"/>
-      </Action>
-      <Action id="goto-position"/>
+      <Action id="find-selection"/>
       <Action id="selection-down">
          <Stroke code="VK_DOWN" shift="on"/>
          <Stroke code="VK_KP_DOWN" shift="on"/>
@@ -74,11 +91,6 @@
       <Action id="next-history-item">
          <Stroke code="VK_DOWN"/>
          <Stroke code="VK_KP_DOWN"/>
-      </Action>
-      <Action id="caret-forward">
-         <Stroke code="VK_L" ctrl="on"/>
-         <Stroke code="VK_RIGHT"/>
-         <Stroke code="VK_KP_RIGHT"/>
       </Action>
    </Context>
    <Context id="MATLABEditor">
