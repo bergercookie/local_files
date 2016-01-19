@@ -1,4 +1,4 @@
-% nickkouk - 03-Apr-2015
+    % nickkouk - 03-Apr-2015
 % Startup file
 
 %%% INITIALIZATION 
@@ -10,6 +10,13 @@ clc;
 
 % motivational message of the day
 quotes;
+fprintf(1, '---------------------------------------------------------------------\n');
+
+%% Windows specific settings
+if strfind(computer, 'WIN')
+    cd('C:\Users\nick\Documents\MATLAB\');
+    fprintf(1, 'Current Dir:\n\t%s\n\n', pwd);
+end
 
 %% FIGURES
 fontsize = 9;
@@ -24,6 +31,7 @@ set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
 
 
 % Taken from http://se.mathworks.com/matlabcentral/newsreader/view_thread/161797
+
 set(0, 'DefaultFigureColor', [0.5 0.5 0.5], ...
 'DefaultFigurePaperType', 'a4letter', ...
 'DefaultAxesColor',  'white', ...

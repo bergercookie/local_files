@@ -3,6 +3,7 @@
    <Context id="Global">
       <Action id="caret-previous-word">
          <Stroke alt="on" code="VK_H" ctrl="on"/>
+         <Stroke code="VK_H" ctrl="on" meta="on"/>
          <Stroke code="VK_LEFT" ctrl="on"/>
          <Stroke code="VK_KP_LEFT" ctrl="on"/>
       </Action>
@@ -12,7 +13,8 @@
          <Stroke code="VK_H" ctrl="on" shift="on"/>
       </Action>
       <Action id="kill-line">
-         <Stroke code="VK_BACK_SPACE" meta="on" shift="on" sysctrl="on"/>
+         <Stroke alt="on" code="VK_BACK_SPACE" ctrl="on" shift="on"/>
+         <Stroke code="VK_BACK_SPACE" ctrl="on" meta="on" shift="on"/>
       </Action>
       <Action id="move-track-down">
          <Stroke code="VK_J" ctrl="on"/>
@@ -24,12 +26,18 @@
          <Stroke code="VK_UP"/>
          <Stroke code="VK_KP_UP"/>
       </Action>
+<<<<<<< HEAD
       <Action id="select-previous-tab">
          <Stroke code="VK_P" ctrl="on"/>
       </Action>
       <Action id="collapse-all-folds"/>
       <Action id="select-all">
          <Stroke code="VK_A" ctrl="on" meta="on" sysctrl="on"/>
+=======
+      <Action id="select-all">
+         <Stroke alt="on" code="VK_A" ctrl="on"/>
+         <Stroke code="VK_A" ctrl="on" meta="on"/>
+>>>>>>> 8bf612e18701fe1dec70adbe3a2edc28fd6a60ed
       </Action>
       <Action id="remove-word-previous">
          <Stroke code="VK_W" ctrl="on"/>
@@ -37,14 +45,20 @@
       <Action id="caret-down">
          <Stroke code="VK_J" ctrl="on"/>
       </Action>
+<<<<<<< HEAD
       <Action id="select-next-tab">
          <Stroke code="VK_N" ctrl="on"/>
+=======
+      <Action id="selection-begin-line">
+         <Stroke code="VK_A" ctrl="on" shift="on"/>
+>>>>>>> 8bf612e18701fe1dec70adbe3a2edc28fd6a60ed
       </Action>
       <Action id="selection-up">
          <Stroke code="VK_UP" shift="on"/>
          <Stroke code="VK_KP_UP" shift="on"/>
          <Stroke code="VK_K" ctrl="on" shift="on"/>
       </Action>
+<<<<<<< HEAD
       <Action id="zoom-minus">
          <Stroke code="VK_SUBTRACT"/>
          <Stroke code="VK_MINUS" meta="on" sysctrl="on"/>
@@ -77,6 +91,21 @@
       <Action id="goto-line">
          <Stroke code="VK_G" meta="on" sysctrl="on"/>
       </Action>
+=======
+      <Action id="caret-next-word">
+         <Stroke alt="on" code="VK_L" ctrl="on"/>
+         <Stroke code="VK_L" ctrl="on" meta="on"/>
+      </Action>
+      <Action id="goto-position"/>
+      <Action id="caret-forward">
+         <Stroke code="VK_L" ctrl="on"/>
+         <Stroke code="VK_RIGHT"/>
+         <Stroke code="VK_KP_RIGHT"/>
+      </Action>
+      <Action id="page-down"/>
+      <Action id="clear-command-window"/>
+      <Action id="goto-line"/>
+>>>>>>> 8bf612e18701fe1dec70adbe3a2edc28fd6a60ed
       <Action id="caret-backward">
          <Stroke code="VK_H" ctrl="on"/>
          <Stroke code="VK_LEFT"/>
@@ -84,12 +113,20 @@
       </Action>
       <Action id="next-cell">
          <Stroke alt="on" code="VK_J" ctrl="on"/>
+         <Stroke code="VK_J" ctrl="on" meta="on"/>
       </Action>
       <Action id="generic-delete"/>
       <Action id="find-next"/>
       <Action id="prev-cell">
          <Stroke alt="on" code="VK_K" ctrl="on"/>
+         <Stroke code="VK_K" ctrl="on" meta="on"/>
       </Action>
+<<<<<<< HEAD
+=======
+      <Action id="caret-begin-line">
+         <Stroke code="VK_A" ctrl="on"/>
+      </Action>
+>>>>>>> 8bf612e18701fe1dec70adbe3a2edc28fd6a60ed
       <Action id="caret-up">
          <Stroke code="VK_K" ctrl="on"/>
       </Action>
@@ -102,6 +139,10 @@
          <Stroke code="VK_ESCAPE"/>
          <Stroke code="VK_OPEN_BRACKET" ctrl="on"/>
       </Action>
+<<<<<<< HEAD
+=======
+      <Action id="find-selection"/>
+>>>>>>> 8bf612e18701fe1dec70adbe3a2edc28fd6a60ed
       <Action id="selection-down">
          <Stroke code="VK_DOWN" shift="on"/>
          <Stroke code="VK_KP_DOWN" shift="on"/>
