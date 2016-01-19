@@ -2,9 +2,9 @@
 % Startup file
 
 %%% INITIALIZATION 
-%edit to_know.m
-%edit shortcuts.m
-%edit startup.m
+edit to_know.m
+edit shortcuts.m
+edit startup.m
 
 clc;
 
@@ -70,3 +70,13 @@ double_int = 1/s^2;
 
 %% ENDING ARGS
 clear i;
+
+% folders to add to path
+addpath(genpath('~/local/matlab_extensions/damarob/'))
+addpath(genpath('~/local/matlab_extensions/rvctools/'))
+addpath(genpath('/Users/nick/Documents/MATLAB/SupportPackages/R2014a/'))
+addpath(genpath('/Users/nick/local/matlab_extensions/grep04apr06'));
+addpath(genpath('/Users/nick/local/matlab_extensions/unit_converters'));
+
+% set certain warnings off
+warning('off', 'images:imshow:magnificationMustBeFitForDockedFigure')

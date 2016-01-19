@@ -1,0 +1,355 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>drive_manip</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-24">
+      <meta name="m-file" content="drive_manip"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content"><pre class="codeinput"><span class="keyword">function</span> drive_manip(manip)
+
+<span class="comment">% DRIVE_MANIP gives you the possibility to manually drive the manipulator.</span>
+<span class="comment">%  syntax:</span>
+<span class="comment">%        manipulator.drive_manip   or   drive_manip(manipulator)</span>
+<span class="comment">%</span>
+<span class="comment">%     See also manipulator</span>
+<span class="comment">%              manipulator/show_manip</span>
+<span class="comment">%              manipulator/Direct_Kinematics</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+
+<span class="keyword">if</span> manip.DH.r==0 &amp;&amp; isfield(manip.DH,<span class="string">'table'</span>)
+    disp(<span class="string">' Unable to drive or show a manipulator without joints'</span>);
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+<span class="keyword">if</span> manip.is_sym == 0
+    manip.jointpos = manip.jointpos;                  <span class="comment">% open 3D window</span>
+    objname = inputname(1);                           <span class="comment">% object name</span>
+    q_min = double(manip.DH.table(:,6));              <span class="comment">% limits</span>
+    q_max = double(manip.DH.table(:,7));
+    r = manip.DH.r;                                   <span class="comment">% number of joints</span>
+
+    <span class="keyword">for</span> i = 1:1:r                                     <span class="comment">% check finite value limits</span>
+        <span class="keyword">if</span> q_min(i) == -Inf
+            <span class="keyword">if</span> manip.DH.table(i,5) == 0
+                q_min(i) = -4;
+            <span class="keyword">else</span>
+                q_min(i) = -1;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> q_max(i) == Inf
+            <span class="keyword">if</span> manip.DH.table(i,5) == 0
+                q_max(i) = 4;
+            <span class="keyword">else</span>
+                q_max(i) = 1;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% manual drive Main Window</span>
+    manmov.mainfig = dialog(<span class="string">'Position'</span>,[358 402 630 60+20*r], <span class="string">'Name'</span>, [<span class="string">'DAMAROB manipulator : '</span>, manip.name], <span class="keyword">...</span>
+        <span class="string">'WindowStyle'</span>, <span class="string">'normal'</span>, <span class="keyword">...</span>
+        <span class="string">'CloseRequestFcn'</span>, [<span class="string">'try; close('</span>,objname,<span class="string">'.vr_base); end; closereq'</span>] );
+
+    <span class="comment">% subtitle</span>
+    uicontrol(<span class="string">'Parent'</span>,manmov.mainfig, <span class="string">'Position'</span>,[270 40+20*r 320 20], <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>, <span class="keyword">...</span>
+        <span class="string">'String'</span>,<span class="string">'Manual Drive: Joint Positions'</span>, <span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'FontSize'</span>,11);
+
+    <span class="comment">% show axes button</span>
+    manmov.togglebutton = uicontrol(<span class="string">'Parent'</span>,manmov.mainfig, <span class="keyword">...</span>
+        <span class="string">'Position'</span>,[10 5 90 20], <span class="keyword">...</span>
+        <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>, <span class="keyword">...</span>
+        <span class="string">'String'</span>,<span class="string">'show axes'</span>, <span class="keyword">...</span>
+        <span class="string">'Style'</span>,<span class="string">'togglebutton'</span>, <span class="keyword">...</span>
+        <span class="string">'Value'</span>,1, <span class="keyword">...</span>
+        <span class="string">'Callback'</span>,[<span class="string">'toggled = get('</span>,objname,<span class="string">'.fig.manmov.togglebutton,''Value''); '</span>,objname,<span class="string">'.show_manip(toggled); clear toggled;'</span>], <span class="keyword">...</span>
+        <span class="string">'FontSize'</span>,10);
+
+    <span class="comment">% home button</span>
+    manmov.homebutton = uicontrol(<span class="string">'Parent'</span>,manmov.mainfig, <span class="keyword">...</span>
+        <span class="string">'Position'</span>,[110 5 50 20], <span class="keyword">...</span>
+        <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>, <span class="keyword">...</span>
+        <span class="string">'String'</span>,<span class="string">'home'</span>, <span class="keyword">...</span>
+        <span class="string">'Style'</span>,<span class="string">'pushbutton'</span>, <span class="keyword">...</span>
+        <span class="string">'Value'</span>,1, <span class="keyword">...</span>
+        <span class="string">'Callback'</span>, [<span class="string">'for i=1:1:'</span>,objname,<span class="string">'.DH.r set('</span>,objname,<span class="string">'.fig.manmov.val{i},''String'',''0'');'</span>,<span class="string">'eval(get('</span>,objname,<span class="string">'.fig.manmov.val{i},''callback'')); end; clear i;'</span>] , <span class="keyword">...</span>
+        <span class="string">'FontSize'</span>,10);
+
+
+    <span class="comment">% End Effector position</span>
+    uicontrol(<span class="string">'Parent'</span>,manmov.mainfig,<span class="keyword">...</span>
+        <span class="string">'Position'</span>,[285 5 120 20], <span class="keyword">...</span>
+        <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>, <span class="keyword">...</span>
+        <span class="string">'String'</span>,<span class="string">'End Effector XYZ:'</span>,<span class="keyword">...</span>
+        <span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span>
+        <span class="string">'FontSize'</span>,11);
+
+    manmov.x = uicontrol(<span class="string">'Parent'</span>,manmov.mainfig, <span class="keyword">...</span>
+        <span class="string">'Style'</span>,<span class="string">'edit'</span>, <span class="string">'Position'</span>,[405 5 60 20], <span class="keyword">...</span>
+        <span class="string">'String'</span>,num2str( manip.func.x(manip.jointpos),2 ),<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+    manmov.y = uicontrol(<span class="string">'Parent'</span>,manmov.mainfig, <span class="keyword">...</span>
+        <span class="string">'Style'</span>,<span class="string">'edit'</span>, <span class="string">'Position'</span>,[470 5 60 20], <span class="keyword">...</span>
+        <span class="string">'String'</span>,num2str( manip.func.y(manip.jointpos),3 ),<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+    manmov.z = uicontrol(<span class="string">'Parent'</span>,manmov.mainfig, <span class="keyword">...</span>
+        <span class="string">'Style'</span>,<span class="string">'edit'</span>, <span class="string">'Position'</span>,[535 5 60 20], <span class="keyword">...</span>
+        <span class="string">'String'</span>,num2str( manip.func.z(manip.jointpos),3 ),<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+
+    <span class="comment">% sliders</span>
+    <span class="keyword">for</span> i = 1:1:r
+        uicontrol(<span class="string">'Parent'</span>,manmov.mainfig, <span class="keyword">...</span>
+            <span class="string">'Position'</span>,[10 35+20*(r-i) 30 20],<span class="keyword">...</span>
+            <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>, <span class="keyword">...</span>
+            <span class="string">'String'</span>,[<span class="string">'q'</span>,num2str(i)], <span class="string">'Style'</span>,<span class="string">'text'</span>);
+
+        manmov.min{i} = uicontrol(<span class="string">'Parent'</span>,manmov.mainfig,<span class="keyword">...</span>
+            <span class="string">'Style'</span>,<span class="string">'edit'</span>, <span class="string">'Position'</span>,[40 35+20*(r-i) 60 20],<span class="keyword">...</span>
+            <span class="string">'String'</span>,char(manip.DH.table(i,6)),<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+        manmov.val{i} = uicontrol(<span class="string">'Parent'</span>,manmov.mainfig,<span class="keyword">...</span>
+            <span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="keyword">...</span>
+            <span class="string">'Position'</span>,[105 35+20*(r-i) 60 20]);
+        manmov.max{i} = uicontrol(<span class="string">'Parent'</span>,manmov.mainfig,<span class="keyword">...</span>
+            <span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="keyword">...</span>
+            <span class="string">'Position'</span>,[170 35+20*(r-i) 60 20],<span class="keyword">...</span>
+            <span class="string">'String'</span>,char(manip.DH.table(i,7)),<span class="keyword">...</span>
+            <span class="string">'Enable'</span>,<span class="string">'off'</span>);
+        manmov.slid{i} = uicontrol(<span class="string">'Parent'</span>,manmov.mainfig,<span class="keyword">...</span>
+            <span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="keyword">...</span>
+            <span class="string">'Position'</span>,[244 35+20*(r-i) 352 20], <span class="keyword">...</span>
+            <span class="string">'Min'</span>, q_min(i) ,<span class="keyword">...</span>
+            <span class="string">'Max'</span>, q_max(i), <span class="keyword">...</span>
+            <span class="string">'Callback'</span>, <span class="keyword">...</span>
+            [<span class="string">'rot = get('</span>,objname,<span class="string">'.fig.manmov.slid{'</span>,num2str(i),<span class="string">'},''Value'');'</span><span class="keyword">...</span>
+            <span class="string">' '</span>,objname,<span class="string">'.jointpos('</span>,num2str(i),<span class="string">') = rot;'</span><span class="keyword">...</span>
+            <span class="string">' set('</span>,objname,<span class="string">'.fig.manmov.val{'</span>,num2str(i),<span class="string">'},''String'',num2str(rot));'</span><span class="keyword">...</span>
+            <span class="string">' clear rot;'</span><span class="keyword">...</span>
+            <span class="string">' set('</span>,objname,<span class="string">'.fig.manmov.x,''String'', eval(num2str('</span>,objname,<span class="string">'.func.x('</span>,objname,<span class="string">'.jointpos),3)));'</span>,<span class="keyword">...</span>
+            <span class="string">' set('</span>,objname,<span class="string">'.fig.manmov.y,''String'', eval(num2str('</span>,objname,<span class="string">'.func.y('</span>,objname,<span class="string">'.jointpos),3)));'</span>,<span class="keyword">...</span>
+            <span class="string">' set('</span>,objname,<span class="string">'.fig.manmov.z,''String'', eval(num2str('</span>,objname,<span class="string">'.func.z('</span>,objname,<span class="string">'.jointpos),3)));'</span>],<span class="keyword">...</span>
+            <span class="string">'SliderStep'</span>,[i/(100*pi), i/(50*pi)]);
+
+        manip.fig.manmov = manmov;
+        set(manip.fig.manmov.val{i},<span class="string">'Callback'</span>,<span class="keyword">...</span>
+            [<span class="string">'set('</span>,objname,<span class="string">'.fig.manmov.slid{'</span>,num2str(i),<span class="string">'},''Value'',str2num(get('</span>,objname,<span class="string">'.fig.manmov.val{'</span>,num2str(i),<span class="string">'},''String'')));'</span>,<span class="keyword">...</span>
+            <span class="string">'eval(get('</span>,objname,<span class="string">'.fig.manmov.slid{'</span>,num2str(i),<span class="string">'},''Callback''));'</span>]);
+        set(manip.fig.manmov.slid{i},<span class="string">'Value'</span>,manip.jointpos(i));
+        set(manip.fig.manmov.val{i},<span class="string">'String'</span>,num2str(manip.jointpos(i)));
+    <span class="keyword">end</span>
+
+    assignin(<span class="string">'caller'</span>,inputname(1),manip);
+<span class="keyword">else</span>
+    disp(<span class="string">' Unable to drive or show a symbolic manipulator'</span>);
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function drive_manip(manip)
+
+% DRIVE_MANIP gives you the possibility to manually drive the manipulator.
+%  syntax:
+%        manipulator.drive_manip   or   drive_manip(manipulator)
+%
+%     See also manipulator
+%              manipulator/show_manip
+%              manipulator/Direct_Kinematics
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+if manip.DH.r==0 && isfield(manip.DH,'table')
+    disp(' Unable to drive or show a manipulator without joints');    
+    return    
+end
+if manip.is_sym == 0
+    manip.jointpos = manip.jointpos;                  % open 3D window
+    objname = inputname(1);                           % object name
+    q_min = double(manip.DH.table(:,6));              % limits
+    q_max = double(manip.DH.table(:,7));
+    r = manip.DH.r;                                   % number of joints
+
+    for i = 1:1:r                                     % check finite value limits
+        if q_min(i) == -Inf
+            if manip.DH.table(i,5) == 0
+                q_min(i) = -4;
+            else
+                q_min(i) = -1;
+            end
+        end
+        if q_max(i) == Inf
+            if manip.DH.table(i,5) == 0
+                q_max(i) = 4;
+            else
+                q_max(i) = 1;
+            end
+        end
+    end
+
+    % manual drive Main Window
+    manmov.mainfig = dialog('Position',[358 402 630 60+20*r], 'Name', ['DAMAROB manipulator : ', manip.name], ...
+        'WindowStyle', 'normal', ...
+        'CloseRequestFcn', ['try; close(',objname,'.vr_base); end; closereq'] );
+
+    % subtitle
+    uicontrol('Parent',manmov.mainfig, 'Position',[270 40+20*r 320 20], 'HorizontalAlignment','center', ...
+        'String','Manual Drive: Joint Positions', 'Style','text','FontSize',11);
+
+    % show axes button
+    manmov.togglebutton = uicontrol('Parent',manmov.mainfig, ...
+        'Position',[10 5 90 20], ...
+        'HorizontalAlignment','center', ...
+        'String','show axes', ...
+        'Style','togglebutton', ...
+        'Value',1, ...
+        'Callback',['toggled = get(',objname,'.fig.manmov.togglebutton,''Value''); ',objname,'.show_manip(toggled); clear toggled;'], ...
+        'FontSize',10);
+
+    % home button
+    manmov.homebutton = uicontrol('Parent',manmov.mainfig, ...
+        'Position',[110 5 50 20], ...
+        'HorizontalAlignment','center', ...
+        'String','home', ...
+        'Style','pushbutton', ...
+        'Value',1, ...
+        'Callback', ['for i=1:1:',objname,'.DH.r set(',objname,'.fig.manmov.val{i},''String'',''0'');','eval(get(',objname,'.fig.manmov.val{i},''callback'')); end; clear i;'] , ...
+        'FontSize',10);
+
+
+    % End Effector position
+    uicontrol('Parent',manmov.mainfig,...
+        'Position',[285 5 120 20], ...
+        'HorizontalAlignment','left', ...
+        'String','End Effector XYZ:',...
+        'Style','text',...
+        'FontSize',11);
+
+    manmov.x = uicontrol('Parent',manmov.mainfig, ...
+        'Style','edit', 'Position',[405 5 60 20], ...
+        'String',num2str( manip.func.x(manip.jointpos),2 ),'Enable','off');
+    manmov.y = uicontrol('Parent',manmov.mainfig, ...
+        'Style','edit', 'Position',[470 5 60 20], ...
+        'String',num2str( manip.func.y(manip.jointpos),3 ),'Enable','off');
+    manmov.z = uicontrol('Parent',manmov.mainfig, ...
+        'Style','edit', 'Position',[535 5 60 20], ...
+        'String',num2str( manip.func.z(manip.jointpos),3 ),'Enable','off');
+
+    % sliders
+    for i = 1:1:r
+        uicontrol('Parent',manmov.mainfig, ...
+            'Position',[10 35+20*(r-i) 30 20],...
+            'HorizontalAlignment','left', ...
+            'String',['q',num2str(i)], 'Style','text');
+
+        manmov.min{i} = uicontrol('Parent',manmov.mainfig,...
+            'Style','edit', 'Position',[40 35+20*(r-i) 60 20],...
+            'String',char(manip.DH.table(i,6)),'Enable','off');
+        manmov.val{i} = uicontrol('Parent',manmov.mainfig,...
+            'Style','edit',...
+            'Position',[105 35+20*(r-i) 60 20]);
+        manmov.max{i} = uicontrol('Parent',manmov.mainfig,...
+            'Style','edit',...
+            'Position',[170 35+20*(r-i) 60 20],...
+            'String',char(manip.DH.table(i,7)),...
+            'Enable','off');
+        manmov.slid{i} = uicontrol('Parent',manmov.mainfig,...
+            'Style','slider',...
+            'Position',[244 35+20*(r-i) 352 20], ...
+            'Min', q_min(i) ,...
+            'Max', q_max(i), ...
+            'Callback', ...
+            ['rot = get(',objname,'.fig.manmov.slid{',num2str(i),'},''Value'');'...
+            ' ',objname,'.jointpos(',num2str(i),') = rot;'...
+            ' set(',objname,'.fig.manmov.val{',num2str(i),'},''String'',num2str(rot));'...
+            ' clear rot;'...
+            ' set(',objname,'.fig.manmov.x,''String'', eval(num2str(',objname,'.func.x(',objname,'.jointpos),3)));',...
+            ' set(',objname,'.fig.manmov.y,''String'', eval(num2str(',objname,'.func.y(',objname,'.jointpos),3)));',...
+            ' set(',objname,'.fig.manmov.z,''String'', eval(num2str(',objname,'.func.z(',objname,'.jointpos),3)));'],...
+            'SliderStep',[i/(100*pi), i/(50*pi)]);
+
+        manip.fig.manmov = manmov;
+        set(manip.fig.manmov.val{i},'Callback',...
+            ['set(',objname,'.fig.manmov.slid{',num2str(i),'},''Value'',str2num(get(',objname,'.fig.manmov.val{',num2str(i),'},''String'')));',...
+            'eval(get(',objname,'.fig.manmov.slid{',num2str(i),'},''Callback''));']);
+        set(manip.fig.manmov.slid{i},'Value',manip.jointpos(i));
+        set(manip.fig.manmov.val{i},'String',num2str(manip.jointpos(i)));
+    end
+
+    assignin('caller',inputname(1),manip);
+else
+    disp(' Unable to drive or show a symbolic manipulator');    
+end
+end
+##### SOURCE END #####
+-->
+   </body>
+</html>

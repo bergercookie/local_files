@@ -1,0 +1,1533 @@
+Model {
+  Name			  "AAA"
+  Version		  6.6
+  MdlSubVersion		  0
+  GraphicalInterface {
+    NumRootInports	    0
+    NumRootOutports	    0
+    ParameterArgumentNames  ""
+    ComputedModelVersion    "1.13"
+    NumModelReferences	    0
+    NumTestPointedSignals   0
+  }
+  SavedCharacterEncoding  "UTF-8"
+  SaveDefaultBlockParams  on
+  SampleTimeColors	  off
+  LibraryLinkDisplay	  "none"
+  WideLines		  off
+  ShowLineDimensions	  off
+  ShowPortDataTypes	  off
+  ShowLoopsOnError	  on
+  IgnoreBidirectionalLines off
+  ShowStorageClass	  off
+  ShowTestPointIcons	  on
+  ShowViewerIcons	  on
+  SortedOrder		  off
+  ExecutionContextIcon	  off
+  ShowLinearizationAnnotations on
+  ScopeRefreshTime	  0.035000
+  OverrideScopeRefreshTime on
+  DisableAllScopes	  off
+  DataTypeOverride	  "UseLocalSettings"
+  MinMaxOverflowLogging	  "UseLocalSettings"
+  MinMaxOverflowArchiveMode "Overwrite"
+  BlockNameDataTip	  off
+  BlockParametersDataTip  off
+  BlockDescriptionStringDataTip	off
+  ToolBar		  on
+  StatusBar		  on
+  BrowserShowLibraryLinks off
+  BrowserLookUnderMasks	  off
+  Created		  "Tue Nov 24 23:23:57 2009"
+  Creator		  "dario"
+  UpdateHistory		  "UpdateHistoryNever"
+  ModifiedByFormat	  "%<Auto>"
+  LastModifiedBy	  "mofo"
+  ModifiedDateFormat	  "%<Auto>"
+  LastModifiedDate	  "Wed Nov 25 15:16:00 2009"
+  ModelVersionFormat	  "1.%<AutoIncrement:13>"
+  ConfigurationManager	  "None"
+  SimulationMode	  "normal"
+  LinearizationMsg	  "none"
+  Profile		  off
+  ParamWorkspaceSource	  "MATLABWorkspace"
+  AccelSystemTargetFile	  "accel.tlc"
+  AccelTemplateMakefile	  "accel_default_tmf"
+  AccelMakeCommand	  "make_rtw"
+  AccelVerboseBuild	  off
+  TryForcingSFcnDF	  off
+  RecordCoverage	  off
+  CovPath		  "/"
+  CovSaveName		  "covdata"
+  CovMetricSettings	  "dw"
+  CovNameIncrementing	  off
+  CovHtmlReporting	  on
+  covSaveCumulativeToWorkspaceVar on
+  CovSaveSingleToWorkspaceVar on
+  CovCumulativeVarName	  "covCumulativeData"
+  CovCumulativeReport	  off
+  CovReportOnPause	  on
+  ExtModeBatchMode	  off
+  ExtModeEnableFloating	  on
+  ExtModeTrigType	  "manual"
+  ExtModeTrigMode	  "normal"
+  ExtModeTrigPort	  "1"
+  ExtModeTrigElement	  "any"
+  ExtModeTrigDuration	  1000
+  ExtModeTrigDurationFloating "auto"
+  ExtModeTrigHoldOff	  0
+  ExtModeTrigDelay	  0
+  ExtModeTrigDirection	  "rising"
+  ExtModeTrigLevel	  0
+  ExtModeArchiveMode	  "off"
+  ExtModeAutoIncOneShot	  off
+  ExtModeIncDirWhenArm	  off
+  ExtModeAddSuffixToVar	  off
+  ExtModeWriteAllDataToWs off
+  ExtModeArmWhenConnect	  on
+  ExtModeSkipDownloadWhenConnect off
+  ExtModeLogAll		  on
+  ExtModeAutoUpdateStatusClock off
+  BufferReuse		  on
+  ProdHWDeviceType	  "32-bit Generic"
+  ShowModelReferenceBlockVersion off
+  ShowModelReferenceBlockIO off
+  Array {
+    Type		    "Handle"
+    Dimension		    1
+    Simulink.ConfigSet {
+      $ObjectID		      1
+      Version		      "1.2.0"
+      Array {
+	Type			"Handle"
+	Dimension		8
+	Simulink.SolverCC {
+	  $ObjectID		  2
+	  Version		  "1.2.0"
+	  StartTime		  "0.0"
+	  StopTime		  "40"
+	  AbsTol		  "auto"
+	  FixedStep		  "auto"
+	  InitialStep		  "auto"
+	  MaxNumMinSteps	  "-1"
+	  MaxOrder		  5
+	  ConsecutiveZCsStepRelTol "10*128*eps"
+	  MaxConsecutiveZCs	  "1000"
+	  ExtrapolationOrder	  4
+	  NumberNewtonIterations  1
+	  MaxStep		  "auto"
+	  MinStep		  "auto"
+	  MaxConsecutiveMinStep	  "1"
+	  RelTol		  "1e-3"
+	  SolverMode		  "Auto"
+	  Solver		  "FixedStepDiscrete"
+	  SolverName		  "FixedStepDiscrete"
+	  ZeroCrossControl	  "UseLocalSettings"
+	  AlgebraicLoopSolver	  "TrustRegion"
+	  SolverResetMethod	  "Fast"
+	  PositivePriorityOrder	  off
+	  AutoInsertRateTranBlk	  off
+	  SampleTimeConstraint	  "Unconstrained"
+	  RateTranMode		  "Deterministic"
+	}
+	Simulink.DataIOCC {
+	  $ObjectID		  3
+	  Version		  "1.2.0"
+	  Decimation		  "1"
+	  ExternalInput		  "[t, u]"
+	  FinalStateName	  "xFinal"
+	  InitialState		  "xInitial"
+	  LimitDataPoints	  on
+	  MaxDataPoints		  "1000"
+	  LoadExternalInput	  off
+	  LoadInitialState	  off
+	  SaveFinalState	  off
+	  SaveFormat		  "Array"
+	  SaveOutput		  on
+	  SaveState		  off
+	  SignalLogging		  on
+	  InspectSignalLogs	  off
+	  SaveTime		  on
+	  StateSaveName		  "xout"
+	  TimeSaveName		  "tout"
+	  OutputSaveName	  "yout"
+	  SignalLoggingName	  "logsout"
+	  OutputOption		  "RefineOutputTimes"
+	  OutputTimes		  "[]"
+	  Refine		  "1"
+	}
+	Simulink.OptimizationCC {
+	  $ObjectID		  4
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    5
+	    Cell		    "ZeroExternalMemoryAtStartup"
+	    Cell		    "ZeroInternalMemoryAtStartup"
+	    Cell		    "InitFltsAndDblsToZero"
+	    Cell		    "OptimizeModelRefInitCode"
+	    Cell		    "NoFixptDivByZeroProtection"
+	    PropName		    "DisabledProps"
+	  }
+	  Version		  "1.2.0"
+	  BlockReduction	  on
+	  BooleanDataType	  on
+	  ConditionallyExecuteInputs on
+	  InlineParams		  off
+	  InlineInvariantSignals  off
+	  OptimizeBlockIOStorage  on
+	  BufferReuse		  on
+	  EnforceIntegerDowncast  on
+	  ExpressionFolding	  on
+	  ExpressionDepthLimit	  2147483647
+	  FoldNonRolledExpr	  on
+	  LocalBlockOutputs	  on
+	  RollThreshold		  5
+	  SystemCodeInlineAuto	  off
+	  StateBitsets		  off
+	  DataBitsets		  off
+	  UseTempVars		  off
+	  ZeroExternalMemoryAtStartup on
+	  ZeroInternalMemoryAtStartup on
+	  InitFltsAndDblsToZero	  on
+	  NoFixptDivByZeroProtection off
+	  EfficientFloat2IntCast  off
+	  OptimizeModelRefInitCode off
+	  LifeSpan		  "inf"
+	  BufferReusableBoundary  on
+	}
+	Simulink.DebuggingCC {
+	  $ObjectID		  5
+	  Version		  "1.2.0"
+	  RTPrefix		  "error"
+	  ConsistencyChecking	  "none"
+	  ArrayBoundsChecking	  "none"
+	  SignalInfNanChecking	  "none"
+	  ReadBeforeWriteMsg	  "UseLocalSettings"
+	  WriteAfterWriteMsg	  "UseLocalSettings"
+	  WriteAfterReadMsg	  "UseLocalSettings"
+	  AlgebraicLoopMsg	  "warning"
+	  ArtificialAlgebraicLoopMsg "warning"
+	  CheckSSInitialOutputMsg on
+	  CheckExecutionContextPreStartOutputMsg off
+	  CheckExecutionContextRuntimeOutputMsg	off
+	  SignalResolutionControl "UseLocalSettings"
+	  BlockPriorityViolationMsg "warning"
+	  MinStepSizeMsg	  "warning"
+	  TimeAdjustmentMsg	  "none"
+	  MaxConsecutiveZCsMsg	  "error"
+	  SolverPrmCheckMsg	  "warning"
+	  InheritedTsInSrcMsg	  "warning"
+	  DiscreteInheritContinuousMsg "warning"
+	  MultiTaskDSMMsg	  "error"
+	  MultiTaskCondExecSysMsg "error"
+	  MultiTaskRateTransMsg	  "error"
+	  SingleTaskRateTransMsg  "none"
+	  TasksWithSamePriorityMsg "warning"
+	  SigSpecEnsureSampleTimeMsg "warning"
+	  CheckMatrixSingularityMsg "none"
+	  IntegerOverflowMsg	  "warning"
+	  Int32ToFloatConvMsg	  "warning"
+	  ParameterDowncastMsg	  "error"
+	  ParameterOverflowMsg	  "error"
+	  ParameterUnderflowMsg	  "none"
+	  ParameterPrecisionLossMsg "warning"
+	  ParameterTunabilityLossMsg "warning"
+	  UnderSpecifiedDataTypeMsg "none"
+	  UnnecessaryDatatypeConvMsg "none"
+	  VectorMatrixConversionMsg "none"
+	  InvalidFcnCallConnMsg	  "error"
+	  FcnCallInpInsideContextMsg "Use local settings"
+	  SignalLabelMismatchMsg  "none"
+	  UnconnectedInputMsg	  "warning"
+	  UnconnectedOutputMsg	  "warning"
+	  UnconnectedLineMsg	  "warning"
+	  SFcnCompatibilityMsg	  "none"
+	  UniqueDataStoreMsg	  "none"
+	  BusObjectLabelMismatch  "warning"
+	  RootOutportRequireBusObject "warning"
+	  AssertControl		  "UseLocalSettings"
+	  EnableOverflowDetection off
+	  ModelReferenceIOMsg	  "none"
+	  ModelReferenceVersionMismatchMessage "none"
+	  ModelReferenceIOMismatchMessage "none"
+	  ModelReferenceCSMismatchMessage "none"
+	  ModelReferenceSimTargetVerbose off
+	  UnknownTsInhSupMsg	  "warning"
+	  ModelReferenceDataLoggingMessage "warning"
+	  ModelReferenceSymbolNameMessage "warning"
+	  ModelReferenceExtraNoncontSigs "error"
+	  StateNameClashWarn	  "warning"
+	  StrictBusMsg		  "Warning"
+	}
+	Simulink.HardwareCC {
+	  $ObjectID		  6
+	  Version		  "1.2.0"
+	  ProdBitPerChar	  8
+	  ProdBitPerShort	  16
+	  ProdBitPerInt		  32
+	  ProdBitPerLong	  32
+	  ProdIntDivRoundTo	  "Undefined"
+	  ProdEndianess		  "Unspecified"
+	  ProdWordSize		  32
+	  ProdShiftRightIntArith  on
+	  ProdHWDeviceType	  "32-bit Generic"
+	  TargetBitPerChar	  8
+	  TargetBitPerShort	  16
+	  TargetBitPerInt	  32
+	  TargetBitPerLong	  32
+	  TargetShiftRightIntArith on
+	  TargetIntDivRoundTo	  "Undefined"
+	  TargetEndianess	  "Unspecified"
+	  TargetWordSize	  32
+	  TargetTypeEmulationWarnSuppressLevel 0
+	  TargetPreprocMaxBitsSint 32
+	  TargetPreprocMaxBitsUint 32
+	  TargetHWDeviceType	  "Specified"
+	  TargetUnknown		  off
+	  ProdEqTarget		  on
+	}
+	Simulink.ModelReferenceCC {
+	  $ObjectID		  7
+	  Version		  "1.2.0"
+	  UpdateModelReferenceTargets "IfOutOfDateOrStructuralChange"
+	  CheckModelReferenceTargetMessage "error"
+	  ModelReferenceNumInstancesAllowed "Multi"
+	  ModelReferencePassRootInputsByReference on
+	  ModelReferenceMinAlgLoopOccurrences off
+	}
+	Simulink.RTWCC {
+	  $BackupClass		  "Simulink.RTWCC"
+	  $ObjectID		  8
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    1
+	    Cell		    "IncludeHyperlinkInReport"
+	    PropName		    "DisabledProps"
+	  }
+	  Version		  "1.2.0"
+	  SystemTargetFile	  "grt.tlc"
+	  GenCodeOnly		  off
+	  MakeCommand		  "make_rtw"
+	  GenerateMakefile	  on
+	  TemplateMakefile	  "grt_default_tmf"
+	  GenerateReport	  off
+	  SaveLog		  off
+	  RTWVerbose		  on
+	  RetainRTWFile		  off
+	  ProfileTLC		  off
+	  TLCDebug		  off
+	  TLCCoverage		  off
+	  TLCAssert		  off
+	  ProcessScriptMode	  "Default"
+	  ConfigurationMode	  "Optimized"
+	  ConfigAtBuild		  off
+	  IncludeHyperlinkInReport off
+	  LaunchReport		  off
+	  TargetLang		  "C"
+	  IncludeBusHierarchyInRTWFileBlockHierarchyMap	off
+	  IncludeERTFirstTime	  off
+	  Array {
+	    Type		    "Handle"
+	    Dimension		    2
+	    Simulink.CodeAppCC {
+	      $ObjectID		      9
+	      Array {
+		Type			"Cell"
+		Dimension		16
+		Cell			"IgnoreCustomStorageClasses"
+		Cell			"InsertBlockDesc"
+		Cell			"SFDataObjDesc"
+		Cell			"SimulinkDataObjDesc"
+		Cell			"DefineNamingRule"
+		Cell			"SignalNamingRule"
+		Cell			"ParamNamingRule"
+		Cell			"InlinedPrmAccess"
+		Cell			"CustomSymbolStr"
+		Cell			"CustomSymbolStrGlobalVar"
+		Cell			"CustomSymbolStrType"
+		Cell			"CustomSymbolStrField"
+		Cell			"CustomSymbolStrFcn"
+		Cell			"CustomSymbolStrBlkIO"
+		Cell			"CustomSymbolStrTmpVar"
+		Cell			"CustomSymbolStrMacro"
+		PropName		"DisabledProps"
+	      }
+	      Version		      "1.2.0"
+	      ForceParamTrailComments off
+	      GenerateComments	      on
+	      IgnoreCustomStorageClasses on
+	      IncHierarchyInIds	      off
+	      MaxIdLength	      31
+	      PreserveName	      off
+	      PreserveNameWithParent  off
+	      ShowEliminatedStatement off
+	      IncAutoGenComments      off
+	      SimulinkDataObjDesc     off
+	      SFDataObjDesc	      off
+	      IncDataTypeInIds	      off
+	      PrefixModelToSubsysFcnNames on
+	      MangleLength	      1
+	      CustomSymbolStrGlobalVar "$R$N$M"
+	      CustomSymbolStrType     "$N$R$M"
+	      CustomSymbolStrField    "$N$M"
+	      CustomSymbolStrFcn      "$R$N$M$F"
+	      CustomSymbolStrBlkIO    "rtb_$N$M"
+	      CustomSymbolStrTmpVar   "$N$M"
+	      CustomSymbolStrMacro    "$R$N$M"
+	      DefineNamingRule	      "None"
+	      ParamNamingRule	      "None"
+	      SignalNamingRule	      "None"
+	      InsertBlockDesc	      off
+	      SimulinkBlockComments   on
+	      EnableCustomComments    off
+	      InlinedPrmAccess	      "Literals"
+	      ReqsInCode	      off
+	    }
+	    Simulink.GRTTargetCC {
+	      $BackupClass	      "Simulink.TargetCC"
+	      $ObjectID		      10
+	      Array {
+		Type			"Cell"
+		Dimension		15
+		Cell			"IncludeMdlTerminateFcn"
+		Cell			"CombineOutputUpdateFcns"
+		Cell			"SuppressErrorStatus"
+		Cell			"ERTCustomFileBanners"
+		Cell			"GenerateSampleERTMain"
+		Cell			"GenerateTestInterfaces"
+		Cell			"ModelStepFunctionPrototypeControlComp"
+"liant"
+		Cell			"MultiInstanceERTCode"
+		Cell			"PurelyIntegerCode"
+		Cell			"SupportNonFinite"
+		Cell			"SupportComplex"
+		Cell			"SupportAbsoluteTime"
+		Cell			"SupportContinuousTime"
+		Cell			"SupportNonInlinedSFcns"
+		Cell			"PortableWordSizes"
+		PropName		"DisabledProps"
+	      }
+	      Version		      "1.2.0"
+	      TargetFcnLib	      "ansi_tfl_tmw.mat"
+	      TargetLibSuffix	      ""
+	      TargetPreCompLibLocation ""
+	      GenFloatMathFcnCalls    "ANSI_C"
+	      UtilityFuncGeneration   "Auto"
+	      GenerateFullHeader      on
+	      GenerateSampleERTMain   off
+	      GenerateTestInterfaces  off
+	      IsPILTarget	      off
+	      ModelReferenceCompliant on
+	      IncludeMdlTerminateFcn  on
+	      CombineOutputUpdateFcns off
+	      SuppressErrorStatus     off
+	      IncludeFileDelimiter    "Auto"
+	      ERTCustomFileBanners    off
+	      SupportAbsoluteTime     on
+	      LogVarNameModifier      "rt_"
+	      MatFileLogging	      on
+	      MultiInstanceERTCode    off
+	      SupportNonFinite	      on
+	      SupportComplex	      on
+	      PurelyIntegerCode	      off
+	      SupportContinuousTime   on
+	      SupportNonInlinedSFcns  on
+	      EnableShiftOperators    on
+	      ParenthesesLevel	      "Nominal"
+	      PortableWordSizes	      off
+	      ModelStepFunctionPrototypeControlCompliant off
+	      ExtMode		      off
+	      ExtModeStaticAlloc      off
+	      ExtModeTesting	      off
+	      ExtModeStaticAllocSize  1000000
+	      ExtModeTransport	      0
+	      ExtModeMexFile	      "ext_comm"
+	      ExtModeIntrfLevel	      "Level1"
+	      RTWCAPISignals	      off
+	      RTWCAPIParams	      off
+	      RTWCAPIStates	      off
+	      GenerateASAP2	      off
+	    }
+	    PropName		    "Components"
+	  }
+	}
+	hdlcoderui.hdlcc {
+	  $ObjectID		  11
+	  Description		  "HDL Coder custom configuration component"
+	  Version		  "1.2.0"
+	  Name			  "HDL Coder"
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    1
+	    Cell		    ""
+	    PropName		    "HDLConfigFile"
+	  }
+	  HDLCActiveTab		  "0"
+	}
+	PropName		"Components"
+      }
+      Name		      "Configuration"
+      CurrentDlgPage	      "Solver"
+    }
+    PropName		    "ConfigurationSets"
+  }
+  Simulink.ConfigSet {
+    $PropName		    "ActiveConfigurationSet"
+    $ObjectID		    1
+  }
+  BlockDefaults {
+    Orientation		    "right"
+    ForegroundColor	    "black"
+    BackgroundColor	    "white"
+    DropShadow		    off
+    NamePlacement	    "normal"
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+    ShowName		    on
+  }
+  BlockParameterDefaults {
+    Block {
+      BlockType		      Constant
+      Value		      "1"
+      VectorParams1D	      on
+      SamplingMode	      "Sample based"
+      OutDataTypeMode	      "Inherit from 'Constant value'"
+      OutDataType	      "sfix(16)"
+      ConRadixGroup	      "Use specified scaling"
+      OutScaling	      "2^0"
+      SampleTime	      "inf"
+      FramePeriod	      "inf"
+    }
+    Block {
+      BlockType		      Demux
+      Outputs		      "4"
+      DisplayOption	      "none"
+      BusSelectionMode	      off
+    }
+    Block {
+      BlockType		      Derivative
+      LinearizePole	      "inf"
+    }
+    Block {
+      BlockType		      DiscreteIntegrator
+      IntegratorMethod	      "Integration: Forward Euler"
+      gainval		      "1.0"
+      ExternalReset	      "none"
+      InitialConditionSource  "internal"
+      InitialCondition	      "0"
+      InitialConditionMode    "State and output"
+      SampleTime	      "1"
+      OutDataTypeMode	      "Inherit via internal rule"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      LockScale		      off
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	off
+      LimitOutput	      off
+      UpperSaturationLimit    "inf"
+      LowerSaturationLimit    "-inf"
+      ShowSaturationPort      off
+      ShowStatePort	      off
+      IgnoreLimit	      off
+      StateMustResolveToSignalObject off
+      RTWStateStorageClass    "Auto"
+    }
+    Block {
+      BlockType		      From
+      IconDisplay	      "Tag"
+    }
+    Block {
+      BlockType		      FromWorkspace
+      VariableName	      "simulink_input"
+      SampleTime	      "-1"
+      Interpolate	      on
+      ZeroCross		      off
+      OutputAfterFinalValue   "Extrapolation"
+    }
+    Block {
+      BlockType		      Fcn
+      Expr		      "sin(u[1])"
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Gain
+      Gain		      "1"
+      Multiplication	      "Element-wise(K.*u)"
+      ParameterDataTypeMode   "Same as input"
+      ParameterDataType	      "sfix(16)"
+      ParameterScalingMode    "Best Precision: Matrix-wise"
+      ParameterScaling	      "2^0"
+      OutDataTypeMode	      "Same as input"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      LockScale		      off
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Goto
+      IconDisplay	      "Tag"
+    }
+    Block {
+      BlockType		      Inport
+      Port		      "1"
+      UseBusObject	      off
+      BusObject		      "BusObject"
+      BusOutputAsStruct	      off
+      PortDimensions	      "-1"
+      SampleTime	      "-1"
+      DataType		      "auto"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      SignalType	      "auto"
+      SamplingMode	      "auto"
+      LatchByDelayingOutsideSignal off
+      LatchByCopyingInsideSignal off
+      Interpolate	      on
+    }
+    Block {
+      BlockType		      MATLABFcn
+      MATLABFcn		      "sin"
+      OutputDimensions	      "-1"
+      OutputSignalType	      "auto"
+      Output1D		      on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Mux
+      Inputs		      "4"
+      DisplayOption	      "none"
+      UseBusObject	      off
+      BusObject		      "BusObject"
+      NonVirtualBus	      off
+    }
+    Block {
+      BlockType		      Outport
+      Port		      "1"
+      UseBusObject	      off
+      BusObject		      "BusObject"
+      BusOutputAsStruct	      off
+      PortDimensions	      "-1"
+      SampleTime	      "-1"
+      DataType		      "auto"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      SignalType	      "auto"
+      SamplingMode	      "auto"
+      OutputWhenDisabled      "held"
+      InitialOutput	      "[]"
+    }
+    Block {
+      BlockType		      Product
+      Inputs		      "2"
+      Multiplication	      "Element-wise(.*)"
+      CollapseMode	      "All dimensions"
+      CollapseDim	      "1"
+      InputSameDT	      on
+      OutDataTypeMode	      "Same as first input"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      LockScale		      off
+      RndMeth		      "Zero"
+      SaturateOnIntegerOverflow	on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Scope
+      ModelBased	      off
+      TickLabels	      "OneTimeTick"
+      ZoomMode		      "on"
+      Grid		      "on"
+      TimeRange		      "auto"
+      YMin		      "-5"
+      YMax		      "5"
+      SaveToWorkspace	      off
+      SaveName		      "ScopeData"
+      LimitDataPoints	      on
+      MaxDataPoints	      "5000"
+      Decimation	      "1"
+      SampleInput	      off
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Selector
+      NumberOfDimensions      "1"
+      IndexMode		      "One-based"
+      InputPortWidth	      "-1"
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      "S-Function"
+      FunctionName	      "system"
+      SFunctionModules	      "''"
+      PortCounts	      "[]"
+    }
+    Block {
+      BlockType		      SubSystem
+      ShowPortLabels	      "FromPortIcon"
+      Permissions	      "ReadWrite"
+      PermitHierarchicalResolution "All"
+      TreatAsAtomicUnit	      off
+      SystemSampleTime	      "-1"
+      RTWFcnNameOpts	      "Auto"
+      RTWFileNameOpts	      "Auto"
+      RTWMemSecFuncInitTerm   "Inherit from model"
+      RTWMemSecFuncExecute    "Inherit from model"
+      RTWMemSecDataConstants  "Inherit from model"
+      RTWMemSecDataInternal   "Inherit from model"
+      RTWMemSecDataParameters "Inherit from model"
+      SimViewingDevice	      off
+      DataTypeOverride	      "UseLocalSettings"
+      MinMaxOverflowLogging   "UseLocalSettings"
+    }
+    Block {
+      BlockType		      Sum
+      IconShape		      "rectangular"
+      Inputs		      "++"
+      CollapseMode	      "All dimensions"
+      CollapseDim	      "1"
+      InputSameDT	      on
+      OutDataTypeMode	      "Same as first input"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      LockScale		      off
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Terminator
+    }
+  }
+  AnnotationDefaults {
+    HorizontalAlignment	    "center"
+    VerticalAlignment	    "middle"
+    ForegroundColor	    "black"
+    BackgroundColor	    "white"
+    DropShadow		    off
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+    UseDisplayTextAsClickCallback off
+  }
+  LineDefaults {
+    FontName		    "Helvetica"
+    FontSize		    9
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+  }
+  System {
+    Name		    "AAA"
+    Location		    [425, 128, 1233, 382]
+    Open		    on
+    ModelBrowserVisibility  off
+    ModelBrowserWidth	    200
+    ScreenColor		    "white"
+    PaperOrientation	    "landscape"
+    PaperPositionMode	    "auto"
+    PaperType		    "usletter"
+    PaperUnits		    "inches"
+    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
+    TiledPageScale	    1
+    ShowPageBoundaries	    off
+    ZoomFactor		    "100"
+    ReportName		    "simulink-default.rpt"
+    Block {
+      BlockType		      SubSystem
+      Name		      "3Dmodel"
+      Ports		      [1]
+      Position		      [535, 25, 770, 175]
+      BackgroundColor	      "[0.784300, 0.882400, 0.882400]"
+      ShowName		      off
+      AncestorBlock	      "DAMA_lib/3D/3Dmodel"
+      MinAlgLoopOccurrences   off
+      RTWSystemCode	      "Auto"
+      FunctionWithSeparateData off
+      MaskHideContents	      off
+      MaskType		      "3D model"
+      MaskDescription	      "Display the 3D model associated with a manipula"
+"tor.\n\nBlock Inputs:\n1st: signal with joint positions\n2nd (if enabled): lo"
+"gical input, if true show frame-axes in 3D animation.\n\nCopyright (C) 2009, "
+"by Carmine Dario Bellicoso and Marco Caputano.\nThis file is part of DAMA^{RO"
+"B} v.???\nrelased under GNU license LGPLv2.1 "
+      MaskPromptString	      "Input Method                          |Manipula"
+"tor Name|WRL file name|3D Sample Time|enable \"show axes\" input|show VRML pa"
+"rameters|screenshot file format              |screenshot file name (string)  "
+"  |RecordWRL                             |WRL file name (string)|Record AVI  "
+"                           |AVI Compression                    |AVI FPS|AVI f"
+"ile name (string)|Wireframe                               |ViewPoint         "
+"                      |RecordMode                           |Record Interval"
+      MaskStyleString	      "popup(Manipulator Name|WRL file name),edit,edit"
+",edit,checkbox,checkbox,popup(png|tif),edit,checkbox,edit,checkbox,popup(none"
+"|auto),edit,edit,checkbox,popup(STD|XY_plane|XY_perspective|left view (XZ)|ri"
+"ght view (-XZ)|rear view (-YZ)|front view (-YZ)),popup(manual|scheduled),edit"
+      MaskTunableValueString  "off,off,off,off,off,off,off,off,off,off,off,off"
+",off,off,off,off,on,on"
+      MaskCallbackString      "maskStr = get_param(gcb,'MaskValues');\nMask_Vi"
+"s_Cell_Param = get_param(gcb,'MaskVisibilities');\n\nif strcmp(maskStr{1},'Ma"
+"nipulator Name')\n    Mask_Vis_Cell_Param{2} = 'on';\n    Mask_Vis_Cell_Param"
+"{3} = 'off';\nelse\n    Mask_Vis_Cell_Param{2} = 'off';\n    Mask_Vis_Cell_Pa"
+"ram{3} = 'on';\nend\n\nset_param(gcb,'MaskVisibilities', Mask_Vis_Cell_Param)"
+";\nclear maskStr Mask_Vis_Cell_Param|if strcmp(get_param(gcb,'sel_obj_nam'),'"
+"Manipulator Name')\n    manip_name_param = get_param(gcb,'robot');\n    if ex"
+"ist(manip_name_param,'var') && isa( eval(manip_name_param), 'manipulator')\n "
+"       % do nothing\n    else\n        warndlg([manip_name_param,' is not a v"
+"alid manipulator name.'])\n    end\nend\nclear manip_name_param|if strcmp(get"
+"_param(gcb,'sel_obj_nam'),'WRL file name')\n    wrl_file_name_param = get_par"
+"am(gcb,'wrlfile');\n    if exist(wrl_file_name_param,'file')\n        % do no"
+"thing\n    else\n        warndlg([wrl_file_name_param,' does''nt exist.'])\n "
+"   end\nend\nclear wrl_file_name_param|||maskStr = get_param(gcb,'MaskValues'"
+");\nMask_Vis_Cell_Param = get_param(gcb,'MaskVisibilities');\n\nif strcmp(mas"
+"kStr{6},'on')\n    for i_mask_par=7:18\n        Mask_Vis_Cell_Param{i_mask_pa"
+"r} = 'on';\n    end\nelse\n    for i_mask_par=7:18\n        Mask_Vis_Cell_Par"
+"am{i_mask_par} = 'off';\n    end\nend\n\nset_param(gcb,'MaskVisibilities', Ma"
+"sk_Vis_Cell_Param);\nclear maskStr Mask_Vis_Cell_Param i_mask_par\n||||||||||"
+"||"
+      MaskEnableString	      "on,on,on,on,on,on,on,on,on,on,on,on,on,on,on,on"
+",on,on"
+      MaskVisibilityString    "on,on,off,on,on,on,off,off,off,off,off,off,off,"
+"off,off,off,off,off"
+      MaskToolTipString	      "on,on,on,on,on,on,on,on,on,on,on,on,on,on,on,on"
+",on,on"
+      MaskVarAliasString      ",,,,,,,,,,,,,,,,,"
+      MaskVariables	      "sel_obj_nam=&1;robot=@2;wrlfile=&3;SampleTime=@"
+"4;show_ax=@5;show_3D_param=@6;CaptureFileFormat=@7;CaptureFileName=@8;Record3"
+"D=@9;Record3DFileName=@10;Record2D=@11;Record2DCompressMethod=@12;Record2DFPS"
+"=@13;Record2DFileName=@14;Wireframe=@15;Viewpoint=@16;RecordMode=@17;RecordIn"
+"terval=@18;"
+      MaskInitialization      "%% SOME INIT\nmainblock = gcb;\nblocks = get(gc"
+"bh,'Blocks');\nload_system('DAMA_lib');\nVR_handle = get_param([gcb,'/VR'],'H"
+"andle');\n% StartTime = str2num(get_param(gcs,'StartTime'));\n\nif strcmp(get"
+"_param(gcs,'SimulationStatus'),'stopped')  % operate inside the block only si"
+"mulation is not running\n    %% there's something inside the block, delete ev"
+"erything but the inport and VR!\n    if length(blocks) >= 2\n        lin = ge"
+"t_param(mainblock,'lines');     % delete lines\n        if ~isempty(lin)\n   "
+"         delete(lin.Handle);\n        end\n        for i = 2:1:length(blocks)"
+"              % delete blocks\n            if strcmp(blocks{i},'VR') ~= 1\n  "
+"              delete_block([mainblock,'/',blocks{i}])\n            end\n     "
+"   end\n        set_param(mainblock,'MaskDisplay', 'disp(''select manipulator"
+"'')' );    % change mask aspect\n        orig_pos = get_param(mainblock,'Posi"
+"tion');\n        new_pos = orig_pos([1,2,1,2]) + [ 0 0 170 65];\n        set_"
+"param(mainblock,'Position', new_pos);\n    end\n\n\n    %% extract informatio"
+"n from input data (oject name / WRL file)\n    if strcmp(sel_obj_nam,'Manipul"
+"ator Name')\n        if isa( robot, 'manipulator') && (robot.DH.r ~= 0)\n    "
+"        robot_name = robot.name;\n            DH = robot.DH.table;\n         "
+"   r = size(DH)*[1;0];\n            wrlfile = [robot_name,'VR_base.wrl'];\n  "
+"          imagefile = [robot_name,'_3D.png'];\n        else\n            retu"
+"rn\n        end\n    else\n        if strcmp(sel_obj_nam,'WRL file name')    "
+"       % WRL file\n            if exist(wrlfile,'file')\n                robo"
+"t_name = wrlfile(1:end-11);\n                imagefile = [robot_name,'_3D.png"
+"'];\n                f = fopen(wrlfile,'r');\n                DH5 = fgetl(f);"
+"  %#ok<NASGU>\n                DH5 = fgetl(f);\n                DH5 = DH5(11:"
+"end);\n                fclose(f);\n                DH5n = eval(DH5);\n       "
+"         r = length(DH5n);\n                DH(:,5) = DH5n;\n            else"
+"\n                return\n            end\n        end\n    end\n\n    %% spe"
+"cified manipulator or WRL file exists, let's create the subsystem!\n    if ~e"
+"xist(imagefile,'file')\n        imagefile = 'dama_150.png';\n    end\n    png"
+" = imread(imagefile);\n    dimY_png = size(png)*[1; 0; 0];\n    dimX_png = si"
+"ze(png)*[0; 1; 0];\n    if dimY_png >= 150\n        dimY = 150;\n        dimX"
+" = round(dimY * dimX_png/dimY_png);\n    else\n        dimY = dimY_png;\n    "
+"    dimX = dimX_png;\n    end\n    Mask_Disp_string = ['image(imread(''',imag"
+"efile,'''))',';port_label(''input'',1,''q'');'];\n    nodes = '';         % V"
+"RML nodes to modify\n    for i = 1:1:r\n        if DH(i,5) == 0\n            "
+"nodes = [nodes, 'Z', num2str(i-1) ,'.rotation.4.1.double#' ];  %#ok<AGROW>\n "
+"       else\n            nodes = [nodes, 'Link',num2str(i),'.translation.3#' "
+"];  %#ok<AGROW>\n        end\n    end\n\n    for i = 1:1:r\n        nodes = ["
+"nodes,'Xaxis',num2str(i-1),'.scale#']; %#ok<AGROW>\n        nodes = [nodes,'Y"
+"axis',num2str(i-1),'.scale#']; %#ok<AGROW>\n        nodes = [nodes,'Zaxis',nu"
+"m2str(i-1),'.scale#']; %#ok<AGROW>\n    end\n    nodes = nodes(1:end-1);\n\n "
+"   % add demux and connect input 'q' to it\n    add_block('built-in/demux', ["
+"mainblock,'/demux'],...\n        'DisplayOption','bar',...\n        'Position"
+"','[90,29,95,211]',...\n        'ShowName','off',...\n        'Outputs',num2s"
+"tr(r));\n    add_line(mainblock,'q/1','demux/1');\n\n    % modify VR sink\n  "
+"  set_param([mainblock,'/VR'],...\n        'Position','[360,69,455,141]',..."
+"\n        'WorldFileName',wrlfile,...\n        'WorldDescription',['3DAMA man"
+"ipulator: ',robot_name],...\n        'AutoView','off',...\n        'SampleTim"
+"e',num2str(SampleTime),...\n        'FieldsWritten',nodes, ...\n        'Figu"
+"reProperties', '{''Position'', ''Name'', ''Viewpoint'', ''CameraBound'', ''Ca"
+"meraDirection'', ''CameraPosition'', ''CameraUpVector'', ''ZoomFactor'', ''An"
+"tialiasing'', ''Headlight'', ''Lighting'', ''NavPanel'', ''StatusBar'', ''Too"
+"lBar'', ''Textures'', ''Transparency'', ''Wireframe'', ''NavZones'', ''NavMod"
+"e'', ''NavSpeed'', ''Record2DCompressMethod'', ''Record2DCompressQuality'', '"
+"'Record2D'', ''Record2DFileName'', ''Record2DFPS'';                [5.0000000"
+"000000000e+00   9.7000000000000000e+01   7.8400000000000000e+02   5.380000000"
+"0000000e+02], ''scara'', ''_untitled_1'', ''on'', [-1.9898756659875949e-02   "
+"1.7901367086524811e-01  -9.8364533503023699e-01], [8.8076866149981403e-01  -7"
+".9236092358681276e+00  -7.2561079645852544e-01], [1.9965352243806467e-03   9."
+"8384528836631602e-01   1.7900967126522893e-01], [1.0000000000000000e+00], ''o"
+"n'', ''on'', ''on'', ''halfbar'', ''on'', ''on'', ''on'', ''on'', ''off'', ''"
+"off'', ''examine'', ''normal'', ''auto'', [7.5000000000000000e+01], ''on'', '"
+"'%f_anim2_%n.avi'', [1.0000000000000000e+01]}' );\n\n    % add VR rotation an"
+"d VR translation blocks, with offset and connections\n    for i = 1:1:length("
+" DH(:,5) )\n        position = [200, 50, 270, 80] + [0 50 0 50]*(i-1);\n     "
+"   if DH(i,5) == 0\n            add_block('DAMA_lib/util/rotation', [mainbloc"
+"k,'/rotation',num2str(i)]);\n            set_param([mainblock,'/rotation',num"
+"2str(i)],'Position',position);\n            add_block('built-in/constant', [m"
+"ainblock,'/offset',num2str(i)]);\n            set_param([mainblock,'/offset',"
+"num2str(i)],'Value','0');                                         % OFFSET HE"
+"RE\n            set_param([mainblock,'/offset',num2str(i)],'Position',positio"
+"n - [65,-18,95,-2]);\n            add_line(mainblock,['rotation',num2str(i),'"
+"/1'], ['VR/',num2str(i)]);\n            add_line(mainblock,['offset',num2str("
+"i),'/1'],['rotation',num2str(i),'/2']);\n            add_line(mainblock,['dem"
+"ux/',num2str(i)],['rotation',num2str(i),'/1']);\n        else\n            ad"
+"d_block('DAMA_lib/util/translation', [mainblock,'/translation',num2str(i)]);"
+"\n            set_param([mainblock,'/translation',num2str(i)],'Position',posi"
+"tion);\n            add_block('built-in/constant', [mainblock,'/offset',num2s"
+"tr(i)]);\n            set_param([mainblock,'/offset',num2str(i)],'Value','0.5"
+"');                                         % OFFSET HERE\n            set_pa"
+"ram([mainblock,'/offset',num2str(i)],'Position',position - [65,-18,95,-2]);\n"
+"            add_line(mainblock,['translation',num2str(i),'/1'], ['VR/',num2st"
+"r(i)]);\n            add_line(mainblock,['offset',num2str(i),'/1'],['translat"
+"ion',num2str(i),'/2']);\n            add_line(mainblock,['demux/',num2str(i)]"
+",['translation',num2str(i),'/1']);\n        end\n    end\n\n    % add scale c"
+"ontrol for axes\n    add_block('built-in/Product',[mainblock,'/show'],...\n  "
+"      'Position',[435,212,475,248]);\n    add_block('built-in/Constant',[main"
+"block,'/scale'],...\n        'Value','[1,1,1]',...\n        'Position','[370,"
+"232,410,248]');\n    add_line(mainblock,'scale/1','show/2');\n    for i=r+1:1"
+":r+(3*r)\n        add_line(mainblock,'show/1',['VR/',num2str(i)]);\n    end\n"
+"\n    % inport 2 or constant '1'\n    if strcmp(get_param(mainblock,'show_ax'"
+"),'on')\n        add_block('built-in/Inport',[mainblock,'/axes_en'],...\n    "
+"        'Position','[375,203,405,217]');\n        Mask_Disp_string = [Mask_Di"
+"sp_string ,';port_label(''input'',2,''axes'');'];\n    else\n        add_bloc"
+"k('built-in/Constant',[mainblock,'/axes_en'],...\n            'Value','1',..."
+"\n            'Position','[375,203,405,217]');\n    end\n    add_line(mainblo"
+"ck,'axes_en/1','show/1');\n\n    % change mask aspect\n    set_param(mainbloc"
+"k,'MaskDisplay',Mask_Disp_string);\n    orig_pos = get_param(mainblock,'Posit"
+"ion');\n    new_pos = orig_pos([1,2,1,2]) + [ 0 0 dimX dimY];\n    set_param("
+"mainblock,'Position', new_pos);\n\n    % add 'show 3D' block\n    %     add_b"
+"lock('DAMA_lib/util/show_3D', [mainblock,'/Show_3D'], ...\n    %         'Pos"
+"ition','[375,286,448,316]');\n\n    vrmfunc('FnOpen', VR_handle );\n    try\n"
+"        wrl_file = get(get_param([mainblock,'/VR'],'Handle'),'WorldFileName')"
+";\n        list_world_corresp = strfind(get(vrworld(vrsfunc('VRT3ListScenes')"
+"),'FileName'),wrl_file);\n        if length(list_world_corresp) == 1\n       "
+"     num_world_found = 1;\n        else\n            for i=1:length(list_worl"
+"d_corresp)\n                if ~isempty(list_world_corresp{i})\n             "
+"       num_world_found = i;\n                    break\n                end\n"
+"            end\n        end\n        ls_wrworlds = vrwho;\n\n        w = ls_"
+"wrworlds(num_world_found);\n        f = get(w, 'Figures');\n    catch\n      "
+"  w = vrworld;\n        f = vrfigure;\n    end\n\n    if isvalid(w)\n        "
+"if RecordMode == 1\n            set(w,'RecordMode','manual');\n        else\n"
+"            set(w,'RecordMode','scheduled');\n        end\n        set(w,'Rec"
+"ordInterval', RecordInterval);\n\n        if Record3D == 0\n            set(w"
+",'Record3D','off');\n        else\n            set(w,'Record3D','on');\n     "
+"   end\n        set(w,'Record3DFileName',Record3DFileName);\n    end\n\n    i"
+"f isvalid(f)\n        if CaptureFileFormat == 1\n            set(f,'CaptureFi"
+"leFormat','png');\n        else\n            set(f,'CaptureFileFormat','tif')"
+";\n        end\n\n        if Record2D == 0\n            set(f,'Record2D','off"
+"');\n        else\n            set(f,'Record2D','on');\n        end\n\n      "
+"  if Record2DCompressMethod == 1\n            set(f,'Record2DCompressMethod',"
+"'none');\n        else\n            set(f,'Record2DCompressMethod','auto');\n"
+"        end\n\n        if Wireframe == 0\n            set(f,'Wireframe','off'"
+");\n        else\n            set(f,'Wireframe','on');\n        end\n\n      "
+"  if Viewpoint == 1\n            set(f,'Viewpoint','STD');\n        elseif Vi"
+"ewpoint == 2\n            set(f,'Viewpoint','XY_plane');\n        elseif View"
+"point == 3\n            set(f,'Viewpoint','XY_perspective');\n        elseif "
+"Viewpoint == 4\n            set(f,'Viewpoint','left view (XZ)');\n        els"
+"eif Viewpoint == 5\n            set(f,'Viewpoint','right view (-XZ)');\n     "
+"   elseif Viewpoint == 6\n            set(f,'Viewpoint','rear view (-YZ)');\n"
+"        elseif Viewpoint == 7\n            set(f,'Viewpoint','front view (-YZ"
+")');\n        end\n\n        set(f,'Record2DFPS',Record2DFPS);\n        set(f"
+",'CaptureFileName',CaptureFileName);\n        set(f,'Record2DFileName',Record"
+"2DFileName);\n    end\n\nelse\n\n    try\n        wrl_file = get(get_param([m"
+"ainblock,'/VR'],'Handle'),'WorldFileName');\n        list_world_corresp = str"
+"find(get(vrworld(vrsfunc('VRT3ListScenes')),'FileName'),wrl_file);\n        i"
+"f length(list_world_corresp) == 1\n            num_world_found = 1;\n        "
+"else\n            for i=1:length(list_world_corresp)\n                if ~ise"
+"mpty(list_world_corresp{i})\n                    num_world_found = i;\n      "
+"              break\n                end\n            end\n        end\n     "
+"   ls_wrworlds = vrwho;\n\n        w = ls_wrworlds(num_world_found);\n       "
+" f = get(w, 'Figures');\n        if isempty(f)\n            vrmfunc('FnOpen',"
+" VR_handle );\n        end\n    catch\n        w = vrworld;\n        f = vrfi"
+"gure;\n    end\n\n    if isvalid(w)\n        if RecordMode == 1\n            "
+"set(w,'RecordMode','manual');\n        else\n            set(w,'RecordMode','"
+"scheduled');\n        end\n        set(w,'RecordInterval', RecordInterval);\n"
+"\n        if Record3D == 0\n            set(w,'Record3D','off');\n        els"
+"e\n            set(w,'Record3D','on');\n        end\n        set(w,'Record3DF"
+"ileName',Record3DFileName);\n    end\n\n    if isvalid(f)\n        if Capture"
+"FileFormat == 1\n            set(f,'CaptureFileFormat','png');\n        else"
+"\n            set(f,'CaptureFileFormat','tif');\n        end\n\n        if Re"
+"cord2D == 0\n            set(f,'Record2D','off');\n        else\n            "
+"set(f,'Record2D','on');\n        end\n\n        if Record2DCompressMethod == "
+"1\n            set(f,'Record2DCompressMethod','none');\n        else\n       "
+"     set(f,'Record2DCompressMethod','auto');\n        end\n\n        if Wiref"
+"rame == 0\n            set(f,'Wireframe','off');\n        else\n            s"
+"et(f,'Wireframe','on');\n        end\n\n        if Viewpoint == 1\n          "
+"  set(f,'Viewpoint','STD');\n        elseif Viewpoint == 2\n            set(f"
+",'Viewpoint','XY_plane');\n        elseif Viewpoint == 3\n            set(f,'"
+"Viewpoint','XY_perspective');\n        elseif Viewpoint == 4\n            set"
+"(f,'Viewpoint','left view (XZ)');\n        elseif Viewpoint == 5\n           "
+" set(f,'Viewpoint','right view (-XZ)');\n        elseif Viewpoint == 6\n     "
+"       set(f,'Viewpoint','rear view (-YZ)');\n        elseif Viewpoint == 7\n"
+"            set(f,'Viewpoint','front view (-YZ)');\n        end\n\n        se"
+"t(f,'Record2DFPS',Record2DFPS);\n        set(f,'CaptureFileName',CaptureFileN"
+"ame);\n        set(f,'Record2DFileName',Record2DFileName);\n    end\nend"
+      MaskDisplay	      "image(imread('manip3_3D.png'));port_label('inpu"
+"t',1,'q');"
+      MaskSelfModifiable      on
+      MaskIconFrame	      on
+      MaskIconOpaque	      on
+      MaskIconRotate	      "none"
+      MaskIconUnits	      "autoscale"
+      MaskValueString	      "Manipulator Name|manip3|manipVR_base.wrl|Ts_mdl"
+"|off|off|png|'%f_shot_%n.png'|off|'%f_anim_%n.wrl'|off|none|15|'%f_anim_%n.av"
+"i'|off|STD|scheduled|[0 10]"
+      MaskTabNameString	      ",,,,,,,,,,,,,,,,,"
+      System {
+	Name			"3Dmodel"
+	Location		[93, 117, 645, 630]
+	Open			off
+	ModelBrowserVisibility	off
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"A4"
+	PaperUnits		"centimeters"
+	TiledPaperMargins	[0.500000, 0.500000, 0.500000, 0.500000]
+	TiledPageScale		1
+	ShowPageBoundaries	off
+	ZoomFactor		"100"
+	Block {
+	  BlockType		  Inport
+	  Name			  "q"
+	  Position		  [25, 112, 60, 128]
+	  IconDisplay		  "Port number"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "VR"
+	  Ports			  [24]
+	  Position		  [360, 50, 455, 165]
+	  SourceBlock		  "vrlib/VR Sink"
+	  SourceType		  "Virtual Reality Sink"
+	  SampleTime		  "0.01"
+	  ViewEnable		  on
+	  RemoteChange		  off
+	  RemoteView		  on
+	  FieldsWritten		  "Z0.rotation.4.1.double#Z1.rotation.4.1.doub"
+"le#Z2.rotation.4.1.double#Z3.rotation.4.1.double#Z4.rotation.4.1.double#Z5.ro"
+"tation.4.1.double#Xaxis0.scale#Yaxis0.scale#Zaxis0.scale#Xaxis1.scale#Yaxis1."
+"scale#Zaxis1.scale#Xaxis2.scale#Yaxis2.scale#Zaxis2.scale#Xaxis3.scale#Yaxis3"
+".scale#Zaxis3.scale#Xaxis4.scale#Yaxis4.scale#Zaxis4.scale#Xaxis5.scale#Yaxis"
+"5.scale#Zaxis5.scale"
+	  WorldFileName		  "manip3VR_base.wrl"
+	  WorldDescription	  "3DAMA manipulator: manip3"
+	  AutoView		  off
+	  FigureProperties	  "{'Position', 'Name', 'Viewpoint', 'CameraBo"
+"und', 'CameraDirection', 'CameraPosition', 'CameraUpVector', 'ZoomFactor', 'A"
+"ntialiasing', 'Headlight', 'Lighting', 'NavPanel', 'StatusBar', 'ToolBar', 'T"
+"extures', 'Transparency', 'Wireframe', 'NavZones', 'NavMode', 'NavSpeed', 'Re"
+"cord2DCompressMethod', 'Record2DCompressQuality', 'Record2D', 'Record2DFileNa"
+"me', 'Record2DFPS';                [5.0000000000000000e+00   9.70000000000000"
+"00e+01   7.8400000000000000e+02   5.3800000000000000e+02], 'scara', '_untitle"
+"d_1', 'on', [-1.9898756659875949e-02   1.7901367086524811e-01  -9.83645335030"
+"23699e-01], [8.8076866149981403e-01  -7.9236092358681276e+00  -7.256107964585"
+"2544e-01], [1.9965352243806467e-03   9.8384528836631602e-01   1.7900967126522"
+"893e-01], [1.0000000000000000e+00], 'on', 'on', 'on', 'halfbar', 'on', 'on', "
+"'on', 'on', 'off', 'off', 'examine', 'normal', 'auto', [7.5000000000000000e+0"
+"1], 'on', '%f_anim2_%n.avi', [1.0000000000000000e+01]}"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "axes_en"
+	  Position		  [375, 203, 405, 217]
+	}
+	Block {
+	  BlockType		  Demux
+	  Name			  "demux"
+	  Ports			  [1, 6]
+	  Position		  [90, 29, 95, 211]
+	  ShowName		  off
+	  Outputs		  "6"
+	  DisplayOption		  "bar"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "offset1"
+	  Position		  [135, 68, 175, 82]
+	  Value			  "0"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "offset2"
+	  Position		  [135, 118, 175, 132]
+	  Value			  "0"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "offset3"
+	  Position		  [135, 168, 175, 182]
+	  Value			  "0"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "offset4"
+	  Position		  [135, 218, 175, 232]
+	  Value			  "0"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "offset5"
+	  Position		  [135, 268, 175, 282]
+	  Value			  "0"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "offset6"
+	  Position		  [135, 318, 175, 332]
+	  Value			  "0"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "rotation1"
+	  Ports			  [2, 1]
+	  Position		  [200, 52, 270, 83]
+	  SourceBlock		  "DAMA_lib/util/rotation"
+	  SourceType		  "VRML rotation"
+	  ShowPortLabels	  "FromPortIcon"
+	  SystemSampleTime	  "-1"
+	  FunctionWithSeparateData off
+	  RTWMemSecFuncInitTerm	  "Inherit from model"
+	  RTWMemSecFuncExecute	  "Inherit from model"
+	  RTWMemSecDataConstants  "Inherit from model"
+	  RTWMemSecDataInternal	  "Inherit from model"
+	  RTWMemSecDataParameters "Inherit from model"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "rotation2"
+	  Ports			  [2, 1]
+	  Position		  [200, 102, 270, 133]
+	  SourceBlock		  "DAMA_lib/util/rotation"
+	  SourceType		  "VRML rotation"
+	  ShowPortLabels	  "FromPortIcon"
+	  SystemSampleTime	  "-1"
+	  FunctionWithSeparateData off
+	  RTWMemSecFuncInitTerm	  "Inherit from model"
+	  RTWMemSecFuncExecute	  "Inherit from model"
+	  RTWMemSecDataConstants  "Inherit from model"
+	  RTWMemSecDataInternal	  "Inherit from model"
+	  RTWMemSecDataParameters "Inherit from model"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "rotation3"
+	  Ports			  [2, 1]
+	  Position		  [200, 152, 270, 183]
+	  SourceBlock		  "DAMA_lib/util/rotation"
+	  SourceType		  "VRML rotation"
+	  ShowPortLabels	  "FromPortIcon"
+	  SystemSampleTime	  "-1"
+	  FunctionWithSeparateData off
+	  RTWMemSecFuncInitTerm	  "Inherit from model"
+	  RTWMemSecFuncExecute	  "Inherit from model"
+	  RTWMemSecDataConstants  "Inherit from model"
+	  RTWMemSecDataInternal	  "Inherit from model"
+	  RTWMemSecDataParameters "Inherit from model"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "rotation4"
+	  Ports			  [2, 1]
+	  Position		  [200, 202, 270, 233]
+	  SourceBlock		  "DAMA_lib/util/rotation"
+	  SourceType		  "VRML rotation"
+	  ShowPortLabels	  "FromPortIcon"
+	  SystemSampleTime	  "-1"
+	  FunctionWithSeparateData off
+	  RTWMemSecFuncInitTerm	  "Inherit from model"
+	  RTWMemSecFuncExecute	  "Inherit from model"
+	  RTWMemSecDataConstants  "Inherit from model"
+	  RTWMemSecDataInternal	  "Inherit from model"
+	  RTWMemSecDataParameters "Inherit from model"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "rotation5"
+	  Ports			  [2, 1]
+	  Position		  [200, 252, 270, 283]
+	  SourceBlock		  "DAMA_lib/util/rotation"
+	  SourceType		  "VRML rotation"
+	  ShowPortLabels	  "FromPortIcon"
+	  SystemSampleTime	  "-1"
+	  FunctionWithSeparateData off
+	  RTWMemSecFuncInitTerm	  "Inherit from model"
+	  RTWMemSecFuncExecute	  "Inherit from model"
+	  RTWMemSecDataConstants  "Inherit from model"
+	  RTWMemSecDataInternal	  "Inherit from model"
+	  RTWMemSecDataParameters "Inherit from model"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "rotation6"
+	  Ports			  [2, 1]
+	  Position		  [200, 302, 270, 333]
+	  SourceBlock		  "DAMA_lib/util/rotation"
+	  SourceType		  "VRML rotation"
+	  ShowPortLabels	  "FromPortIcon"
+	  SystemSampleTime	  "-1"
+	  FunctionWithSeparateData off
+	  RTWMemSecFuncInitTerm	  "Inherit from model"
+	  RTWMemSecFuncExecute	  "Inherit from model"
+	  RTWMemSecDataConstants  "Inherit from model"
+	  RTWMemSecDataInternal	  "Inherit from model"
+	  RTWMemSecDataParameters "Inherit from model"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "scale"
+	  Position		  [370, 232, 410, 248]
+	  Value			  "[1,1,1]"
+	}
+	Block {
+	  BlockType		  Product
+	  Name			  "show"
+	  Ports			  [2, 1]
+	  Position		  [435, 212, 475, 248]
+	}
+	Line {
+	  SrcBlock		  "q"
+	  SrcPort		  1
+	  DstBlock		  "demux"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "rotation1"
+	  SrcPort		  1
+	  DstBlock		  "VR"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "offset1"
+	  SrcPort		  1
+	  DstBlock		  "rotation1"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "demux"
+	  SrcPort		  1
+	  DstBlock		  "rotation1"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "rotation2"
+	  SrcPort		  1
+	  DstBlock		  "VR"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "offset2"
+	  SrcPort		  1
+	  DstBlock		  "rotation2"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "demux"
+	  SrcPort		  2
+	  DstBlock		  "rotation2"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "rotation3"
+	  SrcPort		  1
+	  DstBlock		  "VR"
+	  DstPort		  3
+	}
+	Line {
+	  SrcBlock		  "offset3"
+	  SrcPort		  1
+	  DstBlock		  "rotation3"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "demux"
+	  SrcPort		  3
+	  DstBlock		  "rotation3"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "rotation4"
+	  SrcPort		  1
+	  DstBlock		  "VR"
+	  DstPort		  4
+	}
+	Line {
+	  SrcBlock		  "offset4"
+	  SrcPort		  1
+	  DstBlock		  "rotation4"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "demux"
+	  SrcPort		  4
+	  DstBlock		  "rotation4"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "rotation5"
+	  SrcPort		  1
+	  DstBlock		  "VR"
+	  DstPort		  5
+	}
+	Line {
+	  SrcBlock		  "offset5"
+	  SrcPort		  1
+	  DstBlock		  "rotation5"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "demux"
+	  SrcPort		  5
+	  DstBlock		  "rotation5"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "rotation6"
+	  SrcPort		  1
+	  DstBlock		  "VR"
+	  DstPort		  6
+	}
+	Line {
+	  SrcBlock		  "offset6"
+	  SrcPort		  1
+	  DstBlock		  "rotation6"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "demux"
+	  SrcPort		  6
+	  DstBlock		  "rotation6"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "scale"
+	  SrcPort		  1
+	  DstBlock		  "show"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "show"
+	  SrcPort		  1
+	  Points		  [0, 0]
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    7
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    8
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    9
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    10
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    11
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    12
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    13
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    14
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    15
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    16
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    17
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    18
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    19
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    20
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    21
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    22
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    23
+	  }
+	  Branch {
+	    DstBlock		    "VR"
+	    DstPort		    24
+	  }
+	}
+	Line {
+	  SrcBlock		  "axes_en"
+	  SrcPort		  1
+	  DstBlock		  "show"
+	  DstPort		  1
+	}
+	Annotation {
+	  Position		  [520, 147]
+	}
+      }
+    }
+    Block {
+      BlockType		      Mux
+      Name		      "Mux"
+      Ports		      [2, 1]
+      Position		      [430, 109, 435, 151]
+      ShowName		      off
+      Inputs		      "2"
+      DisplayOption	      "bar"
+    }
+    Block {
+      BlockType		      Terminator
+      Name		      "Terminator"
+      Position		      [455, 120, 475, 140]
+      ShowName		      off
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "Transpose Jacobian\nInverse Kinematics"
+      Ports		      [3, 5]
+      Position		      [205, 94, 400, 186]
+      ForegroundColor	      "darkGreen"
+      BackgroundColor	      "darkGreen"
+      SourceBlock	      "DAMA_lib/Kinematics/Transpose Jacobian\nInverse"
+" Kinematics"
+      SourceType	      "Transpose Jacobian Inverse Kinematics"
+      ShowPortLabels	      "FromPortIcon"
+      SystemSampleTime	      "-1"
+      FunctionWithSeparateData off
+      RTWMemSecFuncInitTerm   "Inherit from model"
+      RTWMemSecFuncExecute    "Inherit from model"
+      RTWMemSecDataConstants  "Inherit from model"
+      RTWMemSecDataInternal   "Inherit from model"
+      RTWMemSecDataParameters "Inherit from model"
+      manip		      "manip3"
+      Kp		      "Kp"
+      Ko		      "Ko"
+      q0		      "zeros(1,6)"
+      Ts		      "Ts_mdl"
+    }
+    Block {
+      BlockType		      Scope
+      Name		      "errors"
+      Ports		      [2]
+      Position		      [475, 151, 510, 189]
+      Floating		      off
+      Location		      [96, 486, 1157, 730]
+      Open		      on
+      NumInputPorts	      "2"
+      List {
+	ListType		AxesTitles
+	axes1			"|e_p|"
+	axes2			"|e_o|"
+      }
+      YMin		      "-1.38778e-17~0"
+      YMax		      "0.2~0.05"
+      DataFormat	      "StructureWithTime"
+      LimitDataPoints	      off
+      SampleTime	      "0"
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "trajectory"
+      Ports		      [0, 3]
+      Position		      [85, 94, 150, 186]
+      ForegroundColor	      "darkGreen"
+      BackgroundColor	      "darkGreen"
+      SourceBlock	      "DAMA_lib/Kinematics/trajectory"
+      SourceType	      "Trajectory"
+      ShowPortLabels	      "FromPortIcon"
+      SystemSampleTime	      "-1"
+      FunctionWithSeparateData off
+      RTWMemSecFuncInitTerm   "Inherit from model"
+      RTWMemSecFuncExecute    "Inherit from model"
+      RTWMemSecDataConstants  "Inherit from model"
+      RTWMemSecDataInternal   "Inherit from model"
+      RTWMemSecDataParameters "Inherit from model"
+      path_des		      "path_des"
+    }
+    Line {
+      SrcBlock		      "Transpose Jacobian\nInverse Kinematics"
+      SrcPort		      1
+      DstBlock		      "3Dmodel"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Mux"
+      SrcPort		      1
+      DstBlock		      "Terminator"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Transpose Jacobian\nInverse Kinematics"
+      SrcPort		      2
+      DstBlock		      "Mux"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Transpose Jacobian\nInverse Kinematics"
+      SrcPort		      3
+      DstBlock		      "Mux"
+      DstPort		      2
+    }
+    Line {
+      SrcBlock		      "trajectory"
+      SrcPort		      1
+      DstBlock		      "Transpose Jacobian\nInverse Kinematics"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "trajectory"
+      SrcPort		      2
+      DstBlock		      "Transpose Jacobian\nInverse Kinematics"
+      DstPort		      2
+    }
+    Line {
+      SrcBlock		      "trajectory"
+      SrcPort		      3
+      DstBlock		      "Transpose Jacobian\nInverse Kinematics"
+      DstPort		      3
+    }
+    Line {
+      SrcBlock		      "Transpose Jacobian\nInverse Kinematics"
+      SrcPort		      4
+      DstBlock		      "errors"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Transpose Jacobian\nInverse Kinematics"
+      SrcPort		      5
+      DstBlock		      "errors"
+      DstPort		      2
+    }
+  }
+}

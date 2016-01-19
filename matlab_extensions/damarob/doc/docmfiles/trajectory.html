@@ -1,0 +1,1016 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>trajectory</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-24">
+      <meta name="m-file" content="trajectory"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#2">Initialization</a></li>
+               <li><a href="#3">Inizialization of all poses</a></li>
+               <li><a href="#4">Check for errors in caller function</a></li>
+               <li><a href="#5">Computation of time advances for via points</a></li>
+               <li><a href="#6">Assignment and initialization of other variables</a></li>
+               <li><a href="#7">Path generation</a></li>
+               <li><a href="#8">Orientation trajectory planning</a></li>
+               <li><a href="#9">EULER ZYZ ANGLES</a></li>
+               <li><a href="#10">AXIS/ANGLE</a></li>
+               <li><a href="#11">ANGULAR VELOCITY</a></li>
+               <li><a href="#12">UNIT QUATERNION (will be available in the next version)</a></li>
+               <li><a href="#13">Finish generation of the orientation part</a></li>
+               <li><a href="#14">Output</a></li>
+               <li><a href="#15">Plot the generated trajectory</a></li>
+               <li><a href="#16">----------------SUBFUNCTIONS----------------</a></li>
+               <li><a href="#17">Cubic polynomial generation (includes the case of a via point)</a></li>
+               <li><a href="#18">Rectpath</a></li>
+               <li><a href="#19">Circpath</a></li>
+               <li><a href="#20">Euler orientation</a></li>
+               <li><a href="#21">Axis/Angle Orientation</a></li>
+            </ul>
+         </div><pre class="codeinput"><span class="keyword">function</span> pathd = trajectory(Ts,startpoint,startorient,orient_type,varargin)
+
+<span class="comment">% TRAJECTORY generates a trajectory in the operational space. The</span>
+<span class="comment">% manipulator is initialized in an arbitrary configuration q0 in the joint</span>
+<span class="comment">% space. Initial pose in operational space is given by applying the</span>
+<span class="comment">% direct kinematics function to q0.</span>
+<span class="comment">%</span>
+<span class="comment">% syntax:</span>
+<span class="comment">%      pathd = trajectory(Ts,startpoint,startorient,orient_type,varargin)</span>
+<span class="comment">%</span>
+<span class="comment">% For each given input (varargin), a path is generated between two</span>
+<span class="comment">% consecutive inputs, based on the specified path type. Inputs are structs in</span>
+<span class="comment">% the form:</span>
+<span class="comment">%</span>
+<span class="comment">%  Rectilinear path</span>
+<span class="comment">%</span>
+<span class="comment">%   input.g --&gt; goal point (column vector)</span>
+<span class="comment">%   input.tf --&gt; time to reach goal point (seconds)</span>
+<span class="comment">%   input.path_type = 'r' --&gt; specifies the type of path (rectilinear)</span>
+<span class="comment">%   input.via --&gt; point is via point (1) or not (0)</span>
+<span class="comment">%</span>
+<span class="comment">%  Circular path</span>
+<span class="comment">%</span>
+<span class="comment">%   input.g --&gt; goal point (column vector)</span>
+<span class="comment">%   input.tf --&gt; time to reach goal point (seconds)</span>
+<span class="comment">%   input.path_type = 'c' --&gt; specifies the type of path (circular)</span>
+<span class="comment">%   input.thf --&gt; radians to be sweeped by the position vector</span>
+<span class="comment">%   input.c --&gt; centre of the circle</span>
+<span class="comment">%   input.z --&gt; axis of rotation</span>
+<span class="comment">%   input.via --&gt; point is via point (1) or not (0)</span>
+<span class="comment">%</span>
+<span class="comment">%  Other inputs are:</span>
+<span class="comment">%</span>
+<span class="comment">%   Ts --&gt; sampling time</span>
+<span class="comment">%   startpoint --&gt; initial end-effector position (operational space)</span>
+<span class="comment">%   startorient --&gt; initial end-effector orientation (ZYZ Euler angles)</span>
+<span class="comment">%   orient_type --&gt; specifies which kind of representation is used to</span>
+<span class="comment">%                   define orientation ('euler' for ZYZ or ZYX Euler</span>
+<span class="comment">%                   angles, 'aa' for axis/angle). Every input should use</span>
+<span class="comment">%                   the same type of representation.</span>
+<span class="comment">%</span>
+<span class="comment">%  Orientation is specified by:</span>
+<span class="comment">%</span>
+<span class="comment">%   input.orient --&gt; this can be a three component vector (for ZYX or ZYZ</span>
+<span class="comment">%                    Euler angles) or a four component one (for axis/angle</span>
+<span class="comment">%                    representation).</span>
+<span class="comment">%</span>
+<span class="comment">%  The output will be in the form of a struct, containing these variables:</span>
+<span class="comment">%</span>
+<span class="comment">%   pos, pos_d, pos_dd --&gt; position, velocity and acceleration</span>
+<span class="comment">%   orient, orient_d, orient_dd --&gt; orientation (in Euler angles or</span>
+<span class="comment">%                                   axis/angle representation) and it's</span>
+<span class="comment">%                                   first and second derivative</span>
+<span class="comment">%   w, w_d --&gt; angular velocity and it's first derivative</span>
+<span class="comment">%</span>
+<span class="comment">%  Note: future versions of this program will include the possibility of</span>
+<span class="comment">%  specifying orientation using unit quaternions and other combinations of</span>
+<span class="comment">%  Euler angles.</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">%</span>
+<span class="comment">% This file is part of Dario &amp; Marco's Robotics Symbolic Toolbox for Matlab (DAMA^{ROB}).</span>
+<span class="comment">%</span>
+<span class="comment">% DAMA^{ROB} is free software: you can redistribute it and/or modify</span>
+<span class="comment">% it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="comment">% the Free Software Foundation version 2.1</span>
+<span class="comment">%</span>
+<span class="comment">% DAMA^{ROB} is distributed in the hope that it will be useful,</span>
+<span class="comment">% but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="comment">% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="comment">% GNU Lesser General Public License for more details.</span>
+<span class="comment">%</span>
+<span class="comment">% You should have received a copy of the GNU Leser General Public License</span>
+<span class="comment">% along with DAMA^{ROB}.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+</pre><h2>Initialization<a name="2"></a></h2><pre class="codeinput"><span class="comment">% This section initializes variables used in the function</span>
+r = nargin-4;                       <span class="comment">% number of points (with the exception of the start point)</span>
+pose = cell(1,r);                   <span class="comment">% structs containing input information</span>
+ts = cell(1,r);                     <span class="comment">% time values</span>
+Dt = cell(1,r);                     <span class="comment">% time advances for via points</span>
+</pre><h2>Inizialization of all poses<a name="3"></a></h2><pre class="codeinput">pose{1}.g = startpoint;
+pose{1}.orient = startorient;
+pose{1}.tf = 0;                   <span class="comment">% generation of the trajectory starts from pose{1}</span>
+pose{1}.via = 0;
+ts{1} = pose{1}.tf;
+pose{1}.orient_type = orient_type;
+
+<span class="keyword">for</span> i=1:r
+ pose{i+1} = varargin{i};
+ ts{i+1} = ts{i}+pose{i+1}.tf;
+<span class="keyword">end</span>
+
+pose{end}.via = 0; <span class="comment">% First and last points are not via points</span>
+Dt{1} = 0;
+</pre><h2>Check for errors in caller function<a name="4"></a></h2><pre class="codeinput"><span class="keyword">if</span> ~strcmp(orient_type,<span class="string">'ZYZ euler'</span>) &amp;&amp; ~strcmp(orient_type,<span class="string">'ZYX euler'</span>) &amp;&amp; ~strcmp(orient_type,<span class="string">'aa'</span>)
+        disp(<span class="string">''</span>);
+        disp(<span class="string">' ERROR : Check input orient_type in caller function. It must be ''ZYZ euler'', ''ZYX euler'' or ''aa''.'</span>);
+        disp(<span class="string">''</span>);
+        pathd = struct([]);
+        <span class="keyword">return</span>
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> i=1:(r+1)
+    <span class="keyword">if</span> (strcmp(orient_type,<span class="string">'ZYZ euler'</span>) || strcmp(orient_type,<span class="string">'ZYX euler'</span>)) &amp;&amp; ~(length(pose{i}.orient)==3)
+        disp(<span class="string">''</span>);
+        <span class="keyword">if</span> i == 1
+            disp(<span class="string">' ERROR : Orientation choosed is Euler angles. Please check input ''startorient'' in caller function.'</span>);
+        <span class="keyword">else</span>
+            disp([<span class="string">' ERROR : Orientation choosed is Euler angles. Please check point number '</span> num2str(i-1) <span class="string">'.'</span>]);
+        <span class="keyword">end</span>
+        disp(<span class="string">''</span>);
+        pathd = struct([]);
+        <span class="keyword">return</span>
+    <span class="keyword">elseif</span> strcmp(orient_type,<span class="string">'aa'</span>) &amp;&amp; ~(length(pose{i}.orient)==4)
+        disp(<span class="string">''</span>);
+        <span class="keyword">if</span> i == 1
+            disp(<span class="string">' ERROR : Orientation choosed is axis/angle. Please check input startorient in caller function'</span>);
+        <span class="keyword">else</span>
+            disp([<span class="string">' ERROR : Orientation choosed is axis/angle. Please check point number '</span> num2str(i-1) <span class="string">'.'</span>]);
+        <span class="keyword">end</span>
+        disp(<span class="string">''</span>);
+        pathd = struct([]);
+        <span class="keyword">return</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Computation of time advances for via points<a name="5"></a></h2><pre class="codeinput"><span class="comment">% Time advance will be 20% of actual length</span>
+<span class="keyword">for</span> i=1:(r+1)
+    Dt{i+1} = Dt{i} + ( 0.2 * pose{i}.tf - mod(0.2*pose{i}.tf,Ts) ) * pose{i}.via;
+<span class="keyword">end</span>
+</pre><h2>Assignment and initialization of other variables<a name="6"></a></h2><pre class="codeinput">tN = ts{end}-Dt{end};                         <span class="comment">% real time length of the generated trajectory</span>
+t = 0:Ts:tN;                                  <span class="comment">% time vector</span>
+n_samples = size(0:Ts:tN)*[0;1];              <span class="comment">% number of discrete samples</span>
+pos = zeros(3,n_samples);
+pos_d = zeros(3,n_samples);
+pos_dd = zeros(3,n_samples);
+ph_e.euler = zeros(3,n_samples);
+ph_e_d.euler = zeros(3,n_samples);
+ph_e_dd.euler = zeros(3,n_samples);
+ph_e.quat = zeros(4,n_samples);
+ph_e_d.quat = zeros(4,n_samples);
+ph_e_dd.quat = zeros(4,n_samples);
+w = [];
+w_d = [];
+ph_e.aa = [];
+</pre><h2>Path generation<a name="7"></a></h2><pre class="codeinput">   <span class="comment">% Position trajectory planning</span>
+     <span class="keyword">for</span> i=1:r
+         <span class="keyword">if</span> pose{i+1}.path_type == <span class="string">'r'</span>
+               [pos,pos_d,pos_dd] = <span class="keyword">...</span>
+                                     rectpath(pose{i},pose{i+1},pos,pos_d,pos_dd,ts{i},ts{i+1},Dt{i+1},Ts,tN,n_samples);
+         <span class="keyword">elseif</span> pose{i+1}.path_type == <span class="string">'c'</span>
+               [pos,pos_d,pos_dd,pose{i+1}] = <span class="keyword">...</span>
+                                     circpath(pose{i},pose{i+1},pos,pos_d,pos_dd,ts{i},ts{i+1},Dt{i+1},Ts,tN,n_samples,startpoint);
+         <span class="keyword">end</span>
+     <span class="keyword">end</span>
+
+   <span class="comment">% Update total position, velocity and acceleration matrices. Position</span>
+   <span class="comment">% matrix needs the initial pose</span>
+     pos = (pose{1}.g*ones(1,n_samples) + pos).';
+     pos_d = pos_d.';
+     pos_dd = pos_dd.';
+</pre><h2>Orientation trajectory planning<a name="8"></a></h2><pre class="codeinput">     k = 0;
+     R = cell(1,r+1);
+     ts_orient = cell(1,r);   <span class="comment">% FIXME: fix the cell dimension</span>
+     w_temp = cell(1,r+1);
+     w_d_temp = cell(1,r+1);
+
+   <span class="comment">% Evaluate time instants between which the orientation will be planned</span>
+     <span class="keyword">for</span> i=1:(r+1)
+         <span class="keyword">if</span> pose{i}.via == 0
+            k = k+1;
+            ts_orient{k} = [ts{i}-Dt{i};i];
+            <span class="keyword">if</span> strcmp(orient_type,<span class="string">'ZYZ euler'</span>)
+                R{i} = euler2rot(pose{i}.orient,<span class="string">'ZYZ'</span>);  <span class="comment">%rotation matrix of each specified orientation</span>
+            <span class="keyword">elseif</span> strcmp(orient_type,<span class="string">'ZYX euler'</span>)
+                R{i} = euler2rot(pose{i}.orient,<span class="string">'ZYX'</span>);
+            <span class="keyword">elseif</span> strcmp(orient_type,<span class="string">'aa'</span>)
+                R{i} = aa2rot(pose{i}.orient(1:3),pose{i}.orient(4));
+            <span class="keyword">end</span>
+         <span class="keyword">else</span>
+            R{i} = eye(3);
+         <span class="keyword">end</span>
+     <span class="keyword">end</span>
+
+     <span class="keyword">for</span> i=1:(k-1)
+         ti_orient = ts_orient{i}(2);    <span class="comment">% Start and final planning time for each segment</span>
+         tf_orient = ts_orient{i+1}(2);
+</pre><h2>EULER ZYZ ANGLES<a name="9"></a></h2><pre class="codeinput">    <span class="keyword">if</span> (strcmp(orient_type,<span class="string">'ZYZ euler'</span>) || strcmp(orient_type,<span class="string">'ZYX euler'</span>))
+        orient_norm = norm(pose{tf_orient}.orient-pose{ti_orient}.orient);
+        [ph_e ph_e_d ph_e_dd] = euler_orient(ph_e,ph_e_d,ph_e_dd,pose,tf_orient,<span class="keyword">...</span>
+            ti_orient,orient_norm,ts_orient{i}(1),ts_orient{i+1}(1),tN,Ts,n_samples);
+    <span class="keyword">end</span>
+</pre><h2>AXIS/ANGLE<a name="10"></a></h2><pre class="codeinput">    [ph_e,th_t_d,th_t_dd,axis] = aa_orient(ph_e,R{ti_orient},R{tf_orient},<span class="keyword">...</span>
+                                       ts_orient{i}(1),ts_orient{i+1}(1),Ts,i);
+</pre><h2>ANGULAR VELOCITY<a name="11"></a></h2><pre class="codeinput">    w_i = axis.*([1;1;1]*th_t_d);
+    w_i_d = axis.*([1;1;1]*th_t_dd);
+    w_temp{i} = R{i}*w_i;
+    w_d_temp{i} = R{i}*w_i_d;
+
+    <span class="keyword">if</span> i == 1
+        w = [w w_temp{i}];
+        w_d = [w_d w_d_temp{i}];
+    <span class="keyword">else</span>
+        w = [w(:,1:(end-1)) w_temp{i}];
+        w_d = [w_d(:,1:(end-1)) w_d_temp{i}];
+    <span class="keyword">end</span>
+</pre><h2>UNIT QUATERNION (will be available in the next version)<a name="12"></a></h2>
+         <h2>Finish generation of the orientation part<a name="13"></a></h2><pre class="codeinput">     <span class="keyword">end</span>
+
+<span class="keyword">if</span> (strcmp(orient_type,<span class="string">'ZYZ euler'</span>) || strcmp(orient_type,<span class="string">'ZYX euler'</span>))
+   <span class="comment">% Update final orientation matrices (euler andgles)</span>
+     ph_e.euler = (pose{1}.orient*ones(1,n_samples) + ph_e.euler).';
+     ph_e_d.euler = ph_e_d.euler.';
+     ph_e_dd.euler = ph_e_dd.euler.';
+<span class="keyword">end</span>
+
+<span class="comment">% Save attitude info in a cell of structs</span>
+attitude = cell(1,k);
+
+<span class="keyword">for</span> i = 1:(k)
+    attitude{i}.R = R{ts_orient{i}(2)};
+    attitude{i}.pos = pose{ts_orient{i}(2)}.g;
+<span class="keyword">end</span>
+</pre><h2>Output<a name="14"></a></h2><pre class="codeinput">  <span class="comment">% Assign outputs suitable to SIMULINK simulations</span>
+    t = t.';
+    pathd.t = t;
+    pathd.pos.time = t;
+    pathd.pos.signals.values = pos;
+    pathd.pos.signals.dimensions = 3;
+    pathd.pos_d.time = t;
+    pathd.pos_d.signals.values = pos_d;
+    pathd.pos_d.signals.dimensions = 3;
+    pathd.pos_dd.time = t;
+    pathd.pos_dd.signals.values = pos_dd;
+    pathd.pos_dd.signals.dimensions = 3;
+    pathd.w.time = t;
+    pathd.w.signals.values = w.';
+    pathd.w.signals.dimensions = 3;
+    pathd.w_d.time = t;
+    pathd.w_d.signals.values = w_d.';
+    pathd.w_d.signals.dimensions = 3;
+    pathd.attitude = attitude;
+
+<span class="keyword">if</span> (strcmp(orient_type,<span class="string">'ZYZ euler'</span>) || strcmp(orient_type,<span class="string">'ZYX euler'</span>))
+    pathd.orient.euler.time = t;
+    pathd.orient.euler.signals.values = ph_e.euler;
+    pathd.orient.euler.signals.dimensions = 3;
+    pathd.orient_d.euler.time = t;
+    pathd.orient_d.euler.signals.values = ph_e_d.euler;
+    pathd.orient_d.euler.signals.dimensions = 3;
+    pathd.orient_dd.euler.time = t;
+    pathd.orient_dd.euler.signals.values = ph_e_dd.euler;
+    pathd.orient_dd.euler.signals.dimensions = 3;
+    pathd.orient.aa.time = t;
+    pathd.orient.aa.signals.values = ph_e.aa.';
+    pathd.orient.aa.signals.dimensions = 4;
+<span class="keyword">end</span>
+
+    pathd.orient.aa.time = t;
+    pathd.orient.aa.signals.values = ph_e.aa.';
+    pathd.orient.aa.signals.dimensions = 4;
+</pre><h2>Plot the generated trajectory<a name="15"></a></h2><pre class="codeinput">  <span class="comment">% Vectorfielplot.m is a script that plots the generated trajectory along</span>
+  <span class="comment">% with velocity and acceleration vectors</span>
+    vectorfieldplot(pathd,Ts);
+
+<span class="keyword">end</span>
+</pre><h2>----------------SUBFUNCTIONS----------------<a name="16"></a></h2>
+         <h2>Cubic polynomial generation (includes the case of a via point)<a name="17"></a></h2><pre class="codeinput"><span class="keyword">function</span> [s,s_d,s_dd,t] = cubicarc_via(sf,ti,tf,tN,Dt,Ts)
+
+  <span class="comment">% Evaluation of the cubic polynomial coefficients</span>
+    A = [ti^3    ti^2    ti     1;
+         3*ti^2  2*ti    1      0;
+         tf^3    tf^2    tf     1;
+         3*tf^2  2*tf    1      0];
+    B = [0;       <span class="comment">% s(ti) = 0;</span>
+         0 ;      <span class="comment">% s_d(ti) = 0;</span>
+         sf;      <span class="comment">% s(tf) = sf;</span>
+         0];      <span class="comment">% s_d(tf) = 0;</span>
+    a = A\B;
+
+  <span class="comment">% Arc length s is zero from initial time t = 0 to segment start</span>
+  <span class="comment">% time t = ti</span>
+    s_0 = zeros(size(0:Ts:(ti-Dt)));    <span class="comment">% s_j(t) = 0 for 0 &lt;= t &lt;= ti</span>
+
+  <span class="comment">% Arc length s is given by the cubic polynomial interpolation for</span>
+  <span class="comment">% ti &lt; t &lt; tf</span>
+    t = (ti+Ts-Dt):Ts:(tf-Ts-Dt);
+    s_j = a(1)*(t+Dt).^3 + a(2)*(t+Dt).^2 + a(3)*(t+Dt) + a(4);
+    s_j_d = 3*a(1)*(t+Dt).^2 + 2*a(2)*(t+Dt) + a(3);
+    s_j_dd = 6*a(1)*(t+Dt) + 2*a(2);
+
+  <span class="comment">% Arc length s is sf from time t = tf to final trajectory time t = tN</span>
+    t = (tf-Dt):Ts:tN;
+    s_j_f = sf*ones(size(t));
+
+  <span class="comment">% Total arc length and it's first and second derivatives are simply</span>
+  <span class="comment">% given by CAT of:</span>
+    s = [s_0 s_j s_j_f];
+    s_d = [s_0 s_j_d 0*s_j_f];
+    s_dd = [s_0 s_j_dd 0*s_j_f];
+
+  <span class="comment">% Total time is given by:</span>
+    t = 0:Ts:tN;
+
+<span class="keyword">end</span>
+</pre><h2>Rectpath<a name="18"></a></h2><pre class="codeinput">    <span class="keyword">function</span> [pos,pos_d,pos_dd] = rectpath(pose_i,pose_f,pos,pos_d,pos_dd,ts_i,ts_f,Dt_seg,Ts,tN,n_samples)
+
+    segment = zeros(3,n_samples);
+    segment_d = zeros(3,n_samples);
+    segment_dd = zeros(3,n_samples);
+
+       <span class="comment">% Rectilinear Path</span>
+          <span class="comment">% Arc length computation</span>
+            [s.s s.s_d s.s_dd s.t] = cubicarc_via(norm(pose_f.g-pose_i.g),ts_i,ts_f,tN,Dt_seg,Ts);
+            <span class="keyword">if</span> norm(pose_f.g-pose_i.g) == 0
+                <span class="comment">% Manipulator doesn't move, don't do anything</span>
+            <span class="keyword">else</span>
+          <span class="comment">% Manipulator moves</span>
+            segment = (pose_f.g-pose_i.g)*s.s/norm(pose_f.g-pose_i.g);
+            segment_d = (pose_f.g-pose_i.g)*s.s_d/norm(pose_f.g-pose_i.g);
+            segment_dd = (pose_f.g-pose_i.g)*s.s_dd/norm(pose_f.g-pose_i.g);
+          <span class="comment">% Update the current position, velocity and acceleration matrices</span>
+            pos = pos + segment;
+            pos_d = pos_d + segment_d;
+            pos_dd = pos_dd + segment_dd;
+            <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+</pre><h2>Circpath<a name="19"></a></h2><pre class="codeinput"><span class="keyword">function</span> [pos,pos_d,pos_dd,pose_f] = circpath(pose_i,pose_f,pos,pos_d,pos_dd,ts_i,ts_f,Dt_seg,Ts,tN,n_samples,startpoint)
+
+    segment = zeros(3,n_samples);
+    segment_d = zeros(3,n_samples);
+    segment_dd = zeros(3,n_samples);
+
+       <span class="comment">% Circular Path</span>
+            <span class="comment">% Circle radius</span>
+              rho_v = pose_i.g-pose_f.c;
+              rho = norm(rho_v);
+            <span class="comment">% Arc length computation</span>
+              [s.s s.s_d s.s_dd s.t] = cubicarc_via(pose_f.thf*rho,ts_i,ts_f,tN,Dt_seg,Ts);
+              <span class="keyword">if</span> pose_f.thf == 0;
+                <span class="comment">% Manipulator doesn't move, don't do anything</span>
+              <span class="keyword">else</span>
+            <span class="comment">% Manipulator moves</span>
+            <span class="comment">% x1 y1 z1 are the column vectors of the rotation matrix R,</span>
+            <span class="comment">% which describes the rotation of the reference system of the</span>
+            <span class="comment">% circle with respect to the base reference system</span>
+              x1 = rho_v/rho;
+              z1 = pose_f.z/norm(pose_f.z);
+              y1 = cross(z1,x1);
+              R1 = [x1 y1 z1];
+              j = length(s.s);
+            <span class="comment">% Description of position, velocity and acceleration of a</span>
+            <span class="comment">% circle in a suitable reference system</span>
+              p1s = [rho*cos(s.s./rho); <span class="keyword">...</span>
+                     rho*sin(s.s./rho); <span class="keyword">...</span>
+                     zeros(1,j)];
+              p1s_d = [-s.s_d .* sin(s.s./rho); <span class="keyword">...</span>
+                        s.s_d .* cos(s.s./rho); <span class="keyword">...</span>
+                        zeros(1,j)];
+              p1s_dd = [-s.s_d.^2.*cos(s.s./rho)/rho - s.s_dd .* sin(s.s./rho) ; <span class="keyword">...</span>
+                        -s.s_d.^2.*sin(s.s./rho)/rho - s.s_dd .* cos(s.s./rho) ; <span class="keyword">...</span>
+                         zeros(1,j)];
+
+            <span class="comment">% This operation is needed to successfully generate the circle</span>
+            <span class="comment">% segment</span>
+              segment = R1*p1s + (pose_f.c - pose_i.g)*ones(1,n_samples);
+
+            <span class="comment">% Path segment should be zero until it's start time</span>
+              segment(:,1:ts_i) = zeros(3,ts_i);
+              segment_d = R1*p1s_d;
+              segment_dd = R1*p1s_dd;
+
+            <span class="comment">% Update thye current position, velocity and acceleration</span>
+            <span class="comment">% matrices</span>
+              pos = pos + segment;
+              pos_d = pos_d + segment_d;
+              pos_dd = pos_dd + segment_dd;
+              pose_f.g = pos(:,end)+startpoint;
+              <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Euler orientation<a name="20"></a></h2><pre class="codeinput"><span class="keyword">function</span> [ph_e ph_e_d ph_e_dd orient orient_d orient_dd] = <span class="keyword">...</span>
+                  euler_orient(ph_e,ph_e_d,ph_e_dd,pose,tf_orient,ti_orient,orient_norm,ts_i_orient,ts_f_orient,tN,Ts,n_samples)
+
+<span class="comment">% Arc length computation</span>
+[s.s_orient s.s_orient_d s.s_orient_dd s.t] = cubicarc_via(orient_norm,<span class="keyword">...</span>
+                                         ts_i_orient,ts_f_orient,tN,0,Ts);
+
+    <span class="keyword">if</span> orient_norm == 0
+        <span class="comment">% Orientation doesn't change</span>
+        orient = zeros(3,n_samples);
+        orient_d = zeros(3,n_samples);
+        orient_dd = zeros(3,n_samples);
+    <span class="keyword">else</span>
+        <span class="comment">% Orientation changes</span>
+        orient = (pose{tf_orient}.orient-pose{ti_orient}.orient)*s.s_orient/orient_norm;
+        orient_d = (pose{tf_orient}.orient-pose{ti_orient}.orient)*s.s_orient_d/orient_norm;
+        orient_dd = (pose{tf_orient}.orient-pose{ti_orient}.orient)*s.s_orient_dd/orient_norm;
+        <span class="comment">% Update orientation position, velocity and acceleration matrices</span>
+        ph_e.euler = ph_e.euler + orient;
+        ph_e_d.euler = ph_e_d.euler + orient_d;
+        ph_e_dd.euler = ph_e_dd.euler + orient_dd;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Axis/Angle Orientation<a name="21"></a></h2><pre class="codeinput"><span class="keyword">function</span> [ph_e,th_t_d,th_t_dd,axis] = aa_orient(ph_e,R1,R2,ts_i,ts_f,Ts,i)
+
+th = [];
+axis = [];
+
+Rif = R1.'*R2;
+[r_f th_f] = rot2aa(Rif);
+[th_t th_t_d th_t_dd] = cubicarc_via(th_f,0,ts_f-ts_i,ts_f-ts_i,0,Ts);
+
+<span class="keyword">for</span> l = 1:length(th_t)
+    R_i = aa2rot(r_f,th_t(l));
+    [axis_new th_new] = rot2aa(R1*R_i);
+    th = [th th_new];
+    axis = [axis axis_new];
+<span class="keyword">end</span>
+
+orient_aa = [axis ;th];
+
+    <span class="keyword">if</span> i == 1
+       ph_e.aa = [ph_e.aa orient_aa];
+    <span class="keyword">else</span>
+       ph_e.aa = [ph_e.aa(:,1:(end-1)) orient_aa];
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function pathd = trajectory(Ts,startpoint,startorient,orient_type,varargin)
+
+% TRAJECTORY generates a trajectory in the operational space. The
+% manipulator is initialized in an arbitrary configuration q0 in the joint
+% space. Initial pose in operational space is given by applying the
+% direct kinematics function to q0.
+%
+% syntax:
+%      pathd = trajectory(Ts,startpoint,startorient,orient_type,varargin)
+% 
+% For each given input (varargin), a path is generated between two
+% consecutive inputs, based on the specified path type. Inputs are structs in
+% the form:
+%
+%  Rectilinear path
+%
+%   input.g REPLACE_WITH_DASH_DASH> goal point (column vector)
+%   input.tf REPLACE_WITH_DASH_DASH> time to reach goal point (seconds)
+%   input.path_type = 'r' REPLACE_WITH_DASH_DASH> specifies the type of path (rectilinear)
+%   input.via REPLACE_WITH_DASH_DASH> point is via point (1) or not (0)
+%
+%  Circular path
+%
+%   input.g REPLACE_WITH_DASH_DASH> goal point (column vector)
+%   input.tf REPLACE_WITH_DASH_DASH> time to reach goal point (seconds)
+%   input.path_type = 'c' REPLACE_WITH_DASH_DASH> specifies the type of path (circular)
+%   input.thf REPLACE_WITH_DASH_DASH> radians to be sweeped by the position vector
+%   input.c REPLACE_WITH_DASH_DASH> centre of the circle
+%   input.z REPLACE_WITH_DASH_DASH> axis of rotation
+%   input.via REPLACE_WITH_DASH_DASH> point is via point (1) or not (0)
+%
+%  Other inputs are:
+%
+%   Ts REPLACE_WITH_DASH_DASH> sampling time
+%   startpoint REPLACE_WITH_DASH_DASH> initial end-effector position (operational space)
+%   startorient REPLACE_WITH_DASH_DASH> initial end-effector orientation (ZYZ Euler angles)
+%   orient_type REPLACE_WITH_DASH_DASH> specifies which kind of representation is used to
+%                   define orientation ('euler' for ZYZ or ZYX Euler 
+%                   angles, 'aa' for axis/angle). Every input should use 
+%                   the same type of representation.
+%   
+%  Orientation is specified by:
+%
+%   input.orient REPLACE_WITH_DASH_DASH> this can be a three component vector (for ZYX or ZYZ
+%                    Euler angles) or a four component one (for axis/angle
+%                    representation).
+%
+%  The output will be in the form of a struct, containing these variables:
+%
+%   pos, pos_d, pos_dd REPLACE_WITH_DASH_DASH> position, velocity and acceleration
+%   orient, orient_d, orient_dd REPLACE_WITH_DASH_DASH> orientation (in Euler angles or
+%                                   axis/angle representation) and it's
+%                                   first and second derivative
+%   w, w_d REPLACE_WITH_DASH_DASH> angular velocity and it's first derivative
+%
+%  Note: future versions of this program will include the possibility of
+%  specifying orientation using unit quaternions and other combinations of
+%  Euler angles.
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+%
+% This file is part of Dario & Marco's Robotics Symbolic Toolbox for Matlab (DAMA^{ROB}).
+% 
+% DAMA^{ROB} is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation version 2.1
+% 
+% DAMA^{ROB} is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with DAMA^{ROB}.  If not, see <http://www.gnu.org/licenses/>.
+
+
+%% Initialization
+
+% This section initializes variables used in the function
+r = nargin-4;                       % number of points (with the exception of the start point)
+pose = cell(1,r);                   % structs containing input information
+ts = cell(1,r);                     % time values
+Dt = cell(1,r);                     % time advances for via points
+
+%% Inizialization of all poses
+
+pose{1}.g = startpoint;
+pose{1}.orient = startorient;
+pose{1}.tf = 0;                   % generation of the trajectory starts from pose{1}
+pose{1}.via = 0;
+ts{1} = pose{1}.tf;
+pose{1}.orient_type = orient_type;
+
+for i=1:r
+ pose{i+1} = varargin{i};
+ ts{i+1} = ts{i}+pose{i+1}.tf;
+end
+
+pose{end}.via = 0; % First and last points are not via points
+Dt{1} = 0;
+
+%% Check for errors in caller function
+
+if ~strcmp(orient_type,'ZYZ euler') && ~strcmp(orient_type,'ZYX euler') && ~strcmp(orient_type,'aa')
+        disp('');
+        disp(' ERROR : Check input orient_type in caller function. It must be ''ZYZ euler'', ''ZYX euler'' or ''aa''.');
+        disp('');
+        pathd = struct([]);
+        return
+end
+
+for i=1:(r+1)
+    if (strcmp(orient_type,'ZYZ euler') || strcmp(orient_type,'ZYX euler')) && ~(length(pose{i}.orient)==3)
+        disp('');
+        if i == 1
+            disp(' ERROR : Orientation choosed is Euler angles. Please check input ''startorient'' in caller function.');
+        else
+            disp([' ERROR : Orientation choosed is Euler angles. Please check point number ' num2str(i-1) '.']);
+        end
+        disp('');
+        pathd = struct([]);
+        return
+    elseif strcmp(orient_type,'aa') && ~(length(pose{i}.orient)==4)
+        disp('');
+        if i == 1
+            disp(' ERROR : Orientation choosed is axis/angle. Please check input startorient in caller function');
+        else
+            disp([' ERROR : Orientation choosed is axis/angle. Please check point number ' num2str(i-1) '.']);
+        end
+        disp('');
+        pathd = struct([]);
+        return
+    end
+end
+
+%% Computation of time advances for via points
+
+% Time advance will be 20% of actual length
+for i=1:(r+1)
+    Dt{i+1} = Dt{i} + ( 0.2 * pose{i}.tf - mod(0.2*pose{i}.tf,Ts) ) * pose{i}.via;
+end
+
+%% Assignment and initialization of other variables
+
+tN = ts{end}-Dt{end};                         % real time length of the generated trajectory
+t = 0:Ts:tN;                                  % time vector
+n_samples = size(0:Ts:tN)*[0;1];              % number of discrete samples
+pos = zeros(3,n_samples);
+pos_d = zeros(3,n_samples);
+pos_dd = zeros(3,n_samples);
+ph_e.euler = zeros(3,n_samples);
+ph_e_d.euler = zeros(3,n_samples);
+ph_e_dd.euler = zeros(3,n_samples);
+ph_e.quat = zeros(4,n_samples);
+ph_e_d.quat = zeros(4,n_samples);
+ph_e_dd.quat = zeros(4,n_samples);
+w = [];
+w_d = [];
+ph_e.aa = [];
+
+%% Path generation
+
+   % Position trajectory planning
+     for i=1:r
+         if pose{i+1}.path_type == 'r'
+               [pos,pos_d,pos_dd] = ...
+                                     rectpath(pose{i},pose{i+1},pos,pos_d,pos_dd,ts{i},ts{i+1},Dt{i+1},Ts,tN,n_samples);
+         elseif pose{i+1}.path_type == 'c'
+               [pos,pos_d,pos_dd,pose{i+1}] = ...
+                                     circpath(pose{i},pose{i+1},pos,pos_d,pos_dd,ts{i},ts{i+1},Dt{i+1},Ts,tN,n_samples,startpoint);
+         end
+     end
+
+   % Update total position, velocity and acceleration matrices. Position
+   % matrix needs the initial pose
+     pos = (pose{1}.g*ones(1,n_samples) + pos).';
+     pos_d = pos_d.';
+     pos_dd = pos_dd.';
+
+%% Orientation trajectory planning
+
+     k = 0;
+     R = cell(1,r+1);
+     ts_orient = cell(1,r);   % FIXME: fix the cell dimension
+     w_temp = cell(1,r+1);
+     w_d_temp = cell(1,r+1);
+     
+   % Evaluate time instants between which the orientation will be planned
+     for i=1:(r+1)
+         if pose{i}.via == 0
+            k = k+1;
+            ts_orient{k} = [ts{i}-Dt{i};i];
+            if strcmp(orient_type,'ZYZ euler')
+                R{i} = euler2rot(pose{i}.orient,'ZYZ');  %rotation matrix of each specified orientation
+            elseif strcmp(orient_type,'ZYX euler')
+                R{i} = euler2rot(pose{i}.orient,'ZYX');
+            elseif strcmp(orient_type,'aa')
+                R{i} = aa2rot(pose{i}.orient(1:3),pose{i}.orient(4));
+            end
+         else
+            R{i} = eye(3);
+         end
+     end
+
+     for i=1:(k-1)
+         ti_orient = ts_orient{i}(2);    % Start and final planning time for each segment
+         tf_orient = ts_orient{i+1}(2);
+
+%% EULER ZYZ ANGLES
+
+    if (strcmp(orient_type,'ZYZ euler') || strcmp(orient_type,'ZYX euler'))
+        orient_norm = norm(pose{tf_orient}.orient-pose{ti_orient}.orient);
+        [ph_e ph_e_d ph_e_dd] = euler_orient(ph_e,ph_e_d,ph_e_dd,pose,tf_orient,...
+            ti_orient,orient_norm,ts_orient{i}(1),ts_orient{i+1}(1),tN,Ts,n_samples);
+    end
+                         
+%% AXIS/ANGLE
+    
+    [ph_e,th_t_d,th_t_dd,axis] = aa_orient(ph_e,R{ti_orient},R{tf_orient},...
+                                       ts_orient{i}(1),ts_orient{i+1}(1),Ts,i);
+                               
+%% ANGULAR VELOCITY
+
+    w_i = axis.*([1;1;1]*th_t_d);
+    w_i_d = axis.*([1;1;1]*th_t_dd);
+    w_temp{i} = R{i}*w_i;
+    w_d_temp{i} = R{i}*w_i_d;
+
+    if i == 1
+        w = [w w_temp{i}];
+        w_d = [w_d w_d_temp{i}];
+    else
+        w = [w(:,1:(end-1)) w_temp{i}];
+        w_d = [w_d(:,1:(end-1)) w_d_temp{i}];       
+    end
+    
+%% UNIT QUATERNION (will be available in the next version)
+
+%% Finish generation of the orientation part
+
+     end
+     
+if (strcmp(orient_type,'ZYZ euler') || strcmp(orient_type,'ZYX euler'))
+   % Update final orientation matrices (euler andgles)
+     ph_e.euler = (pose{1}.orient*ones(1,n_samples) + ph_e.euler).';
+     ph_e_d.euler = ph_e_d.euler.';
+     ph_e_dd.euler = ph_e_dd.euler.';
+end
+
+% Save attitude info in a cell of structs
+attitude = cell(1,k);
+
+for i = 1:(k)
+    attitude{i}.R = R{ts_orient{i}(2)};
+    attitude{i}.pos = pose{ts_orient{i}(2)}.g;
+end
+
+%% Output
+
+  % Assign outputs suitable to SIMULINK simulations
+    t = t.';
+    pathd.t = t;
+    pathd.pos.time = t;
+    pathd.pos.signals.values = pos;
+    pathd.pos.signals.dimensions = 3;
+    pathd.pos_d.time = t;
+    pathd.pos_d.signals.values = pos_d;
+    pathd.pos_d.signals.dimensions = 3;
+    pathd.pos_dd.time = t;
+    pathd.pos_dd.signals.values = pos_dd;
+    pathd.pos_dd.signals.dimensions = 3;
+    pathd.w.time = t;
+    pathd.w.signals.values = w.';
+    pathd.w.signals.dimensions = 3;
+    pathd.w_d.time = t;
+    pathd.w_d.signals.values = w_d.';
+    pathd.w_d.signals.dimensions = 3;
+    pathd.attitude = attitude;
+
+if (strcmp(orient_type,'ZYZ euler') || strcmp(orient_type,'ZYX euler'))
+    pathd.orient.euler.time = t;
+    pathd.orient.euler.signals.values = ph_e.euler;
+    pathd.orient.euler.signals.dimensions = 3;
+    pathd.orient_d.euler.time = t;
+    pathd.orient_d.euler.signals.values = ph_e_d.euler;
+    pathd.orient_d.euler.signals.dimensions = 3;
+    pathd.orient_dd.euler.time = t;
+    pathd.orient_dd.euler.signals.values = ph_e_dd.euler;
+    pathd.orient_dd.euler.signals.dimensions = 3;
+    pathd.orient.aa.time = t;
+    pathd.orient.aa.signals.values = ph_e.aa.';
+    pathd.orient.aa.signals.dimensions = 4;
+end   
+   
+    pathd.orient.aa.time = t;
+    pathd.orient.aa.signals.values = ph_e.aa.';
+    pathd.orient.aa.signals.dimensions = 4;
+
+%% Plot the generated trajectory
+
+  % Vectorfielplot.m is a script that plots the generated trajectory along 
+  % with velocity and acceleration vectors  
+    vectorfieldplot(pathd,Ts);
+
+end
+
+%% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHSUBFUNCTIONSREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+%% Cubic polynomial generation (includes the case of a via point)
+
+function [s,s_d,s_dd,t] = cubicarc_via(sf,ti,tf,tN,Dt,Ts)
+
+  % Evaluation of the cubic polynomial coefficients
+    A = [ti^3    ti^2    ti     1;
+         3*ti^2  2*ti    1      0;
+         tf^3    tf^2    tf     1;
+         3*tf^2  2*tf    1      0];
+    B = [0;       % s(ti) = 0;
+         0 ;      % s_d(ti) = 0;
+         sf;      % s(tf) = sf;
+         0];      % s_d(tf) = 0;  
+    a = A\B;
+    
+  % Arc length s is zero from initial time t = 0 to segment start
+  % time t = ti
+    s_0 = zeros(size(0:Ts:(ti-Dt)));    % s_j(t) = 0 for 0 <= t <= ti
+    
+  % Arc length s is given by the cubic polynomial interpolation for
+  % ti < t < tf
+    t = (ti+Ts-Dt):Ts:(tf-Ts-Dt);
+    s_j = a(1)*(t+Dt).^3 + a(2)*(t+Dt).^2 + a(3)*(t+Dt) + a(4);
+    s_j_d = 3*a(1)*(t+Dt).^2 + 2*a(2)*(t+Dt) + a(3);
+    s_j_dd = 6*a(1)*(t+Dt) + 2*a(2);
+    
+  % Arc length s is sf from time t = tf to final trajectory time t = tN
+    t = (tf-Dt):Ts:tN;
+    s_j_f = sf*ones(size(t));
+    
+  % Total arc length and it's first and second derivatives are simply
+  % given by CAT of:
+    s = [s_0 s_j s_j_f];
+    s_d = [s_0 s_j_d 0*s_j_f];
+    s_dd = [s_0 s_j_dd 0*s_j_f];
+    
+  % Total time is given by:
+    t = 0:Ts:tN;
+
+end
+
+%% Rectpath
+
+    function [pos,pos_d,pos_dd] = rectpath(pose_i,pose_f,pos,pos_d,pos_dd,ts_i,ts_f,Dt_seg,Ts,tN,n_samples)
+         
+    segment = zeros(3,n_samples);
+    segment_d = zeros(3,n_samples);
+    segment_dd = zeros(3,n_samples);
+    
+       % Rectilinear Path
+          % Arc length computation
+            [s.s s.s_d s.s_dd s.t] = cubicarc_via(norm(pose_f.g-pose_i.g),ts_i,ts_f,tN,Dt_seg,Ts);
+            if norm(pose_f.g-pose_i.g) == 0
+                % Manipulator doesn't move, don't do anything
+            else
+          % Manipulator moves     
+            segment = (pose_f.g-pose_i.g)*s.s/norm(pose_f.g-pose_i.g);
+            segment_d = (pose_f.g-pose_i.g)*s.s_d/norm(pose_f.g-pose_i.g);
+            segment_dd = (pose_f.g-pose_i.g)*s.s_dd/norm(pose_f.g-pose_i.g);
+          % Update the current position, velocity and acceleration matrices
+            pos = pos + segment;
+            pos_d = pos_d + segment_d;
+            pos_dd = pos_dd + segment_dd;
+            end
+            
+    end
+
+%% Circpath
+
+function [pos,pos_d,pos_dd,pose_f] = circpath(pose_i,pose_f,pos,pos_d,pos_dd,ts_i,ts_f,Dt_seg,Ts,tN,n_samples,startpoint)
+
+    segment = zeros(3,n_samples);
+    segment_d = zeros(3,n_samples);
+    segment_dd = zeros(3,n_samples);
+
+       % Circular Path
+            % Circle radius
+              rho_v = pose_i.g-pose_f.c;
+              rho = norm(rho_v);
+            % Arc length computation
+              [s.s s.s_d s.s_dd s.t] = cubicarc_via(pose_f.thf*rho,ts_i,ts_f,tN,Dt_seg,Ts);
+              if pose_f.thf == 0;
+                % Manipulator doesn't move, don't do anything
+              else
+            % Manipulator moves
+            % x1 y1 z1 are the column vectors of the rotation matrix R,
+            % which describes the rotation of the reference system of the
+            % circle with respect to the base reference system
+              x1 = rho_v/rho;
+              z1 = pose_f.z/norm(pose_f.z);
+              y1 = cross(z1,x1);
+              R1 = [x1 y1 z1];
+              j = length(s.s);
+            % Description of position, velocity and acceleration of a
+            % circle in a suitable reference system
+              p1s = [rho*cos(s.s./rho); ...
+                     rho*sin(s.s./rho); ...
+                     zeros(1,j)];
+              p1s_d = [-s.s_d .* sin(s.s./rho); ...
+                        s.s_d .* cos(s.s./rho); ...
+                        zeros(1,j)]; 
+              p1s_dd = [-s.s_d.^2.*cos(s.s./rho)/rho - s.s_dd .* sin(s.s./rho) ; ...
+                        -s.s_d.^2.*sin(s.s./rho)/rho - s.s_dd .* cos(s.s./rho) ; ...
+                         zeros(1,j)];
+                     
+            % This operation is needed to successfully generate the circle
+            % segment
+              segment = R1*p1s + (pose_f.c - pose_i.g)*ones(1,n_samples);
+              
+            % Path segment should be zero until it's start time
+              segment(:,1:ts_i) = zeros(3,ts_i); 
+              segment_d = R1*p1s_d;
+              segment_dd = R1*p1s_dd;
+              
+            % Update thye current position, velocity and acceleration
+            % matrices 
+              pos = pos + segment;
+              pos_d = pos_d + segment_d;
+              pos_dd = pos_dd + segment_dd;
+              pose_f.g = pos(:,end)+startpoint;
+              end
+end
+
+
+%% Euler orientation
+
+function [ph_e ph_e_d ph_e_dd orient orient_d orient_dd] = ...
+                  euler_orient(ph_e,ph_e_d,ph_e_dd,pose,tf_orient,ti_orient,orient_norm,ts_i_orient,ts_f_orient,tN,Ts,n_samples)
+              
+% Arc length computation
+[s.s_orient s.s_orient_d s.s_orient_dd s.t] = cubicarc_via(orient_norm,...
+                                         ts_i_orient,ts_f_orient,tN,0,Ts);
+
+    if orient_norm == 0
+        % Orientation doesn't change
+        orient = zeros(3,n_samples);
+        orient_d = zeros(3,n_samples);
+        orient_dd = zeros(3,n_samples);
+    else
+        % Orientation changes
+        orient = (pose{tf_orient}.orient-pose{ti_orient}.orient)*s.s_orient/orient_norm;
+        orient_d = (pose{tf_orient}.orient-pose{ti_orient}.orient)*s.s_orient_d/orient_norm;
+        orient_dd = (pose{tf_orient}.orient-pose{ti_orient}.orient)*s.s_orient_dd/orient_norm;
+        % Update orientation position, velocity and acceleration matrices
+        ph_e.euler = ph_e.euler + orient;
+        ph_e_d.euler = ph_e_d.euler + orient_d;
+        ph_e_dd.euler = ph_e_dd.euler + orient_dd;
+    end
+end
+
+%% Axis/Angle Orientation
+
+function [ph_e,th_t_d,th_t_dd,axis] = aa_orient(ph_e,R1,R2,ts_i,ts_f,Ts,i)
+
+th = [];
+axis = [];
+
+Rif = R1.'*R2;
+[r_f th_f] = rot2aa(Rif);
+[th_t th_t_d th_t_dd] = cubicarc_via(th_f,0,ts_f-ts_i,ts_f-ts_i,0,Ts);
+
+for l = 1:length(th_t)
+    R_i = aa2rot(r_f,th_t(l));
+    [axis_new th_new] = rot2aa(R1*R_i);
+    th = [th th_new];
+    axis = [axis axis_new];
+end
+
+orient_aa = [axis ;th];
+
+    if i == 1
+       ph_e.aa = [ph_e.aa orient_aa];
+    else
+       ph_e.aa = [ph_e.aa(:,1:(end-1)) orient_aa];
+    end
+end
+
+##### SOURCE END #####
+-->
+   </body>
+</html>

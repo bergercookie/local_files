@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+
+<toc version="1.0">
+
+<tocitem target="damarob.htm" image="$toolbox/matlab/icons/book_mat.gif">Filippo
+
+<tocitem target="installation.htm" image="$toolbox/matlab/icons/pagesicon.gif">Installation</tocitem>
+
+<tocitem target="getstart.htm" image="$toolbox/matlab/icons/greenarrowicon.gif">Getting Started with the DAMA^{ROB} Toolbox
+   <tocitem target="examples.htm" image="$toolbox/matlab/icons/demoicon.gif">Examples</tocitem>    
+   <tocitem target="ex_robot.htm" image="$toolbox/matlab/icons/demoicon.gif">Demo</tocitem>    
+</tocitem>
+
+<tocitem target="usersguide.htm" image="$toolbox/matlab/icons/pagesicon.gif">User's Guide</tocitem>
+
+<tocitem target="blocks_category.htm" image="$toolbox/matlab/icons/reficon.gif">Simulink Library</tocitem>
+
+<tocitem target="functions.htm" image="$toolbox/matlab/icons/reficon.gif">Function List</tocitem>
+
+<tocitem target="http://www.damarob.altervista.org" image="$toolbox/matlab/icons/webicon.gif">DAMA^{ROB} Web Site</tocitem>
+
+
+</tocitem>
+</toc>

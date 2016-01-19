@@ -1,0 +1,681 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>manipulator</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-24">
+      <meta name="m-file" content="manipulator"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#2">CONSTRUCTORS</a></li>
+               <li><a href="#3">void input: constructor</a></li>
+               <li><a href="#4">incomplete data</a></li>
+               <li><a href="#5">manipulator in input: no constructor,copy manipulator</a></li>
+               <li><a href="#6">error in input data</a></li>
+               <li><a href="#7">standard constructor</a></li>
+               <li><a href="#8">standard constructor [assign values]</a></li>
+               <li><a href="#9">function: set.jointpos(manip,value)</a></li>
+               <li><a href="#10">DESTRUCTOR</a></li>
+            </ul>
+         </div><pre class="codeinput"><span class="keyword">classdef</span> manipulator
+
+<span class="comment">% MANIPULATOR constructor for manipulator class</span>
+<span class="comment">%    syntax: manip = manipulator(DH,name,Tb0,Tne)</span>
+<span class="comment">%</span>
+<span class="comment">% Creates a manipulator object from:</span>
+<span class="comment">%</span>
+<span class="comment">%   name:  string containing the name of the robot</span>
+<span class="comment">%</span>
+<span class="comment">%     DH:  Denavit-Hartenberg table, including joint type and limits.</span>
+<span class="comment">%          DH is a (r x 7) matrix as follows:</span>
+<span class="comment">%            [a alpha d theta R/P min max]</span>
+<span class="comment">%          Each row contains a link data. Note that R/P is a flag variable:</span>
+<span class="comment">%                 R/P  = 0 indicates a revolute joint</span>
+<span class="comment">%                 R/P != 0 indicates a prismatic joint</span>
+<span class="comment">%          if no limits (min - max) is specified, range will be [-Inf, Inf]</span>
+<span class="comment">%</span>
+<span class="comment">%    Tb0: Homogeneous transformation matrix between b-frame and 0-frame</span>
+<span class="comment">%</span>
+<span class="comment">%    Tne: Homogeneous transformation matrix between n-frame and e-frame</span>
+<span class="comment">%           if not specified, Tb0 and Tne will be assumed identities</span>
+<span class="comment">%</span>
+<span class="comment">%     See also manipload</span>
+<span class="comment">%              manipulator/drive_manip</span>
+<span class="comment">%              manipulator/InsertDyndata</span>
+<span class="comment">%              manipulator/Direct_Kinematics</span>
+<span class="comment">%              manipulator/Direct_Dynamics</span>
+<span class="comment">%              manipulator/plus</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+
+    <span class="comment">%protected properties</span>
+    <span class="keyword">properties</span> (SetAccess = <span class="string">'protected'</span>, GetAccess = <span class="string">'protected'</span>)
+        is_sym;                             <span class="comment">% flag: true if symbolic data robot</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">%read-only properties</span>
+    <span class="keyword">properties</span> (SetAccess = <span class="string">'protected'</span>)
+        DH;                                 <span class="comment">% struct containing: table,r,c,p,z</span>
+        name;                               <span class="comment">% string: manipulator name</span>
+        jointvar;                           <span class="comment">% struct (syms): q qp qpp: joint variables</span>
+        kin;                                <span class="comment">% struct containing kinematics data</span>
+        dyn                                 <span class="comment">% struct containing dynamics data</span>
+        evaluated;                          <span class="comment">% struct: contains Direct_Kinematics and Direct_Dynamics flags</span>
+        func;                               <span class="comment">% struct: handles of all m-functions</span>
+        vr_base;                            <span class="comment">% vrworld: manipulator's wrl vr-object</span>
+        fig;                                <span class="comment">% struct: handles of all figures</span>
+        dyndata;                            <span class="comment">% flag: 1 means dynamic dataset ready</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">%public properties</span>
+    <span class="keyword">properties</span> <span class="comment">%(Dependent = 'true')</span>
+        <span class="comment">% add here full access properties and be careful !!! ;)</span>
+        jointpos;			    <span class="comment">% joint position (also used for 3d animation)</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">methods</span>
+</pre><h2>CONSTRUCTORS<a name="2"></a></h2><pre class="codeinput">        <span class="keyword">function</span> manip = manipulator(DH,name,Tb0,Tne)
+            <span class="keyword">global</span> LatexSymbolTable; <span class="comment">%#ok&lt;NUSED&gt;</span>
+            evalin(<span class="string">'base'</span>, <span class="string">'global LatexSymbolTable'</span>);
+</pre><h2>void input: constructor<a name="3"></a></h2><pre class="codeinput">            <span class="keyword">if</span> nargin == 0
+                manip.DH = [];
+                manip.DH.r = 0;
+                <span class="keyword">return</span>
+            <span class="keyword">end</span>
+</pre><h2>incomplete data<a name="4"></a></h2><pre class="codeinput">            <span class="keyword">if</span> nargin == 2                                                  <span class="comment">%  no Tb0 Tne specified</span>
+                Tb0 = eye(4);
+                Tne = eye(4);
+                Tb0Tne_added = 1;  <span class="comment">%#ok&lt;NASGU&gt; it's ok: it's in nargin couunt</span>
+            <span class="keyword">end</span>
+
+            <span class="keyword">if</span> (size(DH) * [0;1]) == 5                                      <span class="comment">% no limits specified: 5 coloumns: a alpha d theta R/P</span>
+                DH(:,6:7) = ones(size(DH)*[1;0],1) * [-inf +inf];
+            <span class="keyword">end</span>
+</pre><h2>manipulator in input: no constructor,copy manipulator<a name="5"></a></h2><pre class="codeinput">            <span class="keyword">if</span> isa(DH,<span class="string">'manipulator'</span>)
+                manip = DH;
+</pre><h2>error in input data<a name="6"></a></h2><pre class="codeinput">            <span class="keyword">elseif</span> (nargin ~= 4) &amp;&amp; ~isvarname(<span class="string">'Tb0Tne_added'</span>)                  <span class="comment">% not enough inputs</span>
+                sprintf(<span class="string">'\n       %s\n'</span>, <span class="string">'manipulator: SYNTAX'</span>);
+                help <span class="string">manipulator</span>;
+                error(<span class="string">' please specify DH and manipulator name '</span>);
+
+            <span class="keyword">elseif</span> ~isvarname(name)
+                disp(<span class="string">' '</span>);
+                disp([<span class="string">'   The string: '''</span>,name,<span class="string">''' is not a valid manipulator name.'</span>]);
+                disp(<span class="string">'   A valid manipulator name is a character string of letters, digits and'</span>);
+                disp(<span class="string">'   underscores, with length &lt;= namelengthmax, the first character a letter,'</span>);
+                disp(<span class="string">'   and the name is not a keyword.'</span>);
+                disp(<span class="string">' '</span>);
+                error(<span class="string">'    Please specify a valid manipulator name.'</span>);
+
+            <span class="keyword">elseif</span> (Tb0(4,4) ~= 1) || (Tne(4,4) ~= 1) || <span class="keyword">...</span><span class="comment">               %Tb0 or Tne not valid homogeneous transformation matrix:</span>
+                    (sum(sum(Tb0(1:3,1:3)  * Tb0(1:3,1:3).' ~= eye(3))) == 9) ||<span class="keyword">...</span>
+                    (sum(sum(Tne(1:3,1:3)  * Tne(1:3,1:3).' ~= eye(3))) == 9)
+                help <span class="string">manipulator</span>;
+                error(<span class="string">' Tb0 or Tne is not a valid homogeneous transformation matrix:'</span>);
+
+            <span class="keyword">elseif</span>  (size(DH) * [0;1]) ~= 7 &amp;&amp; ~isempty(DH)                            <span class="comment">% wrong n.coloumns</span>
+                sprintf(<span class="string">'\n       %s\n'</span>, <span class="string">'manipulator: SYNTAX'</span>) ;
+                help <span class="string">manipulator</span>;
+                error(<span class="string">'\n    %s\n        %s'</span>, <span class="string">'please insert all and only these 7 parameters in DH table: '</span>, <span class="string">'a alpha d theta RP min max '</span>);
+
+            <span class="keyword">elseif</span> ~isempty(DH) &amp;&amp; ~isreal( DH(:,6:7) ) &amp;&amp; ~isreal( eval(DH(:,6:7)) )   <span class="comment">% symbolic limits</span>
+                sprintf(<span class="string">'\n       %s\n'</span>, <span class="string">'manipulator: SYNTAX'</span>);
+                help <span class="string">manipulator</span>;
+                error(<span class="string">'\n    %s\n        %s'</span>, <span class="string">'please specify numeric limits'</span>);
+
+
+            <span class="keyword">elseif</span>  ~isempty(DH) &amp;&amp; ~isreal( DH(:,5) )                                  <span class="comment">% symbolic limits</span>
+                sprintf(<span class="string">'\n       %s\n'</span>, <span class="string">'manipulator: SYNTAX'</span>);
+                help <span class="string">manipulator</span>;
+                error(<span class="string">'\n    %s\n        %s'</span>, <span class="string">'error in joint types P/R'</span>);
+</pre><h2>standard constructor<a name="7"></a></h2><pre class="codeinput">            <span class="keyword">else</span>
+                r = size(DH) * [1; 0];                 <span class="comment">% number of links</span>
+                manip.dyndata = 0;
+                manip.evaluated = struct(<span class="string">'Direct_Kinematics'</span>,0,<span class="string">'Direct_Dynamics'</span>,0);
+                manip.DH = struct;
+                manip.DH.table = sym(DH);
+                manip.DH.r = r;
+                manip.DH.p = struct(<span class="string">'p0'</span>,sym,<span class="string">'pe'</span>,sym);
+                manip.DH.p.p = cell(1,r-1);
+                manip.DH.z = struct(<span class="string">'z0'</span>,sym,<span class="string">'ze'</span>,sym);
+                manip.DH.z.z = cell(1,r-1);
+
+                manip.name = name;
+
+                <span class="comment">% This section initializes symbolic and latex variables by creating the</span>
+                <span class="comment">% LatexSymbolTable struct.</span>
+                <span class="keyword">if</span> ~isempty(manip.DH.table)
+                    rp = manip.DH.table(:,5);
+                <span class="keyword">else</span>
+                    q = [];
+                    q_d = [];
+                    q_dd = [];
+
+                <span class="keyword">end</span>
+                <span class="keyword">for</span> h = 1:manip.DH.r
+                    i = num2str(h);
+                    <span class="keyword">if</span> rp(h) == 0
+                        eval([<span class="string">'syms th'</span> i <span class="string">' th'</span> i <span class="string">'_d'</span> <span class="string">' th'</span> i <span class="string">'_dd;'</span>]);
+                        eval([<span class="string">'theta('</span> i <span class="string">') = th'</span> i <span class="string">';'</span>]);
+                        eval([<span class="string">'q('</span> i <span class="string">') = th'</span> i <span class="string">';'</span>]);
+                        eval([<span class="string">'q_d('</span> i <span class="string">') = th'</span> i <span class="string">'_d;'</span>]);
+                        eval([<span class="string">'q_dd('</span> i <span class="string">') = th'</span> i <span class="string">'_dd;'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.th'</span> i <span class="string">'.sym = ''th'</span> i <span class="string">''';'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.th'</span> i <span class="string">'.tex = ''\theta_'</span> i <span class="string">''';'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.th'</span> i <span class="string">'_d.sym = ''th'</span> i <span class="string">'_d'';'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.th'</span> i <span class="string">'_d.tex = ''\dot{\theta_'</span> i <span class="string">'}'';'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.th'</span> i <span class="string">'_dd.tex = ''\ddot{\theta_'</span> i <span class="string">'}'';'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.th'</span> i <span class="string">'_dd.sym = ''th'</span> i <span class="string">'_dd'';'</span>]);
+                        manip.DH.table(h,4) = q(h);
+                    <span class="keyword">else</span>
+                        manip.DH.table(h,5) = 1;
+                        eval([<span class="string">'syms d'</span> i <span class="string">' d'</span> i <span class="string">'_d'</span> <span class="string">' d'</span> i <span class="string">'_dd;'</span> ]);
+                        eval([<span class="string">'d('</span> i <span class="string">') = d'</span> i <span class="string">';'</span>]);
+                        eval([<span class="string">'q('</span> i <span class="string">') = d'</span> i <span class="string">';'</span>])
+                        eval([<span class="string">'q_d('</span> i <span class="string">') = d'</span> i <span class="string">'_d;'</span>]);
+                        eval([<span class="string">'q_dd('</span> i <span class="string">') = d'</span> i <span class="string">'_dd;'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.d'</span> i <span class="string">'.sym = ''d'</span> i <span class="string">''';'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.d'</span> i <span class="string">'.tex = ''d_'</span> i <span class="string">''';'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.d'</span> i <span class="string">'_d.sym = ''d'</span> i <span class="string">'_d'';'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.d'</span> i <span class="string">'_d.tex = ''\dot{d_'</span> i <span class="string">'}'';'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.d'</span> i <span class="string">'_dd.sym = ''d'</span> i <span class="string">'_dd'';'</span>]);
+                        eval([<span class="string">'LatexSymbolTable.d'</span> i <span class="string">'_dd.tex = ''\ddot{d_'</span> i <span class="string">'}'';'</span>]);
+                        manip.DH.table(h,3) = q(h);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+
+                <span class="comment">% look for symbolic data</span>
+                <span class="keyword">if</span> ~isempty(manip.DH.table)
+                is_manip_numeric = isreal(vpa(DH(:,1:2),2)) &amp;&amp; <span class="keyword">...</span>
+                    isreal(DH(:,4) .* DH(:,5)) &amp;&amp; <span class="keyword">...</span>
+                    isreal(DH(:,3) .* (1 - DH(:,5))) &amp;&amp; <span class="keyword">...</span>
+                    isreal(vpa(Tb0)) &amp;&amp; <span class="keyword">...</span>
+                    isreal(vpa(Tne)) ;
+                <span class="keyword">else</span>
+                    is_manip_numeric = isreal(vpa(Tb0)) &amp;&amp; isreal(vpa(Tne));
+                <span class="keyword">end</span>
+</pre><h2>standard constructor [assign values]<a name="8"></a></h2><pre class="codeinput">                manip.is_sym = ~is_manip_numeric;
+                manip.jointvar = struct;
+                manip.jointvar.q = q;
+                manip.jointvar.qd = q_d;
+                manip.jointvar.qdd = q_dd;
+                manip.kin = struct(<span class="string">'T'</span>, struct(<span class="string">'Tb0'</span>,Tb0,<span class="string">'Tne'</span>,Tne), <span class="keyword">...</span>
+                    <span class="string">'J'</span>, struct(<span class="string">'J'</span>,sym,<span class="string">'Jd'</span>,sym,<span class="string">'Jp_l'</span>,sym,<span class="string">'Jo_l'</span>,sym,<span class="string">'Jp_m'</span>,sym,<span class="string">'Jo_m'</span>,sym));
+                manip.dyn = struct;
+                manip.vr_base = vrworld();
+                manip.fig.vr = vrfigure();
+
+                <span class="keyword">if</span> (manip.is_sym == 0)&amp;&amp; ~strcmp(manip.name,<span class="string">'tmp'</span>) &amp;&amp; ~isempty(manip.DH.table)
+                    manip.jointpos= zeros(1,manip.DH.r);
+                    [fx fy fz] = ee_postn(manip);
+                    manip.func.x = fx;
+                    manip.func.y = fy;
+                    manip.func.z = fz;
+                    [manip.fig.vr, manip.vr_base] = createVR(manip);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>     <span class="comment">%end CONSTRUCTOR</span>
+</pre><h2>function: set.jointpos(manip,value)<a name="9"></a></h2><pre class="codeinput"><span class="keyword">function</span> manip = set.jointpos(manip,value)
+    <span class="keyword">if</span> manip.is_sym == 0
+        oldpos = manip.jointpos;
+        manip.jointpos = value;
+
+        offset = double((manip.DH.table(:,5)*0.5)).'; <span class="comment">%#ok&lt;NASGU&gt;                                     % CORRECT OFFSET HERE</span>
+
+        <span class="comment">% draw 3D if someone has closed the window</span>
+        <span class="keyword">if</span> ~isvalid(manip.fig.vr) &amp;&amp; isvalid(manip.vr_base)
+            <span class="keyword">if</span> ~isopen(manip.vr_base)
+                open(manip.vr_base)
+            <span class="keyword">end</span>
+            manip.fig.vr = view(manip.vr_base);
+        <span class="keyword">end</span>
+
+        <span class="keyword">if</span> ~isempty(oldpos) <span class="comment">% &amp;&amp; ~isempty(find(oldpos - manip.jointpos, 1))</span>
+            <span class="comment">%                joint = find(oldpos - manip.jointpos);</span>
+            joint = 1:1:manip.DH.r;
+            <span class="keyword">for</span> j = joint
+                <span class="keyword">if</span> manip.DH.table(j,5) == 0                         <span class="comment">% revolute joint</span>
+                    eval([<span class="string">'manip.vr_base.Z'</span>, num2str(j-1), <span class="string">'.rotation = [0 0 1 value(j)-offset(j)];'</span>]);
+                <span class="keyword">else</span>                                                    <span class="comment">% prismatic joint</span>
+                    eval([<span class="string">'manip.vr_base.Link'</span>, num2str(j), <span class="string">'.translation = [0 0 value(j)-offset(j)];'</span>]);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">else</span>
+        disp(<span class="string">' Unable to drive or show a symbolic manipulator'</span>);
+        manip = manipulator;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>DESTRUCTOR<a name="10"></a></h2><pre class="codeinput"><span class="keyword">function</span> delete(manip)
+    <span class="keyword">if</span> manip.DH.r == 0
+        objname = inputname(1);
+        evalin(<span class="string">'caller'</span>,[<span class="string">'clear '</span>,objname]);
+        <span class="keyword">return</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">if</span> isfield(manip.fig,<span class="string">'manmov'</span>)
+        <span class="keyword">if</span> ishandle(manip.fig.manmov.mainfig)
+            close(manip.fig.manmov.mainfig)
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">try</span>
+        <span class="keyword">if</span> isfield(manip.fig,<span class="string">'vr'</span>)
+            <span class="keyword">if</span> isvalid(manip.fig.vr)
+                close(manip.fig.vr)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">catch</span> <span class="comment">%#ok&lt;CTCH&gt;</span>
+        disp(<span class="string">'  warning: unable to close VR figure'</span>);
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> isvalid(manip.vr_base)
+        close(manip.vr_base)
+        <span class="keyword">try</span>
+            delete(manip.vr_base)
+        <span class="keyword">catch</span>  <span class="comment">%#ok&lt;CTCH&gt;</span>
+            disp(<span class="string">'  warning: unable to delete an open VR World'</span>);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    delete_file([manip.name,<span class="string">'VR_base.wrl'</span>]);
+    delete_file([manip.name,<span class="string">'_Jd_qd.m'</span>]);
+    delete_file([manip.name,<span class="string">'_J_qdd.m'</span>]);
+    delete_file([manip.name,<span class="string">'_Jt_he.m'</span>]);
+    delete_file([manip.name,<span class="string">'_B_qdd.m'</span>]);
+    delete_file([manip.name,<span class="string">'_B_matrix.m'</span>]);
+    delete_file([manip.name,<span class="string">'_C_qd.m'</span>]);
+    delete_file([manip.name,<span class="string">'_g.m'</span>]);
+    delete_file([manip.name,<span class="string">'_nsap.m'</span>]);
+    delete_file([manip.name,<span class="string">'VR_base.wrl'</span>]);
+    delete_file([manip.name,<span class="string">'_3D.png'</span>]);
+    objname = inputname(1);
+    evalin(<span class="string">'caller'</span>,[<span class="string">'clear '</span>,objname]);
+
+    <span class="keyword">function</span> delete_file(namefile)
+        <span class="keyword">if</span> exist([pwd,<span class="string">'/'</span>,namefile],<span class="string">'file'</span>)
+            delete(namefile);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+    <span class="keyword">end</span><span class="comment">% methods</span>
+<span class="keyword">end</span><span class="comment">% classdef</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+classdef manipulator
+    
+% MANIPULATOR constructor for manipulator class
+%    syntax: manip = manipulator(DH,name,Tb0,Tne)
+%
+% Creates a manipulator object from:
+% 
+%   name:  string containing the name of the robot
+% 
+%     DH:  Denavit-Hartenberg table, including joint type and limits.
+%          DH is a (r x 7) matrix as follows:
+%            [a alpha d theta R/P min max]
+%          Each row contains a link data. Note that R/P is a flag variable:
+%                 R/P  = 0 indicates a revolute joint
+%                 R/P != 0 indicates a prismatic joint
+%          if no limits (min - max) is specified, range will be [-Inf, Inf]
+%
+%    Tb0: Homogeneous transformation matrix between b-frame and 0-frame
+% 
+%    Tne: Homogeneous transformation matrix between n-frame and e-frame
+%           if not specified, Tb0 and Tne will be assumed identities
+%
+%     See also manipload
+%              manipulator/drive_manip 
+%              manipulator/InsertDyndata
+%              manipulator/Direct_Kinematics
+%              manipulator/Direct_Dynamics  
+%              manipulator/plus
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+    %protected properties
+    properties (SetAccess = 'protected', GetAccess = 'protected')
+        is_sym;                             % flag: true if symbolic data robot
+    end
+
+    %read-only properties
+    properties (SetAccess = 'protected')
+        DH;                                 % struct containing: table,r,c,p,z
+        name;                               % string: manipulator name
+        jointvar;                           % struct (syms): q qp qpp: joint variables
+        kin;                                % struct containing kinematics data
+        dyn                                 % struct containing dynamics data
+        evaluated;                          % struct: contains Direct_Kinematics and Direct_Dynamics flags
+        func;                               % struct: handles of all m-functions
+        vr_base;                            % vrworld: manipulator's wrl vr-object
+        fig;                                % struct: handles of all figures
+        dyndata;                            % flag: 1 means dynamic dataset ready
+    end
+    
+    %public properties
+    properties %(Dependent = 'true')
+        % add here full access properties and be careful !!! ;)
+        jointpos;			    % joint position (also used for 3d animation)
+    end
+
+    methods
+%% CONSTRUCTORS
+        function manip = manipulator(DH,name,Tb0,Tne)
+            global LatexSymbolTable; %#ok<NUSED>
+            evalin('base', 'global LatexSymbolTable');
+
+%% void input: constructor
+            if nargin == 0
+                manip.DH = [];
+                manip.DH.r = 0;
+                return
+            end
+
+%% incomplete data
+            if nargin == 2                                                  %  no Tb0 Tne specified
+                Tb0 = eye(4);
+                Tne = eye(4);
+                Tb0Tne_added = 1;  %#ok<NASGU> it's ok: it's in nargin couunt
+            end
+
+            if (size(DH) * [0;1]) == 5                                      % no limits specified: 5 coloumns: a alpha d theta R/P
+                DH(:,6:7) = ones(size(DH)*[1;0],1) * [-inf +inf];
+            end
+
+%% manipulator in input: no constructor,copy manipulator
+            if isa(DH,'manipulator')
+                manip = DH;            
+            
+%% error in input data
+            elseif (nargin ~= 4) && ~isvarname('Tb0Tne_added')                  % not enough inputs
+                sprintf('\n       %s\n', 'manipulator: SYNTAX');
+                help manipulator;
+                error(' please specify DH and manipulator name ');
+
+            elseif ~isvarname(name)
+                disp(' ');
+                disp(['   The string: ''',name,''' is not a valid manipulator name.']);
+                disp('   A valid manipulator name is a character string of letters, digits and');
+                disp('   underscores, with length <= namelengthmax, the first character a letter,');
+                disp('   and the name is not a keyword.');
+                disp(' ');
+                error('    Please specify a valid manipulator name.');
+
+            elseif (Tb0(4,4) ~= 1) || (Tne(4,4) ~= 1) || ...               %Tb0 or Tne not valid homogeneous transformation matrix:
+                    (sum(sum(Tb0(1:3,1:3)  * Tb0(1:3,1:3).' ~= eye(3))) == 9) ||...
+                    (sum(sum(Tne(1:3,1:3)  * Tne(1:3,1:3).' ~= eye(3))) == 9)
+                help manipulator;
+                error(' Tb0 or Tne is not a valid homogeneous transformation matrix:');
+
+            elseif  (size(DH) * [0;1]) ~= 7 && ~isempty(DH)                            % wrong n.coloumns
+                sprintf('\n       %s\n', 'manipulator: SYNTAX') ;
+                help manipulator;
+                error('\n    %s\n        %s', 'please insert all and only these 7 parameters in DH table: ', 'a alpha d theta RP min max ');
+
+            elseif ~isempty(DH) && ~isreal( DH(:,6:7) ) && ~isreal( eval(DH(:,6:7)) )   % symbolic limits
+                sprintf('\n       %s\n', 'manipulator: SYNTAX');
+                help manipulator;
+                error('\n    %s\n        %s', 'please specify numeric limits');
+
+
+            elseif  ~isempty(DH) && ~isreal( DH(:,5) )                                  % symbolic limits
+                sprintf('\n       %s\n', 'manipulator: SYNTAX');
+                help manipulator;
+                error('\n    %s\n        %s', 'error in joint types P/R');
+
+%% standard constructor
+            else
+                r = size(DH) * [1; 0];                 % number of links
+                manip.dyndata = 0;
+                manip.evaluated = struct('Direct_Kinematics',0,'Direct_Dynamics',0);
+                manip.DH = struct;
+                manip.DH.table = sym(DH);
+                manip.DH.r = r;
+                manip.DH.p = struct('p0',sym,'pe',sym);
+                manip.DH.p.p = cell(1,r-1);
+                manip.DH.z = struct('z0',sym,'ze',sym);
+                manip.DH.z.z = cell(1,r-1);
+
+                manip.name = name;
+
+                % This section initializes symbolic and latex variables by creating the
+                % LatexSymbolTable struct.
+                if ~isempty(manip.DH.table) 
+                    rp = manip.DH.table(:,5);
+                else
+                    q = [];
+                    q_d = [];
+                    q_dd = [];
+                    
+                end
+                for h = 1:manip.DH.r
+                    i = num2str(h);
+                    if rp(h) == 0
+                        eval(['syms th' i ' th' i '_d' ' th' i '_dd;']);
+                        eval(['theta(' i ') = th' i ';']);
+                        eval(['q(' i ') = th' i ';']);
+                        eval(['q_d(' i ') = th' i '_d;']);
+                        eval(['q_dd(' i ') = th' i '_dd;']);
+                        eval(['LatexSymbolTable.th' i '.sym = ''th' i ''';']);
+                        eval(['LatexSymbolTable.th' i '.tex = ''\theta_' i ''';']);
+                        eval(['LatexSymbolTable.th' i '_d.sym = ''th' i '_d'';']);
+                        eval(['LatexSymbolTable.th' i '_d.tex = ''\dot{\theta_' i '}'';']);
+                        eval(['LatexSymbolTable.th' i '_dd.tex = ''\ddot{\theta_' i '}'';']);
+                        eval(['LatexSymbolTable.th' i '_dd.sym = ''th' i '_dd'';']);
+                        manip.DH.table(h,4) = q(h);
+                    else
+                        manip.DH.table(h,5) = 1;
+                        eval(['syms d' i ' d' i '_d' ' d' i '_dd;' ]);
+                        eval(['d(' i ') = d' i ';']);
+                        eval(['q(' i ') = d' i ';'])
+                        eval(['q_d(' i ') = d' i '_d;']);
+                        eval(['q_dd(' i ') = d' i '_dd;']);
+                        eval(['LatexSymbolTable.d' i '.sym = ''d' i ''';']);
+                        eval(['LatexSymbolTable.d' i '.tex = ''d_' i ''';']);
+                        eval(['LatexSymbolTable.d' i '_d.sym = ''d' i '_d'';']);
+                        eval(['LatexSymbolTable.d' i '_d.tex = ''\dot{d_' i '}'';']);
+                        eval(['LatexSymbolTable.d' i '_dd.sym = ''d' i '_dd'';']);
+                        eval(['LatexSymbolTable.d' i '_dd.tex = ''\ddot{d_' i '}'';']);
+                        manip.DH.table(h,3) = q(h);
+                    end
+                end
+
+                % look for symbolic data
+                if ~isempty(manip.DH.table) 
+                is_manip_numeric = isreal(vpa(DH(:,1:2),2)) && ...
+                    isreal(DH(:,4) .* DH(:,5)) && ...
+                    isreal(DH(:,3) .* (1 - DH(:,5))) && ...
+                    isreal(vpa(Tb0)) && ... 
+                    isreal(vpa(Tne)) ;
+                else
+                    is_manip_numeric = isreal(vpa(Tb0)) && isreal(vpa(Tne));
+                end
+
+%% standard constructor [assign values]
+                manip.is_sym = ~is_manip_numeric;
+                manip.jointvar = struct;
+                manip.jointvar.q = q;
+                manip.jointvar.qd = q_d;
+                manip.jointvar.qdd = q_dd;
+                manip.kin = struct('T', struct('Tb0',Tb0,'Tne',Tne), ...
+                    'J', struct('J',sym,'Jd',sym,'Jp_l',sym,'Jo_l',sym,'Jp_m',sym,'Jo_m',sym));
+                manip.dyn = struct;
+                manip.vr_base = vrworld();
+                manip.fig.vr = vrfigure();
+                
+                if (manip.is_sym == 0)&& ~strcmp(manip.name,'tmp') && ~isempty(manip.DH.table)
+                    manip.jointpos= zeros(1,manip.DH.r);
+                    [fx fy fz] = ee_postn(manip);
+                    manip.func.x = fx;
+                    manip.func.y = fy;
+                    manip.func.z = fz;
+                    [manip.fig.vr, manip.vr_base] = createVR(manip);
+                end
+            end
+        end     %end CONSTRUCTOR
+         
+%% function: set.jointpos(manip,value)
+function manip = set.jointpos(manip,value)
+    if manip.is_sym == 0
+        oldpos = manip.jointpos;
+        manip.jointpos = value;
+
+        offset = double((manip.DH.table(:,5)*0.5)).'; %#ok<NASGU>                                     % CORRECT OFFSET HERE
+
+        % draw 3D if someone has closed the window
+        if ~isvalid(manip.fig.vr) && isvalid(manip.vr_base)
+            if ~isopen(manip.vr_base)
+                open(manip.vr_base)
+            end
+            manip.fig.vr = view(manip.vr_base);
+        end
+
+        if ~isempty(oldpos) % && ~isempty(find(oldpos - manip.jointpos, 1))
+            %                joint = find(oldpos - manip.jointpos);
+            joint = 1:1:manip.DH.r;
+            for j = joint
+                if manip.DH.table(j,5) == 0                         % revolute joint
+                    eval(['manip.vr_base.Z', num2str(j-1), '.rotation = [0 0 1 value(j)-offset(j)];']);
+                else                                                    % prismatic joint
+                    eval(['manip.vr_base.Link', num2str(j), '.translation = [0 0 value(j)-offset(j)];']);
+                end
+            end
+        end
+    else
+        disp(' Unable to drive or show a symbolic manipulator');
+        manip = manipulator;
+    end
+end
+     
+%% DESTRUCTOR
+function delete(manip)
+    if manip.DH.r == 0
+        objname = inputname(1);
+        evalin('caller',['clear ',objname]);
+        return
+    end
+    
+    if isfield(manip.fig,'manmov')
+        if ishandle(manip.fig.manmov.mainfig)
+            close(manip.fig.manmov.mainfig)
+        end
+    end
+    
+    try
+        if isfield(manip.fig,'vr')
+            if isvalid(manip.fig.vr)
+                close(manip.fig.vr)
+            end
+        end
+    catch %#ok<CTCH>
+        disp('  warning: unable to close VR figure');        
+    end
+    if isvalid(manip.vr_base)
+        close(manip.vr_base)
+        try
+            delete(manip.vr_base)
+        catch  %#ok<CTCH>
+            disp('  warning: unable to delete an open VR World');            
+        end
+    end
+    delete_file([manip.name,'VR_base.wrl']);
+    delete_file([manip.name,'_Jd_qd.m']);
+    delete_file([manip.name,'_J_qdd.m']);
+    delete_file([manip.name,'_Jt_he.m']);
+    delete_file([manip.name,'_B_qdd.m']);
+    delete_file([manip.name,'_B_matrix.m']);
+    delete_file([manip.name,'_C_qd.m']);
+    delete_file([manip.name,'_g.m']);
+    delete_file([manip.name,'_nsap.m']);
+    delete_file([manip.name,'VR_base.wrl']);
+    delete_file([manip.name,'_3D.png']);
+    objname = inputname(1);
+    evalin('caller',['clear ',objname]);
+
+    function delete_file(namefile)
+        if exist([pwd,'/',namefile],'file')
+            delete(namefile);
+        end
+    end
+end
+    end% methods
+end% classdef
+
+##### SOURCE END #####
+-->
+   </body>
+</html>

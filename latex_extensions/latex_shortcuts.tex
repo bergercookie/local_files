@@ -213,27 +213,29 @@
 % FIGURES
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{Tex_Graph}
-    \caption{Excess Thrust Graph}
-    \label{fig:Tex_Graph}
+    \includegraphics[width=<+1.0+>\textwidth]{<+Tex_Graph+>}
+    \caption{<+Excess Thrust Graph+>}
+    \label{fig:<+Tex_Graph+>}
 \end{figure}
 
 % SUBFIGURES
 \begin{figure}
         \centering
         \begin{subfigure}[b]{0.48\textwidth}
-                \includegraphics[width=\textwidth]{output_gauss}
-                \caption{Program output when the Gauss elimination method was used}
-                \label{fig:output_gauss}
+                \includegraphics[width=\textwidth]{<+output_gauss+>}
+                \caption{<+Program output when the Gauss elimination method was
+                used+>}
+                \label{fig:<+output_gauss+>}
         \end{subfigure}%
         ~
         \begin{subfigure}[b]{0.48\textwidth}
-                \includegraphics[width=\textwidth]{output_lu}
-                \caption{Program output when the LU method was used}
-                \label{fig:output_lu}
+                \includegraphics[width=\textwidth]{<+output_lu+>}
+                \caption{<+Program output when the LU method was used+>}
+                \label{fig:<+output_lu+>}
         \end{subfigure}
-        \caption{Program Output when run with different system solving methods}
-        \label{figs:program_outputs}
+        \caption{<+Program Output when run with different system solving
+        methods+>}
+        \label{figs:<+program_outputs+>}
 \end{figure}
 
 % NOMENCLATURE
@@ -255,6 +257,7 @@ makeindex report.nlo -s nomencl.ist -o report.nls -t report.nlg
 % ABSTRACT
 \begin{abstract} % beginning
 \renewcommand{\abstractname}{Executive Summary} % change the abstract name
+\end{abstract}
 
 
 % LISTINGSINPUT
@@ -294,3 +297,33 @@ http://tex.stackexchange.com/questions/18986/is-there-a-standard-way-to-refer-to
 
 % skip a section
 \stepcounter{section}
+
+Σχ.~\ref{<+Καλημέρα+>}<++>
+$<++addhere++>\%$<++>
+
+
+% put the figure in the exact place from top - useful for 2column docs
+\begin{figure*}[t]
+    \centering
+    \includegraphics[trim=+3cm 0 0 -6cm,width=0.5\textwidth]{EMF_ex}
+    \caption{Παραδείγματα χρήσης ΗΔΜ}
+    \label{fig:lab2:EMF_ex}
+\end{figure*}
+
+
+% make a table fit a page - move it to the left
+\begin{adjustwidth}{-2cm}{}
+\end{adjustwidth}
+
+% footnotes without markers
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+\usepackage{relsize} % for mathlarger
+
+% remove any occurance of \textlatin command
+:\\textlatin{\<\(\w\+\>\_s*\)*}

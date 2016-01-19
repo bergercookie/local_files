@@ -16,6 +16,7 @@ from contextlib import contextmanager
 
 # function definitions
 
+# TemporaryDirectory already implemented in tempfile module
 @contextmanager
 def tempdir():
     """Operate on a directory and then delete it."""

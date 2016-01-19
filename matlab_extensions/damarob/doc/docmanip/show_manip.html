@@ -1,0 +1,147 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>show_manip</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-24">
+      <meta name="m-file" content="show_manip"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content"><pre class="codeinput"><span class="keyword">function</span> show_manip(manip,show_axes)
+
+<span class="comment">% SHOW_MANIP shows a 3D view of a manipulator object.</span>
+<span class="comment">%    syntax: show_manip(manip,show_axes)</span>
+<span class="comment">%            show_axes is a flag to view axes</span>
+<span class="comment">%</span>
+<span class="comment">%     See also manipulator</span>
+<span class="comment">%              manipulator/drive_manip</span>
+<span class="comment">%              manipulator/Direct_Kinematics</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+
+<span class="keyword">if</span> manip.DH.r==0 &amp;&amp; isfield(manip.DH,<span class="string">'table'</span>)
+    disp(<span class="string">' Unable to drive or show a manipulator without joints'</span>);
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+<span class="keyword">if</span> manip.is_sym == 0
+    <span class="keyword">if</span> nargin == 1
+        show_axes = 1;
+    <span class="keyword">end</span>
+    manip.jointpos = manip.jointpos;                  <span class="comment">% open 3D window</span>
+    scale = [1,1,1]*show_axes;
+    <span class="keyword">for</span> i=1:1:manip.DH.r
+        eval([<span class="string">'manip.vr_base.Xaxis'</span>,num2str(i-1),<span class="string">'.scale = ['</span>,num2str(scale),<span class="string">'];'</span>]);
+        eval([<span class="string">'manip.vr_base.Yaxis'</span>,num2str(i-1),<span class="string">'.scale = ['</span>,num2str(scale),<span class="string">'];'</span>]);
+        eval([<span class="string">'manip.vr_base.Zaxis'</span>,num2str(i-1),<span class="string">'.scale = ['</span>,num2str(scale),<span class="string">'];'</span>]);
+    <span class="keyword">end</span>
+<span class="keyword">else</span>
+    disp(<span class="string">' Unable to drive or show a symbolic manipulator'</span>);
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function show_manip(manip,show_axes)
+
+% SHOW_MANIP shows a 3D view of a manipulator object.
+%    syntax: show_manip(manip,show_axes)
+%            show_axes is a flag to view axes
+%
+%     See also manipulator
+%              manipulator/drive_manip
+%              manipulator/Direct_Kinematics
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+if manip.DH.r==0 && isfield(manip.DH,'table')
+    disp(' Unable to drive or show a manipulator without joints');    
+    return    
+end
+if manip.is_sym == 0
+    if nargin == 1
+        show_axes = 1;
+    end
+    manip.jointpos = manip.jointpos;                  % open 3D window
+    scale = [1,1,1]*show_axes;
+    for i=1:1:manip.DH.r
+        eval(['manip.vr_base.Xaxis',num2str(i-1),'.scale = [',num2str(scale),'];']);
+        eval(['manip.vr_base.Yaxis',num2str(i-1),'.scale = [',num2str(scale),'];']);
+        eval(['manip.vr_base.Zaxis',num2str(i-1),'.scale = [',num2str(scale),'];']);
+    end
+else
+    disp(' Unable to drive or show a symbolic manipulator');
+end
+##### SOURCE END #####
+-->
+   </body>
+</html>

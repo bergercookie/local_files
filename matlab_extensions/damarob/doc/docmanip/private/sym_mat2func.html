@@ -1,0 +1,311 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>sym_mat2func</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-25">
+      <meta name="m-file" content="sym_mat2func"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content"><pre class="codeinput"><span class="keyword">function</span> sym_mat2func(A, b, params, fname, dig)
+
+<span class="comment">% SYM_MAT2FUNC Generates an m-file containing the function that evaluates</span>
+<span class="comment">% the product A*b.</span>
+<span class="comment">%    syntax: sym_mat2func(A, b, params, fname, digits)</span>
+<span class="comment">%</span>
+<span class="comment">% where:</span>
+<span class="comment">%   A is a symbolic matrix</span>
+<span class="comment">%   params is a symbolic vector of parameters of A or b</span>
+<span class="comment">%   b is a symbolic vector</span>
+<span class="comment">%   fname is string containing the name of the function.</span>
+<span class="comment">%       The name of created file will be 'fname'.m</span>
+<span class="comment">%       The function will be: 'fname'(b,params)</span>
+<span class="comment">%   digits determines the accuracy of Maple's numeric computations</span>
+<span class="comment">%       for more information about digts</span>
+<span class="comment">%       See also sym/digits</span>
+<span class="comment">%</span>
+<span class="comment">% note: if A is a vector and b is a null vector, the function generated</span>
+<span class="comment">%       will be 'fname'(params) = A</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+
+dig_bak = digits;
+digits(dig);
+
+<span class="keyword">if</span> size(b) * [1;0] &lt; size(b) * [0;1]
+    b = b.';
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> size(params) * [1;0] &lt; size(params) * [0;1]
+    params = params.';
+<span class="keyword">end</span>
+
+
+dim_b = length(b);                  <span class="comment">% how many elements in b (variables)</span>
+dim_par = length(params);           <span class="comment">% how many parameters</span>
+
+b_char = evalc(<span class="string">'b.'''</span>);                <span class="comment">% b char</span>
+b_char = b_char(11:end-5);
+params_char = evalc(<span class="string">'params.'''</span>);           <span class="comment">% params.' char</span>
+params_char = params_char(11:end-5);
+
+<span class="keyword">if</span> dim_b ~= 0                               <span class="comment">% if b is a vector</span>
+    A_b_T = (A*b).';                          <span class="comment">% A*b in a row</span>
+<span class="keyword">else</span>                                        <span class="comment">% b is empty</span>
+    <span class="keyword">if</span> size(A) * [1;0] &gt; size(A) * [0;1]
+        A = A.';                                <span class="comment">% A in a row</span>
+    <span class="keyword">end</span>
+    A_b_T = A;
+<span class="keyword">end</span>
+A_b_T = simplify( A_b_T );              <span class="comment">%#ok&lt;NASGU&gt;</span>
+<span class="comment">% A_b_T = evalc('vpa(A_b_T)');          % A*b.' char                                   OLD ROW</span>
+A_b_T = evalc(<span class="string">'(A_b_T)'</span>);               <span class="comment">% A*b.' char</span>
+A_b_T = A_b_T(13:end-5);              <span class="comment">% suppress the row 'ans =' and void</span>
+
+
+NL = [char(13),char(10)]; <span class="comment">% 'new line' string</span>
+
+file_fun = fopen([fname,<span class="string">'.m'</span>], <span class="string">'w'</span>);
+
+<span class="keyword">if</span> dim_b ~= 0                               <span class="comment">% if b is a vector</span>
+    fwrite(file_fun, [<span class="string">'function result='</span>, fname,<span class="string">'(b,params) '</span>,NL ]);
+<span class="keyword">else</span>
+    fwrite(file_fun, [<span class="string">'function result='</span>, fname,<span class="string">'(params) '</span>,NL ]);
+<span class="keyword">end</span>
+fwrite(file_fun, [<span class="string">'% This code has been automatically generated by sym_mat2func '</span>, NL]);
+fwrite(file_fun, [<span class="string">'% '</span>, NL]);
+
+<span class="keyword">if</span> dim_b ~= 0                               <span class="comment">% if b is a vector</span>
+    fwrite(file_fun, [<span class="string">'%    function: '</span>,fname ,<span class="string">'(b,params)'</span> , NL]);
+<span class="keyword">else</span>
+    fwrite(file_fun, [<span class="string">'%    function: '</span>,fname ,<span class="string">'(params)'</span> , NL]);
+<span class="keyword">end</span>
+fwrite(file_fun, [<span class="string">'% '</span>, NL]);
+fwrite(file_fun, [<span class="string">'%       variables b: '</span>,b_char, NL]);
+fwrite(file_fun, [<span class="string">'%       parameters params:'</span>,params_char, NL]);
+fwrite(file_fun, <span class="string">'%'</span>); fwrite(file_fun, NL);
+fwrite(file_fun, <span class="string">'% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.'</span>); fwrite(file_fun, NL);
+fwrite(file_fun, <span class="string">'% This file is part of GNU LGPLv2.1 DAMA^{ROB}'</span>); fwrite(file_fun, NL);
+fwrite(file_fun, <span class="string">'%    http://www.damarob.altervista.org'</span>); fwrite(file_fun, NL);
+fwrite(file_fun, NL);
+
+
+fwrite(file_fun, [<span class="string">'%    variables :'</span>, NL]);
+<span class="keyword">for</span> i=1:1:dim_b
+    i_st = num2str(i);
+    b_c_i = evalc([<span class="string">'b('</span> i_st <span class="string">')'</span>]);    <span class="comment">% string with the name of the variable</span>
+    b_c_i = b_c_i(11:end-5);
+    row_assign = [b_c_i, <span class="string">' = b('</span>, i_st ,<span class="string">'); '</span>];   <span class="comment">%code to be written</span>
+
+    fwrite(file_fun, [row_assign, NL]);               <span class="comment">% WRITE assignment code</span>
+<span class="keyword">end</span>
+
+fwrite(file_fun, [<span class="string">'%    parameters :'</span>, NL]);
+<span class="keyword">for</span> i=1:1:dim_par
+    i_st = num2str(i);
+    par_i = evalc([<span class="string">'params('</span> i_st <span class="string">')'</span>]);<span class="comment">%string with the name of the variable</span>
+    par_i = par_i(11:end-5);
+    row_assign = [par_i, <span class="string">' = params('</span>, i_st ,<span class="string">'); '</span>];   <span class="comment">%code to be written</span>
+
+    fwrite(file_fun, [row_assign, NL]);               <span class="comment">% WRITE assignment code</span>
+<span class="keyword">end</span>
+
+
+fwrite(file_fun, [<span class="string">'% evaluates result:'</span>,NL]);
+fwrite(file_fun, [<span class="string">'result = '</span> A_b_T ,<span class="string">';'</span>, NL]);
+fwrite(file_fun, [<span class="string">'result = result.''; '</span>, NL]);
+fwrite(file_fun, <span class="string">'return'</span>);
+
+fclose(file_fun);
+
+digits(dig_bak);
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function sym_mat2func(A, b, params, fname, dig)
+
+% SYM_MAT2FUNC Generates an m-file containing the function that evaluates 
+% the product A*b.
+%    syntax: sym_mat2func(A, b, params, fname, digits)
+%
+% where:
+%   A is a symbolic matrix
+%   params is a symbolic vector of parameters of A or b
+%   b is a symbolic vector
+%   fname is string containing the name of the function.
+%       The name of created file will be 'fname'.m
+%       The function will be: 'fname'(b,params)
+%   digits determines the accuracy of Maple's numeric computations
+%       for more information about digts
+%       See also sym/digits
+%
+% note: if A is a vector and b is a null vector, the function generated
+%       will be 'fname'(params) = A
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+dig_bak = digits;
+digits(dig);
+
+if size(b) * [1;0] < size(b) * [0;1]
+    b = b.';
+end
+
+if size(params) * [1;0] < size(params) * [0;1]
+    params = params.';
+end
+
+
+dim_b = length(b);                  % how many elements in b (variables)
+dim_par = length(params);           % how many parameters
+
+b_char = evalc('b.''');                % b char
+b_char = b_char(11:end-5);
+params_char = evalc('params.''');           % params.' char
+params_char = params_char(11:end-5);
+
+if dim_b ~= 0                               % if b is a vector
+    A_b_T = (A*b).';                          % A*b in a row
+else                                        % b is empty
+    if size(A) * [1;0] > size(A) * [0;1]
+        A = A.';                                % A in a row
+    end
+    A_b_T = A;
+end
+A_b_T = simplify( A_b_T );              %#ok<NASGU>
+% A_b_T = evalc('vpa(A_b_T)');          % A*b.' char                                   OLD ROW
+A_b_T = evalc('(A_b_T)');               % A*b.' char  
+A_b_T = A_b_T(13:end-5);              % suppress the row 'ans =' and void
+
+
+NL = [char(13),char(10)]; % 'new line' string
+
+file_fun = fopen([fname,'.m'], 'w');
+
+if dim_b ~= 0                               % if b is a vector
+    fwrite(file_fun, ['function result=', fname,'(b,params) ',NL ]);
+else
+    fwrite(file_fun, ['function result=', fname,'(params) ',NL ]);
+end
+fwrite(file_fun, ['% This code has been automatically generated by sym_mat2func ', NL]);
+fwrite(file_fun, ['% ', NL]);
+
+if dim_b ~= 0                               % if b is a vector
+    fwrite(file_fun, ['%    function: ',fname ,'(b,params)' , NL]);
+else
+    fwrite(file_fun, ['%    function: ',fname ,'(params)' , NL]);
+end
+fwrite(file_fun, ['% ', NL]);
+fwrite(file_fun, ['%       variables b: ',b_char, NL]);
+fwrite(file_fun, ['%       parameters params:',params_char, NL]);
+fwrite(file_fun, '%'); fwrite(file_fun, NL);
+fwrite(file_fun, '% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.'); fwrite(file_fun, NL);
+fwrite(file_fun, '% This file is part of GNU LGPLv2.1 DAMA^{ROB}'); fwrite(file_fun, NL);
+fwrite(file_fun, '%    http://www.damarob.altervista.org'); fwrite(file_fun, NL);
+fwrite(file_fun, NL);
+
+
+fwrite(file_fun, ['%    variables :', NL]);
+for i=1:1:dim_b
+    i_st = num2str(i);
+    b_c_i = evalc(['b(' i_st ')']);    % string with the name of the variable
+    b_c_i = b_c_i(11:end-5);
+    row_assign = [b_c_i, ' = b(', i_st ,'); '];   %code to be written
+
+    fwrite(file_fun, [row_assign, NL]);               % WRITE assignment code
+end
+
+fwrite(file_fun, ['%    parameters :', NL]);
+for i=1:1:dim_par
+    i_st = num2str(i);
+    par_i = evalc(['params(' i_st ')']);%string with the name of the variable
+    par_i = par_i(11:end-5);
+    row_assign = [par_i, ' = params(', i_st ,'); '];   %code to be written
+
+    fwrite(file_fun, [row_assign, NL]);               % WRITE assignment code
+end
+
+
+fwrite(file_fun, ['% evaluates result:',NL]);
+fwrite(file_fun, ['result = ' A_b_T ,';', NL]);
+fwrite(file_fun, ['result = result.''; ', NL]);
+fwrite(file_fun, 'return');
+
+fclose(file_fun);
+
+digits(dig_bak);
+##### SOURCE END #####
+-->
+   </body>
+</html>

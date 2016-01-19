@@ -1,0 +1,621 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>InsertDyndata</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-24">
+      <meta name="m-file" content="InsertDyndata"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#2">Function checkvalue</a></li>
+               <li><a href="#3">Function compare_dyndata: compare all dyndata fields but Fm and Fv</a></li>
+            </ul>
+         </div><pre class="codeinput"><span class="keyword">function</span> InsertDyndata(manip,value)
+
+<span class="comment">% INSERTDYNDATA inserts dynamic data into a manipulator object</span>
+<span class="comment">%    syntax: manip.InsertDyndata(dyndata)</span>
+<span class="comment">%</span>
+<span class="comment">%    where dyndata is a struct containing these fields:</span>
+<span class="comment">%</span>
+<span class="comment">%    dyndata</span>
+<span class="comment">%       |</span>
+<span class="comment">%       +--g0 [gx; gy; gz] --&gt; gravity in 0-frame</span>
+<span class="comment">%       +--ml [1 .. r] --&gt; links' masses</span>
+<span class="comment">%       +--mm [1 .. r] --&gt; rotors' masses</span>
+<span class="comment">%       +--kr [1 .. r] --&gt; motorgears' ratios</span>
+<span class="comment">%       +--zm {1 .. r} --&gt; motor axes expressed in [i-frame]</span>
+<span class="comment">%       +--Il {1 .. r} --&gt; links' mass moments of inertia [i-frame]</span>
+<span class="comment">%       +--Im {1 .. r} --&gt; motors' mass moments of inertia</span>
+<span class="comment">%       +--Fv  [rxr]   --&gt; joints' viscous frictions</span>
+<span class="comment">%       +--Fm  [rxr]   --&gt; motors' viscous frictions</span>
+<span class="comment">%       +--pl {1 .. r} --&gt; position of center of mass of the</span>
+<span class="comment">%       |                  i-link with respect to i-frame</span>
+<span class="comment">%       +--pm {1 .. r} --&gt; position of motors with respect to the</span>
+<span class="comment">%                          previous joint axes</span>
+<span class="comment">%</span>
+<span class="comment">%   Please note:</span>
+<span class="comment">%   Il{i} is a 3x3 matrix</span>
+<span class="comment">%   Im{i} is a 3x3 matrix</span>
+<span class="comment">%   pl{i} is a 3x1 column vector</span>
+<span class="comment">%   pm{i} is a 3x1 column vector</span>
+<span class="comment">%   zm{i} is a 3x1 column vector</span>
+<span class="comment">%</span>
+<span class="comment">%     See also manipulator</span>
+<span class="comment">%              manipulator/Direct_Dynamics</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+
+<span class="keyword">if</span> nargin ~=2
+    disp(<span class="string">'Incorrect input arguments number, See help for more details'</span>)
+    help <span class="string">manipulator/InsertDyndata</span>
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+r = manip.DH.r;
+<span class="keyword">if</span> r==0 &amp;&amp; isfield(manip.DH,<span class="string">'table'</span>)
+    disp(<span class="string">' Unable to insert joints data for a manipulator without joints'</span>);
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+
+<span class="comment">% errors struct:</span>
+<span class="comment">%   0 = not checked</span>
+<span class="comment">%   1 = correct value</span>
+<span class="comment">%  -1 = not-existent field</span>
+<span class="comment">%  -2 = error in field</span>
+errors = struct(<span class="string">'g0'</span>,0,<span class="string">'ml'</span>,0,<span class="string">'mm'</span>,0,<span class="string">'pl'</span>,0,<span class="string">'pm'</span>,0,<span class="string">'Il'</span>,0,<span class="string">'Im'</span>,0,<span class="string">'kr'</span>,0,<span class="string">'Fm'</span>,0,<span class="string">'Fv'</span>,0,<span class="string">'zm'</span>,0);
+
+<span class="comment">% data dimension error conditions</span>
+condition_g0 = <span class="string">'length(value.g0) &gt; 3 || length(value.g0) &lt; 3 || ~isvector(value.g0)'</span>;
+condition_ml = <span class="string">'length(value.ml) &gt; r || length(value.ml) &lt; r || ~isvector(value.ml)'</span>;
+condition_mm = <span class="string">'length(value.mm) &gt; r || length(value.mm) &lt; r || ~isvector(value.mm)'</span>;
+condition_pl = <span class="string">'iscell(value.pl) &amp;&amp; (length(value.pl) &gt; r || length(value.pl) &lt; r)'</span>;
+condition_pm = <span class="string">'iscell(value.pm) &amp;&amp; (length(value.pm) &gt; r || length(value.pm) &lt; r)'</span>;
+condition_Il = <span class="string">'iscell(value.Il) &amp;&amp; (length(value.Il) &gt; r || length(value.Il) &lt; r)'</span>;
+condition_Im = <span class="string">'iscell(value.Im) &amp;&amp; (length(value.Im) &gt; r || length(value.Im) &lt; r)'</span>;
+condition_kr = <span class="string">'length(value.kr) &gt; r || length(value.kr) &lt; r || ~isvector(value.kr)'</span>;
+condition_Fm = <span class="string">'prod(double(size(value.Fm) ~= [r r]))'</span>;
+condition_Fv = <span class="string">'prod(double(size(value.Fv) ~= [r r]))'</span>;
+condition_zm = <span class="string">'iscell(value.zm) &amp;&amp; (length(value.zm) &gt; r || length(value.zm) &lt; r)'</span>;
+
+errors = checkvalue(value,<span class="string">'g0'</span>,errors,condition_g0,r);
+errors = checkvalue(value,<span class="string">'ml'</span>,errors,condition_ml,r);
+errors = checkvalue(value,<span class="string">'mm'</span>,errors,condition_mm,r);
+errors = checkvalue(value,<span class="string">'pl'</span>,errors,condition_pl,r);
+errors = checkvalue(value,<span class="string">'pm'</span>,errors,condition_pm,r);
+errors = checkvalue(value,<span class="string">'Il'</span>,errors,condition_Il,r);
+errors = checkvalue(value,<span class="string">'Im'</span>,errors,condition_Im,r);
+errors = checkvalue(value,<span class="string">'kr'</span>,errors,condition_kr,r);
+errors = checkvalue(value,<span class="string">'Fm'</span>,errors,condition_Fm,r);
+errors = checkvalue(value,<span class="string">'Fv'</span>,errors,condition_Fv,r);
+errors = checkvalue(value,<span class="string">'zm'</span>,errors,condition_zm,r);
+
+<span class="comment">% look for missing fields</span>
+index = (struct2array(errors) == -1);
+fields_name = {<span class="string">'g0'</span>,<span class="string">'ml'</span>,<span class="string">'mm'</span>,<span class="string">'pl'</span>,<span class="string">'pm'</span>,<span class="string">'Il'</span>,<span class="string">'Im'</span>,<span class="string">'kr'</span>,<span class="string">'Fm'</span>,<span class="string">'Fv'</span>,<span class="string">'zm'</span>};
+<span class="keyword">if</span> ~isempty(fields_name(index))
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp(<span class="string">' ERROR : Following fields missing:'</span>);
+    disp(fields_name(index));
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">end</span>
+
+<span class="comment">% look for errors in data (dimensions)</span>
+<span class="keyword">if</span> errors.g0 == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp(<span class="string">' ERROR : The field g0 (gravity in 0-frame) must be a vector of three elements'</span>);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> errors.ml == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp([<span class="string">' ERROR : The field ml (links'' masses) must be a vector of '</span> num2str(r) <span class="string">' elements'</span>]);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> errors.mm == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp([<span class="string">' ERROR : The field mm (rotors'' masses) must be a vector of '</span> num2str(r) <span class="string">' elements'</span>]);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> errors.pl == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp([<span class="string">' ERROR : The field pl (joint''s COM positions) must be a cell of '</span> num2str(r) <span class="string">' elements'</span>]);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">else</span>
+    <span class="keyword">if</span> errors.pl == 1
+        <span class="keyword">for</span> i = 1:length(value.pl)
+            <span class="keyword">if</span> length(value.pl{i}) ~= 3 || ~isvector(value.pl{i})
+                <span class="comment">%   disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');</span>
+                disp([<span class="string">' ERROR : Element '</span> num2str(i) <span class="string">' of pl cell is not a vector of three elements'</span>]);
+                disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+                errors.pl = -2;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> errors.pm == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp([<span class="string">' ERROR : The field pm (rotors'' COM positions) must be a cell of '</span> num2str(r) <span class="string">' elements'</span>]);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">else</span>
+    <span class="keyword">if</span> errors.pm == 1
+        <span class="keyword">for</span> i = 1:length(value.pm)
+            <span class="keyword">if</span> length(value.pm{i}) ~= 3 || ~isvector(value.pm{i})
+                <span class="comment">%   disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');</span>
+                disp([<span class="string">' ERROR : Element '</span> num2str(i) <span class="string">' of pm cell is not a vector of three elements'</span>]);
+                disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> errors.Il == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp([<span class="string">' ERROR : The field Il (joints'' inertia tensor) must be a cell of '</span> num2str(r) <span class="string">' elements'</span>]);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">else</span>
+    <span class="keyword">if</span> errors.Il == 1
+        <span class="keyword">for</span> i = 1:length(value.Il)
+            <span class="keyword">if</span> sum(double(size(value.Il{i}) ~= [3 3]))
+                <span class="comment">%   disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');</span>
+                disp([<span class="string">' ERROR : Element '</span> num2str(i) <span class="string">' of Il cell is not a 3x3 matrix'</span>]);
+                disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+                errors.Il = -2;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> errors.Im == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp([<span class="string">' ERROR : The field Im (rotors'' inertia tensor) must be a cell of '</span> num2str(r) <span class="string">' elements'</span>]);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">else</span>
+    <span class="keyword">if</span> errors.Im == 1
+        <span class="keyword">for</span> i = 1:length(value.Im)
+            <span class="keyword">if</span> sum(double(size(value.Im{i}) ~= [3 3]))
+                <span class="comment">%   disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');</span>
+                disp([<span class="string">' ERROR : Element '</span> num2str(i) <span class="string">' of Im cell is not a 3x3 matrix'</span>]);
+                disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+                errors.Im = -2;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> errors.kr == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp([<span class="string">' ERROR : The field kr (motorgear ratios) must be a vector of '</span> num2str(r) <span class="string">' elements'</span>]);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> errors.Fv == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp([<span class="string">' ERROR : The field Fv (joints viscous friction) must be a ['</span> num2str(r) <span class="string">'x'</span> num2str(r) <span class="string">'] matrix'</span>]);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> errors.Fm == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp([<span class="string">' ERROR : The field Fm (motors viscous friction) must be a ['</span> num2str(r) <span class="string">'x'</span> num2str(r) <span class="string">'] matrix'</span>]);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> errors.zm == -2
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+    disp([<span class="string">' ERROR : The field zm (rotors'' axes) must be a cell of '</span> num2str(r) <span class="string">' elements'</span>]);
+    disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+<span class="keyword">else</span>
+    <span class="keyword">if</span> errors.zm == 1
+        <span class="keyword">for</span> i = 1:length(value.zm)
+            <span class="keyword">if</span> length(value.zm{i}) ~= 3 || ~isvector(value.zm{i})
+                <span class="comment">%   disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');</span>
+                disp([<span class="string">' ERROR : Element '</span> num2str(i) <span class="string">' of zm cell is not a vector of three elements'</span>]);
+                disp(<span class="string">'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'</span>);
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% no errors occurred</span>
+<span class="keyword">if</span> prod(double(struct2array(errors) == 1))
+    value.g0 = value.g0(:);
+    value.ml = value.ml(:).';
+    value.kr = value.kr(:).';
+
+    <span class="keyword">for</span> i=1:1:r
+        value.pl{i} = value.pl{i}.';
+        value.pm{i} = value.pm{i}.';
+        value.zm{i} = value.zm{i}.';
+    <span class="keyword">end</span>
+
+    <span class="keyword">if</span> isempty(struct2cell(manip.dyn))
+        old_data = [];
+    <span class="keyword">else</span>
+        old_data = manip.dyn.data;
+    <span class="keyword">end</span>
+
+    manip.dyn = struct(<span class="string">'data'</span>, value  );
+    manip.dyndata = 1;
+
+    <span class="keyword">if</span> ~compare_dyndata(old_data, value)
+        manip3.evaluated.Direct_Dynamics = 0;
+    <span class="keyword">end</span>
+
+
+
+    assignin(<span class="string">'caller'</span>,inputname(1),manip);
+<span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre><h2>Function checkvalue<a name="2"></a></h2><pre class="codeinput"><span class="keyword">function</span> errors = checkvalue(value,field,errors,condition,r) <span class="comment">%#ok&lt;INUSD&gt;</span>
+<span class="keyword">if</span> isfield(value,field)
+    <span class="keyword">if</span> eval(condition)
+        errors.(field) = -2;
+    <span class="keyword">else</span>
+        errors.(field) = 1;
+    <span class="keyword">end</span>
+<span class="keyword">else</span>
+    errors.(field) = -1;
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Function compare_dyndata: compare all dyndata fields but Fm and Fv<a name="3"></a></h2><pre class="codeinput"><span class="keyword">function</span> res = compare_dyndata(data1, data2)
+<span class="keyword">if</span> ~isstruct(data1) || ~isstruct(data2)
+    res = 0;
+<span class="keyword">else</span> <span class="comment">%assuming that data1 and data2 are correct dyndata structures</span>
+    res = zeros(1,9);
+    <span class="keyword">for</span> i = {<span class="string">'g0'</span>,<span class="string">'ml'</span>,<span class="string">'mm'</span>,<span class="string">'pl'</span>,<span class="string">'pm'</span>,<span class="string">'Il'</span>,<span class="string">'Im'</span>,<span class="string">'kr'</span>,<span class="string">'zm'</span>};
+        res(i) = data1.(i) == data2.(i);
+    <span class="keyword">end</span>
+    res = prod(res);
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function InsertDyndata(manip,value)
+
+% INSERTDYNDATA inserts dynamic data into a manipulator object
+%    syntax: manip.InsertDyndata(dyndata)
+% 
+%    where dyndata is a struct containing these fields:
+%
+%    dyndata
+%       |
+%       +REPLACE_WITH_DASH_DASHg0 [gx; gy; gz] REPLACE_WITH_DASH_DASH> gravity in 0-frame
+%       +REPLACE_WITH_DASH_DASHml [1 .. r] REPLACE_WITH_DASH_DASH> links' masses
+%       +REPLACE_WITH_DASH_DASHmm [1 .. r] REPLACE_WITH_DASH_DASH> rotors' masses
+%       +REPLACE_WITH_DASH_DASHkr [1 .. r] REPLACE_WITH_DASH_DASH> motorgears' ratios
+%       +REPLACE_WITH_DASH_DASHzm {1 .. r} REPLACE_WITH_DASH_DASH> motor axes expressed in [i-frame]
+%       +REPLACE_WITH_DASH_DASHIl {1 .. r} REPLACE_WITH_DASH_DASH> links' mass moments of inertia [i-frame]
+%       +REPLACE_WITH_DASH_DASHIm {1 .. r} REPLACE_WITH_DASH_DASH> motors' mass moments of inertia
+%       +REPLACE_WITH_DASH_DASHFv  [rxr]   REPLACE_WITH_DASH_DASH> joints' viscous frictions
+%       +REPLACE_WITH_DASH_DASHFm  [rxr]   REPLACE_WITH_DASH_DASH> motors' viscous frictions
+%       +REPLACE_WITH_DASH_DASHpl {1 .. r} REPLACE_WITH_DASH_DASH> position of center of mass of the
+%       |                  i-link with respect to i-frame
+%       +REPLACE_WITH_DASH_DASHpm {1 .. r} REPLACE_WITH_DASH_DASH> position of motors with respect to the
+%                          previous joint axes
+%
+%   Please note:
+%   Il{i} is a 3x3 matrix
+%   Im{i} is a 3x3 matrix
+%   pl{i} is a 3x1 column vector
+%   pm{i} is a 3x1 column vector
+%   zm{i} is a 3x1 column vector
+%
+%     See also manipulator
+%              manipulator/Direct_Dynamics
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+if nargin ~=2
+    disp('Incorrect input arguments number, See help for more details')
+    help manipulator/InsertDyndata
+    return
+end
+r = manip.DH.r;
+if r==0 && isfield(manip.DH,'table')
+    disp(' Unable to insert joints data for a manipulator without joints');
+    return
+end
+
+% errors struct:
+%   0 = not checked
+%   1 = correct value
+%  -1 = not-existent field
+%  -2 = error in field
+errors = struct('g0',0,'ml',0,'mm',0,'pl',0,'pm',0,'Il',0,'Im',0,'kr',0,'Fm',0,'Fv',0,'zm',0);
+
+% data dimension error conditions
+condition_g0 = 'length(value.g0) > 3 || length(value.g0) < 3 || ~isvector(value.g0)';
+condition_ml = 'length(value.ml) > r || length(value.ml) < r || ~isvector(value.ml)';
+condition_mm = 'length(value.mm) > r || length(value.mm) < r || ~isvector(value.mm)';
+condition_pl = 'iscell(value.pl) && (length(value.pl) > r || length(value.pl) < r)';
+condition_pm = 'iscell(value.pm) && (length(value.pm) > r || length(value.pm) < r)';
+condition_Il = 'iscell(value.Il) && (length(value.Il) > r || length(value.Il) < r)';
+condition_Im = 'iscell(value.Im) && (length(value.Im) > r || length(value.Im) < r)';
+condition_kr = 'length(value.kr) > r || length(value.kr) < r || ~isvector(value.kr)';
+condition_Fm = 'prod(double(size(value.Fm) ~= [r r]))';
+condition_Fv = 'prod(double(size(value.Fv) ~= [r r]))';
+condition_zm = 'iscell(value.zm) && (length(value.zm) > r || length(value.zm) < r)';
+
+errors = checkvalue(value,'g0',errors,condition_g0,r);
+errors = checkvalue(value,'ml',errors,condition_ml,r);
+errors = checkvalue(value,'mm',errors,condition_mm,r);
+errors = checkvalue(value,'pl',errors,condition_pl,r);
+errors = checkvalue(value,'pm',errors,condition_pm,r);
+errors = checkvalue(value,'Il',errors,condition_Il,r);
+errors = checkvalue(value,'Im',errors,condition_Im,r);
+errors = checkvalue(value,'kr',errors,condition_kr,r);
+errors = checkvalue(value,'Fm',errors,condition_Fm,r);
+errors = checkvalue(value,'Fv',errors,condition_Fv,r);
+errors = checkvalue(value,'zm',errors,condition_zm,r);
+
+% look for missing fields
+index = (struct2array(errors) == -1);
+fields_name = {'g0','ml','mm','pl','pm','Il','Im','kr','Fm','Fv','zm'};
+if ~isempty(fields_name(index))
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp(' ERROR : Following fields missing:');
+    disp(fields_name(index));
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+end
+
+% look for errors in data (dimensions)
+if errors.g0 == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp(' ERROR : The field g0 (gravity in 0-frame) must be a vector of three elements');
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+end
+
+if errors.ml == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp([' ERROR : The field ml (links'' masses) must be a vector of ' num2str(r) ' elements']);
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+end
+
+if errors.mm == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp([' ERROR : The field mm (rotors'' masses) must be a vector of ' num2str(r) ' elements']);
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+end
+
+if errors.pl == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp([' ERROR : The field pl (joint''s COM positions) must be a cell of ' num2str(r) ' elements']);
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+else
+    if errors.pl == 1
+        for i = 1:length(value.pl)
+            if length(value.pl{i}) ~= 3 || ~isvector(value.pl{i})
+                %   disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                disp([' ERROR : Element ' num2str(i) ' of pl cell is not a vector of three elements']);
+                disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                errors.pl = -2;
+            end
+        end
+    end
+end
+
+if errors.pm == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp([' ERROR : The field pm (rotors'' COM positions) must be a cell of ' num2str(r) ' elements']);
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+else
+    if errors.pm == 1
+        for i = 1:length(value.pm)
+            if length(value.pm{i}) ~= 3 || ~isvector(value.pm{i})
+                %   disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                disp([' ERROR : Element ' num2str(i) ' of pm cell is not a vector of three elements']);
+                disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+            end
+        end
+    end
+end
+
+if errors.Il == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp([' ERROR : The field Il (joints'' inertia tensor) must be a cell of ' num2str(r) ' elements']);
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+else
+    if errors.Il == 1
+        for i = 1:length(value.Il)
+            if sum(double(size(value.Il{i}) ~= [3 3]))
+                %   disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                disp([' ERROR : Element ' num2str(i) ' of Il cell is not a 3x3 matrix']);
+                disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                errors.Il = -2;
+            end
+        end
+    end
+end
+
+if errors.Im == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp([' ERROR : The field Im (rotors'' inertia tensor) must be a cell of ' num2str(r) ' elements']);
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+else
+    if errors.Im == 1
+        for i = 1:length(value.Im)
+            if sum(double(size(value.Im{i}) ~= [3 3]))
+                %   disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                disp([' ERROR : Element ' num2str(i) ' of Im cell is not a 3x3 matrix']);
+                disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                errors.Im = -2;
+            end
+        end
+    end
+end
+
+if errors.kr == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp([' ERROR : The field kr (motorgear ratios) must be a vector of ' num2str(r) ' elements']);
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+end
+
+if errors.Fv == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp([' ERROR : The field Fv (joints viscous friction) must be a [' num2str(r) 'x' num2str(r) '] matrix']);
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+end
+
+if errors.Fm == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp([' ERROR : The field Fm (motors viscous friction) must be a [' num2str(r) 'x' num2str(r) '] matrix']);
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+end
+
+if errors.zm == -2
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    disp([' ERROR : The field zm (rotors'' axes) must be a cell of ' num2str(r) ' elements']);
+    disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+else
+    if errors.zm == 1
+        for i = 1:length(value.zm)
+            if length(value.zm{i}) ~= 3 || ~isvector(value.zm{i})
+                %   disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                disp([' ERROR : Element ' num2str(i) ' of zm cell is not a vector of three elements']);
+                disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+            end
+        end
+    end
+end
+
+% no errors occurred
+if prod(double(struct2array(errors) == 1))
+    value.g0 = value.g0(:);
+    value.ml = value.ml(:).';
+    value.kr = value.kr(:).';
+
+    for i=1:1:r
+        value.pl{i} = value.pl{i}.';
+        value.pm{i} = value.pm{i}.';
+        value.zm{i} = value.zm{i}.';
+    end
+
+    if isempty(struct2cell(manip.dyn))
+        old_data = [];
+    else
+        old_data = manip.dyn.data;
+    end
+
+    manip.dyn = struct('data', value  );
+    manip.dyndata = 1;
+
+    if ~compare_dyndata(old_data, value)
+        manip3.evaluated.Direct_Dynamics = 0;
+    end
+    
+    
+    
+    assignin('caller',inputname(1),manip);
+end
+
+end
+
+%% Function checkvalue
+function errors = checkvalue(value,field,errors,condition,r) %#ok<INUSD>
+if isfield(value,field)
+    if eval(condition)
+        errors.(field) = -2;
+    else
+        errors.(field) = 1;
+    end
+else
+    errors.(field) = -1;
+end
+end
+
+%% Function compare_dyndata: compare all dyndata fields but Fm and Fv
+function res = compare_dyndata(data1, data2)
+if ~isstruct(data1) || ~isstruct(data2)
+    res = 0;
+else %assuming that data1 and data2 are correct dyndata structures
+    res = zeros(1,9);
+    for i = {'g0','ml','mm','pl','pm','Il','Im','kr','zm'};
+        res(i) = data1.(i) == data2.(i);
+    end
+    res = prod(res);
+end
+end
+
+##### SOURCE END #####
+-->
+   </body>
+</html>

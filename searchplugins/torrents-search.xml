@@ -1,0 +1,11 @@
+<SearchPlugin xmlns="http://www.mozilla.org/2006/browser/search/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/">
+<os:ShortName>Torrents Search</os:ShortName>
+<os:Description>Free, fast and powerful meta-search engine combining results from dozens of torrent (torrentz) search engines</os:Description>
+<os:InputEncoding>UTF-8</os:InputEncoding>
+<os:Image width="16" height="16">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAQ0lEQVQ4jWNgYGBgME6b+Z8czECJZrghVDGAAQvA6lwsarCJE20AXjBqwGA1AGdyJscFBF2FzwCivITLAKLDg9gwAAA0gPeiz9GUnwAAAABJRU5ErkJggg==</os:Image>
+<SearchForm>https://torrentz.eu/i</SearchForm>
+<os:Url type="text/html" method="GET" template="https://torrentz.eu/search" resultDomain="torrentz.eu">
+  <os:Param name="q" value="{searchTerms}"/>
+</os:Url><os:Url type="application/x-suggestions+json" method="GET" template="http://suggestqueries.google.com/complete/search?output=firefox&amp;client=firefox&amp;hl=en&amp;q={searchTerms}" resultDomain="suggestqueries.google.com">
+</os:Url>
+</SearchPlugin>

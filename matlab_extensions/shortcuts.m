@@ -236,6 +236,9 @@ set(hLegend.BoxFace, 'ColorType','truecoloralpha', ...
     'ColorData',uint8(255*[.5;.5;.5;.8]));  % [.5,.5,.5] is light gray; 0.8 means 20% transparent
 
 
+% Image to graphics file
+imwrite(img, 'kalimera.tiff')
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Change properties in all figures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -267,6 +270,10 @@ autoArrangeFigures(0, 0)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ph_struct.(nname) = ph_struct.(fldname);
 ph_struct = rmfield(ph_struct, fldname);
+
+% displays an animated comet plot of vector Y vs. X.
+comet(X,Y);
+
 
 %% SYMBOLICS
 
@@ -543,3 +550,214 @@ fopen(fname, 'w+');
 % FROM MAC TERMINAL
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 matlab -nodesktop -nosplash
+
+% add folder + subfolders to path
+addpath(genpath('path_to_folder')
+
+
+% check which toolbox does one command [roty] belong to
+which roty
+
+%% IMAGE PROCESSING TOOLBOX
+
+rgb2gray('image_path');
+imshow; % show an image
+imread; % read an image
+drawnow; % force image to display now
+% histogram of an image
+[pixelCount, grayLevels] = imhist(originalImage);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APPLYING A COLOR THRESHOLD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Threshold the image to get a binary image (only 0's and 1's) of class "logical."
+% Method #1: using im2bw()
+%   normalizedThresholdValue = 0.4; % In range 0 to 1.
+%   thresholdValue = normalizedThresholdValue * max(max(originalImage)); % Gray Levels.
+%
+% nickkouk
+% THIS IS WRONG, should have used thresholdValue instead of normalized one
+%   binaryImage = im2bw(originalImage, normalizedThresholdValue);       % One way to threshold to binary
+%
+% Method #2: using a logical operation.
+thresholdValue = 100;
+binaryImage = originalImage > thresholdValue; % Bright objects will be chosen if you use >.
+
+% identify the seperate objects in an image
+labeledImage = bwconncomp(binaryImage);
+
+% shape-based filtering
+% remove all object containing fewer than 30 pixels
+bw = bwareaopen(bw,30);
+
+
+% http://se.mathworks.com/help/images/examples/identifying-round-objects.html
+% fill a gap in the pen's cap
+se = strel('disk',2);
+bw = imclose(bw,se);
+
+% fill any holes, so that regionprops can be used to estimate
+% the area enclosed by each of the boundaries
+bw = imfill(bw,'holes');
+
+imshow(bw)
+
+% convert the found labels into rgb image for visualization
+label2rgb(L, MAP)
+
+% Global image threshold using Otsu's method
+level = graythresh(I)
+[level EM] = graythresh(I)
+
+% You can view the builtin demo images here
+ls('/Applications/MATLAB_R2014a.app/toolbox/images/imdemos')
+ls('/Applications/MATLAB_R2014a.app/toolbox/images/imdata')
+
+% Image segmentation
+
+% Subsract an Image of another (e.g compare against background)
+imgDifff = abs(img1BW - img2BW);
+%or 
+imgDiff = imsubstract(img1BW - imb2BW);
+
+% Find circles using Circular Hough Transform.
+% in order to detect the circles you need to configure the 'Sensitivity'
+% paameter as well!! 
+CENTERS = imfindcircles(A, RADIUS);  % finds cercles with approximately the specified RADIUS
+[CENTERS, RADII] = imfindcircles(A, RADIUS_RANGE, 'objectPolarity', 'dark'); 
+viscircles(centers, radii); % show the detected circles
+
+% add noise!
+% add salt&pepper noise to an image!
+imnoise(x.data, 'salt & pepper');
+
+% you can also process images "in blocks" for memory reasons
+% save to a file, not to a var just to save memory
+filename = 'mandi.tif';
+blocksize = [280, 640];
+blockproc(filename, blocksize, @(x) imnoise(x.data, 'salt & pepper'), ...
+    'destination', 'myresult.tif', ... 
+    'UseParallel', false);
+
+% write reduced resolution set image for easier viewing
+% Clarity of the image and memory usage are balanced
+rset_file = rsetwrite('myresult.tif');
+imtool(rset_file);
+
+% show two images side by side
+imshowpair(img1, img2, 'montage');
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% GUI BUILDING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Have this line at the end of function if you want to update the handles
+% struct
+guidata(hObject, handles); % Update handles structure
+
+%get set methods for getting/setting widget variables
+get(handles.widget_tag, 'PropertyName');
+set(handles.widget_tag, 'PropertyName', PropValue);
+
+% change the GUI Position
+% You can specify 'movegui' as a CreateFcn callback for a figure
+movegui(hObject, 'center');
+% maximize GUI size
+set(gcf,'units','pixel','position',get(0,'screensize'))
+
+% pre-defined dialog boxes
+% http://se.mathworks.com/help/matlab/predefined-dialog-boxes.html
+
+%HELPDLG
+helpdlg('window prompt',...
+        'Window name');
+    
+%MSGBOX
+h = msgbox('Operation Completed');
+h = msgbox({'Operation' 'Completed'}); % use cell for line breaks
+h = msgbox('Invalid Value', 'Error (window name)','error'); % include error icon
+% Use an RGB image of your own
+myicon = imread('landOcean.jpg');
+h=msgbox('Operation Completed','Success','custom',myicon);
+
+% Construct a QUESTDLG with three options
+choice = questdlg('Would you like a dessert?', ...
+	'Dessert Menu', ...
+	'Ice cream','Cake','No thank you','No thank you');
+% Handle response
+switch choice
+    case 'Ice cream'
+        disp([choice ' coming right up.'])
+        dessert = 1;
+    case 'Cake'
+        disp([choice ' coming right up.'])
+        dessert = 2;
+    case 'No thank you'
+        disp('I''ll bring you your check.')
+        dessert = 0;
+end
+
+playagain = menu('Do you want to play again?', 'Yes!', 'No.... :/');
+
+
+% Camera Support
+webcamlist % print a list of the available cameras to use
+cam = webcam; % select the first, you can also use indexes
+preview(cam)
+closePreview(cam)
+img = snapshot(cam);
+imshow(img)
+webcamlist
+
+% Initialize video
+vid = videoinput('macvideo',1);
+hImage=image(zeros(699,1500,1),'Parent',handles.camera_axes);
+set(vid, 'ReturnedColorSpace', 'RGB');
+preview(vid,hImage); % no RGB image in this case
+
+
+% display current time, date
+ c = clock;
+disp(datestr(datenum(c(1),c(2),c(3),c(4),c(5),c(6))));
+
+
+% force GUI to close
+close all force
+
+
+% Strip string of linefeeds (codes 10, 13)
+indx = find(s==char(13) | s==char(10) | s==' ');
+s(indx) = [];
+
+% check if  directory is on the MATLAB path
+pathCell = regexp(path, pathsep, 'split');
+if ispc  % Windows is not case-sensitive
+  onPath = any(strcmpi(foldername, pathCell));
+else
+  onPath = any(strcmp(foldername, pathCell));
+end
+
+
+% matlab version and toolboxes available 
+ver
+
+% grep on a file in matlab
+grep -i -n linewidth ~/local/matlab_extensions/startup.m
+
+
+% get the home path
+if ispc
+home = [getenv('HOMEDRIVE') getenv('HOMEPATH')];
+else
+home = getenv('HOME');
+end
+
+% repeat a string N times in a sequence
+repeatedString = repmat('*', 1, 69);
+
+
+% suppress lsqcurvefit output
+opts = optimset('Display','off');
+a = lsqcurvefit(@model_fun, X, Y,opts);

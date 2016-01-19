@@ -1,0 +1,1163 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>createVR</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-25">
+      <meta name="m-file" content="createVR"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#2">Main function</a></li>
+               <li><a href="#3">Define viewpoints</a></li>
+               <li><a href="#4">Insert prismatic joint</a></li>
+               <li><a href="#5">Insert revolute joint</a></li>
+               <li><a href="#6">Insert Z axis</a></li>
+               <li><a href="#7">Insert Y axis</a></li>
+               <li><a href="#8">Insert X axis</a></li>
+               <li><a href="#9">Insert End-Effector</a></li>
+               <li><a href="#10">rotation matrix 2 axis angle</a></li>
+            </ul>
+         </div><pre class="codeinput"><span class="keyword">function</span> [figvr, vr_base] = createVR(manip)
+
+<span class="comment">% CREATEVR creates a VRML97 model of a manipulator.</span>
+<span class="comment">%    syntax: [figvr, vr_base] = createVR(manip)</span>
+<span class="comment">%</span>
+<span class="comment">%  The program saves the VRML model in a file called nnnnnVR_base.wrl where</span>
+<span class="comment">%  nnnnn is the manipulator's name.</span>
+<span class="comment">%      vr_base: vrworld object associated with wrl file</span>
+<span class="comment">%        figvr: vrfigure associated to vr_base</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+</pre><h2>Main function<a name="2"></a></h2>
+         <p>evaluate workspace limits</p><pre class="codeinput">lim = envelope(manip);
+
+<span class="comment">% extract revolute/prismatic information about joints</span>
+DH5 = char(manip.DH.table(:,5).');
+DH5 = DH5(9:end-2);
+
+background_RGB = [200, 225, 225];
+background_RGB_1 = background_RGB./255;
+DH = manip.DH.table;
+Tb0 = manip.kin.T.Tb0;
+Tne = manip.kin.T.Tne;
+r = size(DH)*[1;0];
+NL = [char(13),char(10)];
+method = [manip.name,<span class="string">'VR_base'</span>];
+
+<span class="keyword">if</span> exist([pwd,<span class="string">'/'</span>,method,<span class="string">'.wrl'</span>],<span class="string">'file'</span>)
+    delete([method,<span class="string">'.wrl'</span>]);
+<span class="keyword">end</span>
+
+file_fun = fopen([method,<span class="string">'.wrl'</span>],<span class="string">'a+'</span>);
+
+alpha_base = atan2(Tb0(1,4),Tb0(2,4));
+beta_base = atan2(Tb0(3,4),sqrt((Tb0(1,4)^2+Tb0(2,4)^2)));
+[rbase_orient base_orient] = rot2aa(rotz(-alpha_base)*rotx(beta_base));
+[rfirstT_vect firstT_rot] = rot2aa(Tb0(1:3,1:3));
+
+<span class="comment">% Start writing wrl file</span>
+fwrite(file_fun,[<span class="keyword">...</span>
+<span class="string">'#VRML V2.0 utf8'</span>,NL,<span class="keyword">...</span>
+<span class="string">'# Joints: '</span>,DH5,NL,<span class="keyword">...</span>
+<span class="string">'DEF Base Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'   children '</span>,NL,<span class="keyword">...</span>
+<span class="string">'     ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'       Shape '</span>,NL,<span class="keyword">...</span><span class="comment">  % Base shape</span>
+<span class="string">'          {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'            appearance Appearance '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 0.650000 0.400000 0.300000'</span>,NL,<span class="string">'transparency 0.1'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'            geometry Box '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'size '</span>,num2str(lim(1,2)*2),<span class="string">' '</span>,num2str(lim(2,2)*2),<span class="string">' 0.010000'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          }'</span>,NL,<span class="keyword">...</span><span class="comment">   % end Base shape</span>
+<span class="string">'       DEF Link0 Transform '</span>,NL,<span class="keyword">...</span>
+<span class="string">'         {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'         rotation '</span>,num2str(rbase_orient(1)),<span class="string">' '</span>,num2str(rbase_orient(2)),<span class="string">' '</span>,num2str(rbase_orient(3)),<span class="string">' '</span>,num2str(base_orient),<span class="string">' '</span>,NL,<span class="keyword">...</span>
+<span class="string">'         translation '</span>,num2str(Tb0(1,4)/2),<span class="string">' '</span>,num2str(Tb0(2,4)/2),<span class="string">' '</span>,num2str(Tb0(3,4)/2),NL,<span class="keyword">...</span>
+<span class="string">'         children '</span>,NL,<span class="keyword">...</span>
+<span class="string">'            ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'              Shape'</span>,NL,<span class="keyword">...</span><span class="comment"> % Link0 Shape</span>
+<span class="string">'                 {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                   appearance Appearance '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 9.000001e-2 0.319999 0.444999'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                   geometry Cylinder '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'height '</span>,num2str(sqrt(Tb0(1,4)^2+Tb0(2,4)^2+Tb0(3,4)^2)),NL,<span class="string">'radius 0.035000'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                 }'</span>,NL,<span class="keyword">...</span><span class="comment">  % end Link0 Shape</span>
+<span class="string">'                 ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                 }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'              DEF FirstT Transform '</span>,NL,<span class="keyword">...</span><span class="comment"> % begin Frame 0</span>
+<span class="string">'                {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                rotation '</span>,num2str(rfirstT_vect(1)),<span class="string">' '</span>,num2str(rfirstT_vect(2)),<span class="string">' '</span>,num2str(rfirstT_vect(3)),<span class="string">' '</span>,num2str(firstT_rot),<span class="string">' '</span>,NL,<span class="keyword">...</span><span class="comment"> % Pose of frame 0 with respect to Link0 center</span>
+<span class="string">'                translation '</span>,num2str(Tb0(1,4)),<span class="string">' '</span>,num2str(Tb0(2,4)),<span class="string">' '</span>,num2str(Tb0(3,4)),NL,<span class="keyword">...</span>
+<span class="string">'                 children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                   ['</span>,NL]);
+<span class="comment">%num2str(sqrt(Tb0(1,4)^2+Tb0(2,4)^2+Tb0(3,4)^2))</span>
+<span class="comment">% Insert a viewable reference frame for Frame 0</span>
+
+insert_axis_z(<span class="string">'0'</span>,file_fun);
+insert_axis_y(<span class="string">'0'</span>,file_fun);
+insert_axis_x(<span class="string">'0'</span>,file_fun);
+
+<span class="comment">% Recursive insertion of successive links</span>
+    <span class="keyword">if</span> DH(1,5) == 0
+        insert_joint_rot(<span class="string">'1'</span>,DH,r,file_fun,Tne);
+    <span class="keyword">else</span>
+        insert_joint_prism(<span class="string">'1'</span>,DH,r,file_fun,Tne);
+    <span class="keyword">end</span>
+
+<span class="comment">% Append end part of file</span>
+fwrite(file_fun,[NL,<span class="keyword">...</span>
+<span class="string">']'</span>,NL,<span class="keyword">...</span><span class="comment"> % End Link0 child</span>
+<span class="string">'}'</span>,NL]);  <span class="comment">% End Link0 transform</span>
+
+<span class="comment">% Insert base axes</span>
+insert_axis_z(<span class="string">'base'</span>,file_fun);
+insert_axis_y(<span class="string">'base'</span>,file_fun);
+insert_axis_x(<span class="string">'base'</span>,file_fun);
+
+fwrite(file_fun,[NL,<span class="string">']'</span>,NL,<span class="keyword">...</span><span class="comment"> % End Base child</span>
+<span class="string">'}'</span>,NL]);                      <span class="comment">% End Base transform</span>
+</pre><h2>Define viewpoints<a name="3"></a></h2><pre class="codeinput">fwrite(file_fun,[NL,<span class="keyword">...</span>
+    <span class="string">'Background '</span>,NL,<span class="keyword">...</span>
+<span class="string">'  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  skyColor '</span>,NL,<span class="keyword">...</span>
+<span class="string">'    ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'    '</span>,num2str(background_RGB_1),NL,<span class="keyword">...</span>
+<span class="string">'    ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL,<span class="keyword">...</span>
+<span class="string">''</span>,NL,<span class="keyword">...</span>
+<span class="string">'DEF STD Viewpoint'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  fieldOfView 0.500000'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  orientation 0.350553 0.523699 0.776436 2.16305'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  position '</span> num2str(1.37*[1.44 0.53 0.76]*norm(lim(:,2))),NL <span class="keyword">...</span><span class="comment"> 3.54316 1.29216 1.86001</span>
+<span class="string">'  description "STD"'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'DEF XY_plane Viewpoint'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  fieldOfView 9.999999e-3'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  orientation 0 1 0 0'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  position 0 0 '</span>,num2str( 100*2*max(lim(1:2,2)) ),NL,<span class="keyword">...</span>
+<span class="string">'  description "XY_plane"'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL,<span class="keyword">...</span>
+<span class="string">''</span>,NL,<span class="keyword">...</span>
+<span class="string">'DEF XY_perspective Viewpoint '</span>,NL,<span class="keyword">...</span>
+<span class="string">'  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  fieldOfView 0.100000'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  orientation 0 1 0 0'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  position 0 0 '</span>,num2str( 10*2*max(lim(1:2,2)) ),NL,<span class="keyword">...</span>
+<span class="string">'  description "XY_perspective"'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL,<span class="keyword">...</span>
+<span class="string">''</span>,NL,<span class="keyword">...</span>
+<span class="string">'DEF leftXZ Viewpoint '</span>,NL,<span class="keyword">...</span>
+<span class="string">'  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  fieldOfView 0.130000'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  orientation 1 0 0 1.570000'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  position 0 '</span>, num2str(-10 * lim(3,2)),<span class="string">' '</span>,num2str( lim(3,2)/2 ),NL,<span class="keyword">...</span>
+<span class="string">'  description "left view (XZ)"'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'DEF rightXZ Viewpoint '</span>,NL,<span class="keyword">...</span>
+<span class="string">'  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  fieldOfView 0.130000'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  orientation 0 0.7071 0.7071 3.14'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  position 0 '</span>, num2str(10 * lim(3,2)),<span class="string">' '</span>,num2str(lim(3,2)/2 ),NL,<span class="keyword">...</span>
+<span class="string">'  description "right view (-XZ)"'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'DEF rearYZ Viewpoint '</span>,NL,<span class="keyword">...</span>
+<span class="string">'  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  fieldOfView 0.130000'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  orientation 0.5774 -0.5774 -0.5774 2.0944'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  position '</span>,num2str(-10 * lim(3,2) ),<span class="string">' 0 '</span>, num2str(lim(3,2)/2),NL,<span class="keyword">...</span>
+<span class="string">'  description "rear view (-YZ)"'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'DEF frontYZ Viewpoint '</span>,NL,<span class="keyword">...</span>
+<span class="string">'  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  fieldOfView 0.130000'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  orientation 0.5774 0.5774 0.5774 2.0944'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  position '</span>,num2str(10 * lim(3,2) ),<span class="string">' 0 '</span>, num2str(lim(3,2)/2),NL,<span class="keyword">...</span>
+<span class="string">'  description "front view (-YZ)"'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL]);
+
+fclose(file_fun);
+
+<span class="comment">% Add VR data to manipulator object</span>
+vr_base = vrworld([manip.name,<span class="string">'VR_base.wrl'</span>]);
+set(vr_base', <span class="string">'Description'</span>, [<span class="string">'DAMA manipulator: '</span>,manip.name]);
+open(vr_base);
+figvr = view(vr_base);
+image_capture = capture(figvr);
+im_crop = cropimage(image_capture,background_RGB);
+imagefile = [manip.name,<span class="string">'_3D.png'</span>];
+imwrite(im_crop,imagefile,<span class="string">'png'</span>);
+
+<span class="comment">% End main function</span>
+<span class="keyword">end</span>
+</pre><h2>Insert prismatic joint<a name="4"></a></h2><pre class="codeinput"><span class="keyword">function</span> insert_joint_prism(link_num,DH,r,file_fun,Tne)
+
+i = str2double(link_num);
+NL = [char(13),char(10)];
+prism_link_length = 1;
+z_num = str2double(link_num)-1;
+
+<span class="comment">% Start writing file...</span>
+fwrite(file_fun,[NL,<span class="keyword">...</span>
+<span class="string">'DEF Z'</span> num2str(z_num) <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">' {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  rotation 0 0 1 '</span>,num2str(double(DH(i,4))),NL,<span class="keyword">...</span>
+<span class="string">'  children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'   ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'    DEF Joint'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      rotation 1 0 0 1.5708'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       children '</span>,NL,<span class="keyword">...</span>
+<span class="string">'         ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'          Shape '</span>,NL,<span class="keyword">...</span>
+<span class="string">'           {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'            appearance Appearance '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 0.740000 0.529999 0.159999'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'            geometry Cylinder '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'height 0.1'</span>,NL,<span class="string">'radius 0.045'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'         ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    DEF Link'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        translation 0 0 '</span>, num2str(-prism_link_length/2+0.045),NL,<span class="keyword">...</span>
+<span class="string">'       children '</span>,NL,<span class="keyword">...</span>
+<span class="string">'        ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'         Shape '</span>,NL,<span class="keyword">...</span>
+<span class="string">'           {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 9.000001e-2 0.319999 0.444999'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           geometry Box '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'size 0.060000 0.060000 '</span>,num2str(prism_link_length),NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'         DEF NextT'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           translation 0 0 '</span>, num2str(prism_link_length/2) ,NL,<span class="keyword">...</span>
+<span class="string">'           rotation 1 0 0 '</span>, num2str(double(DH(i,2))),NL,<span class="keyword">...</span>
+<span class="string">'           children'</span>,NL,<span class="string">'['</span>,NL]);
+
+<span class="keyword">if</span> i &lt; r
+ insert_axis_z(link_num,file_fun);
+ insert_axis_y(link_num,file_fun);
+ insert_axis_x(link_num,file_fun);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> i == r &amp;&amp; DH(r,1) ~= 0
+ insert_axis_z(link_num,file_fun);
+ insert_axis_y(link_num,file_fun);
+ insert_axis_x(link_num,file_fun);
+<span class="keyword">end</span>
+
+<span class="comment">% Recursive insertion of remaining joints</span>
+<span class="keyword">if</span> i&lt;r
+    next = str2double(link_num)+1;
+    <span class="keyword">if</span> DH(i+1,5) == 0
+    insert_joint_rot(num2str(next),DH,r,file_fun,Tne);    <span class="comment">% insert a revolute joint</span>
+    <span class="keyword">else</span>
+    insert_joint_prism(num2str(next),DH,r,file_fun,Tne);  <span class="comment">% insert a prismatic joint</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%If the link is the last one, insert the end-effector</span>
+<span class="keyword">if</span> i == r
+    insert_end_effector(file_fun,Tne);
+<span class="keyword">end</span>
+
+<span class="comment">% Finish writing file...</span>
+fwrite(file_fun,[<span class="string">']'</span>,NL,<span class="keyword">...</span><span class="comment"> % End NextTi child</span>
+<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">']'</span>,NL,<span class="keyword">...</span><span class="comment"> % End Linki child</span>
+<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">']'</span>,NL,<span class="keyword">...</span><span class="comment"> % End Zi child</span>
+<span class="string">'}'</span>,NL]);
+
+<span class="keyword">end</span>
+</pre><h2>Insert revolute joint<a name="5"></a></h2><pre class="codeinput"><span class="keyword">function</span> insert_joint_rot(link_num,DH,r,file_fun,Tne)
+
+i = str2double(link_num);
+NL = [char(13),char(10)];
+z_num = str2double(link_num)-1;
+
+<span class="comment">% Start writing file...</span>
+fwrite(file_fun,[NL,<span class="keyword">...</span>
+<span class="string">'DEF Z'</span> num2str(z_num) <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">' {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'   children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'     DEF Joint'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        rotation 1 0 0 1.5708'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        translation 0 0 0'</span>,NL,<span class="keyword">...</span><span class="comment">  % Pose of Joint i with respect to Zi transform</span>
+<span class="string">'        children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'           Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'            {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'            appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 0.740000 0.529999 0.159999'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'            geometry Cylinder'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'height 0.1'</span>,NL,<span class="string">'radius 0.040000'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'            }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          DEF Link'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'            translation '</span>, num2str(double(DH(i,1))/2) ,<span class="string">' 0 0'</span>,NL,<span class="keyword">...</span><span class="comment">  % Pose of Link i with respect to Joint i</span>
+<span class="string">'            children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'             ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'              Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'               {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'               appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 9.000001e-2 0.319999 0.444999'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'               geometry Box'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'size '</span>, num2str(double(DH(i,1))) ,<span class="string">' 0.075000 0.075000'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'               }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                DEF Doffset Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                  rotation 1 0 1.5708 0'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                  translation '</span>,num2str(double(DH(i,1))/2),<span class="string">' '</span>,num2str(double(DH(i,3))/2),<span class="string">' 0'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                  children'</span>,<span class="keyword">...</span>
+<span class="string">'                   ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'                    Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                     {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                     appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 9.000001e-2 0.319999 0.444999'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                     geometry Cylinder'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'height '</span>, num2str(abs(double(DH(i,3)))) ,<span class="string">' radius 0.03'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                     }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                    ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                   }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                DEF NextT'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                  {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                  translation '</span>, num2str(double(DH(i,1))/2) ,<span class="string">' '</span>,num2str(double(DH(i,3))), <span class="string">' 0'</span>,NL,<span class="keyword">...</span>
+<span class="string">'                  rotation -1 0 0 '</span>,  num2str(-double(DH(i,2))+1.5708),NL,<span class="keyword">...</span>
+<span class="string">'                  children'</span>,NL,<span class="string">'['</span>,NL]);
+
+<span class="comment">% Insert viewable axes for Frame i</span>
+<span class="keyword">if</span> i &lt; r
+ insert_axis_z(link_num,file_fun);
+ insert_axis_y(link_num,file_fun);
+ insert_axis_x(link_num,file_fun);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> i == r &amp;&amp; DH(r,1)~=0
+ insert_axis_z(link_num,file_fun);
+ insert_axis_y(link_num,file_fun);
+ insert_axis_x(link_num,file_fun);
+<span class="keyword">end</span>
+
+<span class="comment">% Recursive insertion of remaining joints</span>
+
+<span class="keyword">if</span> i &lt; r
+    next = str2double(link_num)+1;
+    <span class="keyword">if</span> DH(i+1,5) == 0
+        insert_joint_rot(num2str(next),DH,r,file_fun,Tne);
+    <span class="keyword">else</span>
+        insert_joint_prism(num2str(next),DH,r,file_fun,Tne);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% If the link is the last one, insert the end-effector</span>
+
+<span class="keyword">if</span> i == r
+    insert_end_effector(file_fun,Tne);
+<span class="keyword">end</span>
+
+<span class="comment">% Finish writing file...</span>
+
+fwrite(file_fun,[<span class="string">']'</span>,NL,<span class="keyword">...</span><span class="comment"> % End NextT child</span>
+<span class="string">'}'</span>,NL,<span class="string">']'</span>,NL,<span class="keyword">...</span><span class="comment"> % End Linki child</span>
+<span class="string">'}'</span>,NL,<span class="string">']'</span>,NL,<span class="keyword">...</span><span class="comment"> % End Jointi child</span>
+<span class="string">'}'</span>,NL,<span class="string">']'</span>,NL,<span class="keyword">...</span><span class="comment"> % End Zi child</span>
+<span class="string">'}'</span>,NL]);
+
+<span class="keyword">end</span>
+</pre><h2>Insert Z axis<a name="6"></a></h2><pre class="codeinput"><span class="keyword">function</span> insert_axis_z(link_num,file_fun)
+
+NL = [char(13),char(10)];
+
+<span class="comment">% Start writing file...</span>
+fwrite(file_fun,[NL,<span class="keyword">...</span>
+<span class="string">'DEF Zaxis'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">' {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  rotation 1 0 0 1.5708'</span>,NL,<span class="keyword">...</span><span class="comment"> % Pose of Zaxis with respect to parent transform</span>
+<span class="string">'  translation 0 0 0.1'</span>,NL,<span class="keyword">...</span>
+<span class="string">'   children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'     Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 0 0 1'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      geometry Cylinder'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'radius 4.000002e-3'</span>,NL,<span class="string">'height 0.2'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    DEF Zcone'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'     {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'     translation 0 0.1 0'</span>,NL,<span class="keyword">...</span><span class="comment"> % Pose of Zcone with respect to Zaxis</span>
+<span class="string">'       children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'         Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 0 0 1'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          geometry Cone'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'bottomRadius 0.010000'</span>,NL,<span class="string">'height 0.020000'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL]);
+
+<span class="keyword">end</span>
+</pre><h2>Insert Y axis<a name="7"></a></h2><pre class="codeinput"><span class="keyword">function</span> insert_axis_y(link_num,file_fun)
+
+NL = [char(13),char(10)];
+
+<span class="comment">% Start writing file...</span>
+fwrite(file_fun,[NL,<span class="keyword">...</span>
+<span class="string">'DEF Yaxis'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">' {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  translation 0 0.1 0'</span>,NL,<span class="keyword">...</span><span class="comment"> % Pose of Yaxis with respect to parent transform</span>
+<span class="string">'   children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'     Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 0 1 0'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      geometry Cylinder'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'radius 4.000002e-3'</span>,NL,<span class="string">'height 0.2'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    DEF Ycone'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'     {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'     translation 0 0.1 0'</span>,NL,<span class="keyword">...</span><span class="comment"> % Pose of Ycone with respect to Yaxis</span>
+<span class="string">'       children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'         Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 0 1 0'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          geometry Cone'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'bottomRadius 0.010000'</span>,NL,<span class="string">'height 0.020000'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL]);
+
+<span class="keyword">end</span>
+</pre><h2>Insert X axis<a name="8"></a></h2><pre class="codeinput"><span class="keyword">function</span> insert_axis_x(link_num,file_fun)
+
+NL = [char(13),char(10)];
+
+<span class="comment">% Start writing file...</span>
+fwrite(file_fun,[NL,<span class="keyword">...</span>
+<span class="string">'DEF Xaxis'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">' {'</span>,NL,<span class="keyword">...</span>
+<span class="string">' rotation 0 0 1 -1.5708'</span>,NL,<span class="keyword">...</span><span class="comment"> % Pose of Xaxis with respect to parent transform</span>
+<span class="string">' translation 0.1 0 0'</span>,NL,<span class="keyword">...</span>
+<span class="string">'   children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'     Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 1 0 0'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      geometry Cylinder'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'radius 4.000002e-3'</span>,NL,<span class="string">'height 0.2'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    DEF Xcone'</span> link_num <span class="string">' Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'     {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'     translation 0 0.1 0'</span>,NL,<span class="keyword">...</span><span class="comment"> % Pose of Xcone with respect to Xaxis</span>
+<span class="string">'       children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'         Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 1 0 0'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          geometry Cone'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'bottomRadius 0.010000'</span>,NL,<span class="string">'height 0.020000'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'          }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL]);
+
+<span class="keyword">end</span>
+</pre><h2>Insert End-Effector<a name="9"></a></h2><pre class="codeinput"><span class="keyword">function</span> insert_end_effector(file_fun,Tne)
+
+NL = [char(13),char(10)];
+[r_vect rot] = rot2aa(Tne(1:3,1:3));
+
+alpha = atan2(Tne(1,4),Tne(2,4));
+beta = atan2(Tne(3,4),sqrt((Tne(1,4)^2+Tne(2,4)^2)));
+[r_orient orient] = rot2aa(rotz(-alpha)*rotx(beta));
+
+fwrite(file_fun,[NL,<span class="keyword">...</span>
+<span class="string">'DEF Doffset_ee Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           rotation '</span>,num2str(r_orient(1)),<span class="string">' '</span>,num2str(r_orient(2)),<span class="string">' '</span>,num2str(r_orient(3)),<span class="string">' '</span>,num2str(orient),<span class="string">' '</span>,NL,<span class="keyword">...</span>
+<span class="string">'           translation '</span>,num2str(Tne(1,4)/2),<span class="string">' '</span>,num2str(Tne(2,4)/2),<span class="string">' '</span>,num2str(Tne(3,4)/2),NL,<span class="keyword">...</span>
+<span class="string">'           children'</span>,<span class="keyword">...</span>
+<span class="string">'            ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'             Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'             {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'              appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material '</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 9.000001e-2 0.319999 0.444999'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'              geometry Cylinder'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'height '</span>, num2str(sqrt(Tne(1,4)^2+Tne(2,4)^2+Tne(3,4)^2)),NL,<span class="string">'radius 0.03'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'              }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'             ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'            }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'DEF EndEffector_base Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  {'</span>,NL<span class="keyword">...</span>
+<span class="string">'  translation '</span>,num2str(Tne(1,4)),<span class="string">' '</span>,num2str(Tne(2,4)),<span class="string">' '</span>,num2str(Tne(3,4)),NL,<span class="keyword">...</span>
+<span class="string">'  rotation '</span>,num2str(r_vect(1)),<span class="string">' '</span>,num2str(r_vect(2)),<span class="string">' '</span>,num2str(r_vect(3)),<span class="string">' '</span>,num2str(rot),<span class="string">' '</span>,NL,<span class="keyword">...</span>
+<span class="string">'  children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    ['</span>,NL]);
+
+insert_axis_z(<span class="string">'_ee'</span>,file_fun);
+insert_axis_y(<span class="string">'_ee'</span>,file_fun);
+insert_axis_x(<span class="string">'_ee'</span>,file_fun);
+
+fwrite(file_fun,[NL,<span class="keyword">...</span>
+<span class="string">'     Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 0.470000 0.520000 0.780000'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       geometry Box'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'size 0.100000 0.100000 4.000000e-2'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      DEF EndEffector_Jaw_1 Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       rotation -0.5774 0.5774 -0.5774 4.1888'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       translation 0 -4.000000e-2 3.000000e-2'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'         ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'          Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 0.470000 0.520000 0.780000'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           geometry Box'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'size 0.100000 0.100000 2.000000e-2'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'         ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'      DEF EndEffector_Jaw_2 Transform'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       rotation -0.5774 0.5774 -0.5774 4.1888'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       translation 0 4.000000e-2 3.000000e-2'</span>,NL,<span class="keyword">...</span>
+<span class="string">'        children'</span>,NL,<span class="keyword">...</span>
+<span class="string">'         ['</span>,NL,<span class="keyword">...</span>
+<span class="string">'          Shape'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           {'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           appearance Appearance'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'material Material'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'diffuseColor 0.470000 0.520000 0.780000'</span>,NL,<span class="string">'}'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           geometry Box'</span>,NL,<span class="string">'{'</span>,NL,<span class="string">'size 0.100000 0.100000 2.000000e-2'</span>,NL,<span class="string">'}'</span>,NL,<span class="keyword">...</span>
+<span class="string">'           }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'         ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'       }'</span>,NL,<span class="keyword">...</span>
+<span class="string">'    ]'</span>,NL,<span class="keyword">...</span>
+<span class="string">'  }'</span>,NL]);
+
+<span class="keyword">end</span>
+</pre><h2>rotation matrix 2 axis angle<a name="10"></a></h2><pre class="codeinput"><span class="keyword">function</span> [r,theta] = rot2aa(R)
+
+theta = acos(0.5*(R(1,1)+R(2,2)+R(3,3)-1));
+
+<span class="keyword">if</span> theta == 0 || theta == pi
+    r = [0;0;0];
+<span class="keyword">else</span>
+r = 0.5*inv((sin(theta)))*[R(3,2)-R(2,3) ; R(1,3)-R(3,1) ; R(2,1)-R(1,2)];
+<span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function [figvr, vr_base] = createVR(manip)
+
+% CREATEVR creates a VRML97 model of a manipulator.
+%    syntax: [figvr, vr_base] = createVR(manip) 
+% 
+%  The program saves the VRML model in a file called nnnnnVR_base.wrl where
+%  nnnnn is the manipulator's name.
+%      vr_base: vrworld object associated with wrl file
+%        figvr: vrfigure associated to vr_base
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+%% Main function
+% evaluate workspace limits
+lim = envelope(manip);
+
+% extract revolute/prismatic information about joints
+DH5 = char(manip.DH.table(:,5).'); 
+DH5 = DH5(9:end-2);
+
+background_RGB = [200, 225, 225];
+background_RGB_1 = background_RGB./255;
+DH = manip.DH.table;
+Tb0 = manip.kin.T.Tb0;
+Tne = manip.kin.T.Tne;
+r = size(DH)*[1;0];
+NL = [char(13),char(10)];
+method = [manip.name,'VR_base'];
+
+if exist([pwd,'/',method,'.wrl'],'file')
+    delete([method,'.wrl']);
+end
+
+file_fun = fopen([method,'.wrl'],'a+');
+
+alpha_base = atan2(Tb0(1,4),Tb0(2,4));
+beta_base = atan2(Tb0(3,4),sqrt((Tb0(1,4)^2+Tb0(2,4)^2)));
+[rbase_orient base_orient] = rot2aa(rotz(-alpha_base)*rotx(beta_base));
+[rfirstT_vect firstT_rot] = rot2aa(Tb0(1:3,1:3));
+           
+% Start writing wrl file
+fwrite(file_fun,[...
+'#VRML V2.0 utf8',NL,...
+'# Joints: ',DH5,NL,...
+'DEF Base Transform',NL,...
+'  {',NL,...
+'   children ',NL,...
+'     [',NL,...
+'       Shape ',NL,...  % Base shape
+'          {',NL,...
+'            appearance Appearance ',NL,'{',NL,'material Material ',NL,'{',NL,'diffuseColor 0.650000 0.400000 0.300000',NL,'transparency 0.1',NL,'}',NL,'}',NL,...
+'            geometry Box ',NL,'{',NL,'size ',num2str(lim(1,2)*2),' ',num2str(lim(2,2)*2),' 0.010000',NL,'}',NL,...
+'          }',NL,...   % end Base shape
+'       DEF Link0 Transform ',NL,...
+'         {',NL,...
+'         rotation ',num2str(rbase_orient(1)),' ',num2str(rbase_orient(2)),' ',num2str(rbase_orient(3)),' ',num2str(base_orient),' ',NL,...
+'         translation ',num2str(Tb0(1,4)/2),' ',num2str(Tb0(2,4)/2),' ',num2str(Tb0(3,4)/2),NL,...
+'         children ',NL,...
+'            [',NL,...
+'              Shape',NL,... % Link0 Shape
+'                 {',NL,...
+'                   appearance Appearance ',NL,'{',NL,'material Material ',NL,'{',NL,'diffuseColor 9.000001e-2 0.319999 0.444999',NL,'}',NL,'}',NL,...
+'                   geometry Cylinder ',NL,'{',NL,'height ',num2str(sqrt(Tb0(1,4)^2+Tb0(2,4)^2+Tb0(3,4)^2)),NL,'radius 0.035000',NL,'}',NL,...
+'                 }',NL,...  % end Link0 Shape
+'                 ]',NL,...
+'                 }',NL,...
+'              DEF FirstT Transform ',NL,... % begin Frame 0
+'                {',NL,...
+'                rotation ',num2str(rfirstT_vect(1)),' ',num2str(rfirstT_vect(2)),' ',num2str(rfirstT_vect(3)),' ',num2str(firstT_rot),' ',NL,... % Pose of frame 0 with respect to Link0 center
+'                translation ',num2str(Tb0(1,4)),' ',num2str(Tb0(2,4)),' ',num2str(Tb0(3,4)),NL,...
+'                 children',NL,...
+'                   [',NL]);
+%num2str(sqrt(Tb0(1,4)^2+Tb0(2,4)^2+Tb0(3,4)^2))
+% Insert a viewable reference frame for Frame 0              
+               
+insert_axis_z('0',file_fun);
+insert_axis_y('0',file_fun);
+insert_axis_x('0',file_fun);
+
+% Recursive insertion of successive links
+    if DH(1,5) == 0
+        insert_joint_rot('1',DH,r,file_fun,Tne);
+    else
+        insert_joint_prism('1',DH,r,file_fun,Tne);
+    end
+
+% Append end part of file
+fwrite(file_fun,[NL,...
+']',NL,... % End Link0 child
+'}',NL]);  % End Link0 transform
+
+% Insert base axes
+insert_axis_z('base',file_fun);
+insert_axis_y('base',file_fun);
+insert_axis_x('base',file_fun);
+
+fwrite(file_fun,[NL,']',NL,... % End Base child
+'}',NL]);                      % End Base transform
+
+%% Define viewpoints
+fwrite(file_fun,[NL,...
+    'Background ',NL,...
+'  {',NL,...
+'  skyColor ',NL,...
+'    [',NL,...
+'    ',num2str(background_RGB_1),NL,...
+'    ]',NL,...
+'  }',NL,...
+'',NL,...
+'DEF STD Viewpoint',NL,...
+'  {',NL,...
+'  fieldOfView 0.500000',NL,...
+'  orientation 0.350553 0.523699 0.776436 2.16305',NL,...
+'  position ' num2str(1.37*[1.44 0.53 0.76]*norm(lim(:,2))),NL ... 3.54316 1.29216 1.86001
+'  description "STD"',NL,...
+'  }',NL,...
+'DEF XY_plane Viewpoint',NL,...
+'  {',NL,...
+'  fieldOfView 9.999999e-3',NL,...
+'  orientation 0 1 0 0',NL,...
+'  position 0 0 ',num2str( 100*2*max(lim(1:2,2)) ),NL,...
+'  description "XY_plane"',NL,...
+'  }',NL,...
+'',NL,...
+'DEF XY_perspective Viewpoint ',NL,...
+'  {',NL,...
+'  fieldOfView 0.100000',NL,...
+'  orientation 0 1 0 0',NL,...
+'  position 0 0 ',num2str( 10*2*max(lim(1:2,2)) ),NL,...
+'  description "XY_perspective"',NL,...
+'  }',NL,...
+'',NL,...
+'DEF leftXZ Viewpoint ',NL,...
+'  {',NL,...
+'  fieldOfView 0.130000',NL,...
+'  orientation 1 0 0 1.570000',NL,...
+'  position 0 ', num2str(-10 * lim(3,2)),' ',num2str( lim(3,2)/2 ),NL,...
+'  description "left view (XZ)"',NL,...
+'  }',NL,...
+'DEF rightXZ Viewpoint ',NL,...
+'  {',NL,...
+'  fieldOfView 0.130000',NL,...
+'  orientation 0 0.7071 0.7071 3.14',NL,...
+'  position 0 ', num2str(10 * lim(3,2)),' ',num2str(lim(3,2)/2 ),NL,...
+'  description "right view (-XZ)"',NL,...
+'  }',NL,...
+'DEF rearYZ Viewpoint ',NL,...
+'  {',NL,...
+'  fieldOfView 0.130000',NL,...
+'  orientation 0.5774 -0.5774 -0.5774 2.0944',NL,...
+'  position ',num2str(-10 * lim(3,2) ),' 0 ', num2str(lim(3,2)/2),NL,...
+'  description "rear view (-YZ)"',NL,...
+'  }',NL,...
+'DEF frontYZ Viewpoint ',NL,...
+'  {',NL,...
+'  fieldOfView 0.130000',NL,...
+'  orientation 0.5774 0.5774 0.5774 2.0944',NL,...
+'  position ',num2str(10 * lim(3,2) ),' 0 ', num2str(lim(3,2)/2),NL,...
+'  description "front view (-YZ)"',NL,...
+'  }',NL]);
+  
+fclose(file_fun);
+
+% Add VR data to manipulator object
+vr_base = vrworld([manip.name,'VR_base.wrl']);
+set(vr_base', 'Description', ['DAMA manipulator: ',manip.name]);
+open(vr_base);
+figvr = view(vr_base);
+image_capture = capture(figvr);
+im_crop = cropimage(image_capture,background_RGB);
+imagefile = [manip.name,'_3D.png'];
+imwrite(im_crop,imagefile,'png');
+
+% End main function
+end
+
+%% Insert prismatic joint
+
+function insert_joint_prism(link_num,DH,r,file_fun,Tne)
+
+i = str2double(link_num);
+NL = [char(13),char(10)];
+prism_link_length = 1;
+z_num = str2double(link_num)-1;
+
+% Start writing file...
+fwrite(file_fun,[NL,...
+'DEF Z' num2str(z_num) ' Transform',NL,...
+' {',NL,...
+'  rotation 0 0 1 ',num2str(double(DH(i,4))),NL,...
+'  children',NL,... 
+'   [',NL,...
+'    DEF Joint' link_num ' Transform',NL,...
+'      {',NL,...
+'      rotation 1 0 0 1.5708',NL,...
+'       children ',NL,...
+'         [',NL,...
+'          Shape ',NL,...
+'           {',NL,...
+'            appearance Appearance ',NL,'{',NL,'material Material ',NL,'{',NL,'diffuseColor 0.740000 0.529999 0.159999',NL,'}',NL,'}',NL,...
+'            geometry Cylinder ',NL,'{',NL,'height 0.1',NL,'radius 0.045',NL,'}',NL,...
+'           }',NL,...
+'         ]',NL,...
+'      }',NL,...
+'    DEF Link' link_num ' Transform',NL,...
+'      {',NL,...
+'        translation 0 0 ', num2str(-prism_link_length/2+0.045),NL,...
+'       children ',NL,...
+'        [',NL,...
+'         Shape ',NL,...
+'           {',NL,...
+'           appearance Appearance',NL,'{',NL,'material Material ',NL,'{',NL,'diffuseColor 9.000001e-2 0.319999 0.444999',NL,'}',NL,'}',NL,...
+'           geometry Box ',NL,'{',NL,'size 0.060000 0.060000 ',num2str(prism_link_length),NL,'}',NL,...
+'           }',NL,...
+'         DEF NextT' link_num ' Transform',NL,...
+'           {',NL,...
+'           translation 0 0 ', num2str(prism_link_length/2) ,NL,...
+'           rotation 1 0 0 ', num2str(double(DH(i,2))),NL,...
+'           children',NL,'[',NL]);
+
+if i < r
+ insert_axis_z(link_num,file_fun);
+ insert_axis_y(link_num,file_fun);
+ insert_axis_x(link_num,file_fun);
+end
+
+if i == r && DH(r,1) ~= 0
+ insert_axis_z(link_num,file_fun);
+ insert_axis_y(link_num,file_fun);
+ insert_axis_x(link_num,file_fun);
+end
+
+% Recursive insertion of remaining joints
+if i<r
+    next = str2double(link_num)+1;
+    if DH(i+1,5) == 0
+    insert_joint_rot(num2str(next),DH,r,file_fun,Tne);    % insert a revolute joint
+    else
+    insert_joint_prism(num2str(next),DH,r,file_fun,Tne);  % insert a prismatic joint
+    end
+end
+
+%If the link is the last one, insert the end-effector
+if i == r
+    insert_end_effector(file_fun,Tne);
+end
+
+% Finish writing file...
+fwrite(file_fun,[']',NL,... % End NextTi child
+'}',NL,...
+']',NL,... % End Linki child
+'}',NL,...
+']',NL,... % End Zi child
+'}',NL]);
+
+end
+
+%% Insert revolute joint
+
+function insert_joint_rot(link_num,DH,r,file_fun,Tne)
+
+i = str2double(link_num);
+NL = [char(13),char(10)];
+z_num = str2double(link_num)-1;
+
+% Start writing file...
+fwrite(file_fun,[NL,...
+'DEF Z' num2str(z_num) ' Transform',NL,...
+' {',NL,...
+'   children',NL,...
+'    [',NL,...
+'     DEF Joint' link_num ' Transform',NL,...
+'       {',NL,...
+'        rotation 1 0 0 1.5708',NL,...
+'        translation 0 0 0',NL,...  % Pose of Joint i with respect to Zi transform
+'        children',NL,...
+'        [',NL,...
+'           Shape',NL,... 
+'            {',NL,...
+'            appearance Appearance',NL,'{',NL,'material Material',NL,'{',NL,'diffuseColor 0.740000 0.529999 0.159999',NL,'}',NL,'}',NL,...
+'            geometry Cylinder',NL,'{',NL,'height 0.1',NL,'radius 0.040000',NL,'}',NL,...
+'            }',NL,...
+'          DEF Link' link_num ' Transform',NL,...
+'           {',NL,...
+'            translation ', num2str(double(DH(i,1))/2) ,' 0 0',NL,...  % Pose of Link i with respect to Joint i
+'            children',NL,...
+'             [',NL,...
+'              Shape',NL,...
+'               {',NL,...
+'               appearance Appearance',NL,'{',NL,'material Material ',NL,'{',NL,'diffuseColor 9.000001e-2 0.319999 0.444999',NL,'}',NL,'}',NL,...
+'               geometry Box',NL,'{',NL,'size ', num2str(double(DH(i,1))) ,' 0.075000 0.075000',NL,'}',NL,...
+'               }',NL,...
+'                DEF Doffset Transform',NL,...
+'                  {',NL,...
+'                  rotation 1 0 1.5708 0',NL,...
+'                  translation ',num2str(double(DH(i,1))/2),' ',num2str(double(DH(i,3))/2),' 0',NL,...
+'                  children',...
+'                   [',NL,...
+'                    Shape',NL,...
+'                     {',NL,...
+'                     appearance Appearance',NL,'{',NL,'material Material ',NL,'{',NL,'diffuseColor 9.000001e-2 0.319999 0.444999',NL,'}',NL,'}',NL,...
+'                     geometry Cylinder',NL,'{',NL,'height ', num2str(abs(double(DH(i,3)))) ,' radius 0.03',NL,'}',NL,...
+'                     }',NL,...
+'                    ]',NL,...
+'                   }',NL,...
+'                DEF NextT' link_num ' Transform',NL,...
+'                  {',NL,...
+'                  translation ', num2str(double(DH(i,1))/2) ,' ',num2str(double(DH(i,3))), ' 0',NL,...
+'                  rotation -1 0 0 ',  num2str(-double(DH(i,2))+1.5708),NL,...
+'                  children',NL,'[',NL]);
+       
+% Insert viewable axes for Frame i
+if i < r
+ insert_axis_z(link_num,file_fun);
+ insert_axis_y(link_num,file_fun);
+ insert_axis_x(link_num,file_fun);
+end
+
+if i == r && DH(r,1)~=0
+ insert_axis_z(link_num,file_fun);
+ insert_axis_y(link_num,file_fun);
+ insert_axis_x(link_num,file_fun);
+end
+
+% Recursive insertion of remaining joints
+
+if i < r
+    next = str2double(link_num)+1;
+    if DH(i+1,5) == 0
+        insert_joint_rot(num2str(next),DH,r,file_fun,Tne);
+    else
+        insert_joint_prism(num2str(next),DH,r,file_fun,Tne);
+    end
+end
+
+% If the link is the last one, insert the end-effector
+
+if i == r
+    insert_end_effector(file_fun,Tne);
+end
+
+% Finish writing file...
+
+fwrite(file_fun,[']',NL,... % End NextT child
+'}',NL,']',NL,... % End Linki child
+'}',NL,']',NL,... % End Jointi child
+'}',NL,']',NL,... % End Zi child
+'}',NL]);
+
+end
+
+%% Insert Z axis
+
+function insert_axis_z(link_num,file_fun)
+
+NL = [char(13),char(10)];
+
+% Start writing file...
+fwrite(file_fun,[NL,...
+'DEF Zaxis' link_num ' Transform',NL,... 
+' {',NL,... 
+'  rotation 1 0 0 1.5708',NL,... % Pose of Zaxis with respect to parent transform
+'  translation 0 0 0.1',NL,...
+'   children',NL,... 
+'    [',NL,... 
+'     Shape',NL,...
+'      {',NL,... 
+'      appearance Appearance',NL,'{',NL,'material Material',NL,'{',NL,'diffuseColor 0 0 1',NL,'}',NL,'}',NL,... 
+'      geometry Cylinder',NL,'{',NL,'radius 4.000002e-3',NL,'height 0.2',NL,'}',NL,...
+'      }',NL,...
+'    DEF Zcone' link_num ' Transform',NL,...
+'     {',NL,...
+'     translation 0 0.1 0',NL,... % Pose of Zcone with respect to Zaxis
+'       children',NL,... 
+'        [',NL,...
+'         Shape',NL,... 
+'          {',NL,...
+'          appearance Appearance',NL,'{',NL,'material Material',NL,'{',NL,'diffuseColor 0 0 1',NL,'}',NL,'}',NL,...
+'          geometry Cone',NL,'{',NL,'bottomRadius 0.010000',NL,'height 0.020000',NL,'}',NL,...
+'          }',NL,...
+'        ]',NL,...
+'      }',NL,...
+'    ]',NL,...
+'  }',NL]);
+
+end
+
+%% Insert Y axis
+
+function insert_axis_y(link_num,file_fun)
+
+NL = [char(13),char(10)];
+
+% Start writing file...
+fwrite(file_fun,[NL,...
+'DEF Yaxis' link_num ' Transform',NL,... 
+' {',NL,... 
+'  translation 0 0.1 0',NL,... % Pose of Yaxis with respect to parent transform
+'   children',NL,... 
+'    [',NL,... 
+'     Shape',NL,...
+'      {',NL,... 
+'      appearance Appearance',NL,'{',NL,'material Material',NL,'{',NL,'diffuseColor 0 1 0',NL,'}',NL,'}',NL,... 
+'      geometry Cylinder',NL,'{',NL,'radius 4.000002e-3',NL,'height 0.2',NL,'}',NL,...
+'      }',NL,...
+'    DEF Ycone' link_num ' Transform',NL,...
+'     {',NL,...
+'     translation 0 0.1 0',NL,... % Pose of Ycone with respect to Yaxis
+'       children',NL,... 
+'        [',NL,...
+'         Shape',NL,... 
+'          {',NL,...
+'          appearance Appearance',NL,'{',NL,'material Material',NL,'{',NL,'diffuseColor 0 1 0',NL,'}',NL,'}',NL,...
+'          geometry Cone',NL,'{',NL,'bottomRadius 0.010000',NL,'height 0.020000',NL,'}',NL,...
+'          }',NL,...
+'        ]',NL,...
+'      }',NL,...
+'    ]',NL,...
+'  }',NL]);
+
+end
+
+%% Insert X axis
+
+function insert_axis_x(link_num,file_fun)
+
+NL = [char(13),char(10)];
+
+% Start writing file...
+fwrite(file_fun,[NL,...
+'DEF Xaxis' link_num ' Transform',NL,... 
+' {',NL,... 
+' rotation 0 0 1 -1.5708',NL,... % Pose of Xaxis with respect to parent transform
+' translation 0.1 0 0',NL,...
+'   children',NL,... 
+'    [',NL,... 
+'     Shape',NL,...
+'      {',NL,... 
+'      appearance Appearance',NL,'{',NL,'material Material',NL,'{',NL,'diffuseColor 1 0 0',NL,'}',NL,'}',NL,... 
+'      geometry Cylinder',NL,'{',NL,'radius 4.000002e-3',NL,'height 0.2',NL,'}',NL,...
+'      }',NL,...
+'    DEF Xcone' link_num ' Transform',NL,...
+'     {',NL,...
+'     translation 0 0.1 0',NL,... % Pose of Xcone with respect to Xaxis
+'       children',NL,... 
+'        [',NL,...
+'         Shape',NL,... 
+'          {',NL,...
+'          appearance Appearance',NL,'{',NL,'material Material',NL,'{',NL,'diffuseColor 1 0 0',NL,'}',NL,'}',NL,...
+'          geometry Cone',NL,'{',NL,'bottomRadius 0.010000',NL,'height 0.020000',NL,'}',NL,...
+'          }',NL,...
+'        ]',NL,...
+'      }',NL,...
+'    ]',NL,...
+'  }',NL]);
+
+end
+
+%% Insert End-Effector
+
+function insert_end_effector(file_fun,Tne)
+
+NL = [char(13),char(10)];
+[r_vect rot] = rot2aa(Tne(1:3,1:3));
+
+alpha = atan2(Tne(1,4),Tne(2,4));
+beta = atan2(Tne(3,4),sqrt((Tne(1,4)^2+Tne(2,4)^2)));
+[r_orient orient] = rot2aa(rotz(-alpha)*rotx(beta));
+
+fwrite(file_fun,[NL,...
+'DEF Doffset_ee Transform',NL,...
+'           {',NL,...
+'           rotation ',num2str(r_orient(1)),' ',num2str(r_orient(2)),' ',num2str(r_orient(3)),' ',num2str(orient),' ',NL,...
+'           translation ',num2str(Tne(1,4)/2),' ',num2str(Tne(2,4)/2),' ',num2str(Tne(3,4)/2),NL,...
+'           children',...
+'            [',NL,...
+'             Shape',NL,...
+'             {',NL,...
+'              appearance Appearance',NL,'{',NL,'material Material ',NL,'{',NL,'diffuseColor 9.000001e-2 0.319999 0.444999',NL,'}',NL,'}',NL,...
+'              geometry Cylinder',NL,'{',NL,'height ', num2str(sqrt(Tne(1,4)^2+Tne(2,4)^2+Tne(3,4)^2)),NL,'radius 0.03',NL,'}',NL,...
+'              }',NL,...
+'             ]',NL,...
+'            }',NL,...
+'DEF EndEffector_base Transform',NL,...
+'  {',NL...
+'  translation ',num2str(Tne(1,4)),' ',num2str(Tne(2,4)),' ',num2str(Tne(3,4)),NL,...
+'  rotation ',num2str(r_vect(1)),' ',num2str(r_vect(2)),' ',num2str(r_vect(3)),' ',num2str(rot),' ',NL,...
+'  children',NL,...
+'    [',NL]);
+    
+insert_axis_z('_ee',file_fun);
+insert_axis_y('_ee',file_fun);
+insert_axis_x('_ee',file_fun); 
+    
+fwrite(file_fun,[NL,...   
+'     Shape',NL,...
+'       {',NL,...
+'       appearance Appearance',NL,'{',NL,'material Material',NL,'{',NL,'diffuseColor 0.470000 0.520000 0.780000',NL,'}',NL,'}',NL,...
+'       geometry Box',NL,'{',NL,'size 0.100000 0.100000 4.000000e-2',NL,'}',NL,...
+'       }',NL,...
+'      DEF EndEffector_Jaw_1 Transform',NL,...
+'       {',NL,...
+'       rotation -0.5774 0.5774 -0.5774 4.1888',NL,...
+'       translation 0 -4.000000e-2 3.000000e-2',NL,...
+'        children',NL,...
+'         [',NL,...
+'          Shape',NL,...
+'           {',NL,...
+'           appearance Appearance',NL,'{',NL,'material Material',NL,'{',NL,'diffuseColor 0.470000 0.520000 0.780000',NL,'}',NL,'}',NL,...
+'           geometry Box',NL,'{',NL,'size 0.100000 0.100000 2.000000e-2',NL,'}',NL,...
+'           }',NL,...
+'         ]',NL,...
+'       }',NL,...
+'      DEF EndEffector_Jaw_2 Transform',NL,...
+'       {',NL,...
+'       rotation -0.5774 0.5774 -0.5774 4.1888',NL,...
+'       translation 0 4.000000e-2 3.000000e-2',NL,...
+'        children',NL,...
+'         [',NL,...
+'          Shape',NL,...
+'           {',NL,...
+'           appearance Appearance',NL,'{',NL,'material Material',NL,'{',NL,'diffuseColor 0.470000 0.520000 0.780000',NL,'}',NL,'}',NL,...
+'           geometry Box',NL,'{',NL,'size 0.100000 0.100000 2.000000e-2',NL,'}',NL,...
+'           }',NL,...
+'         ]',NL,...
+'       }',NL,...
+'    ]',NL,...
+'  }',NL]);
+
+end
+
+%% rotation matrix 2 axis angle
+function [r,theta] = rot2aa(R)
+
+theta = acos(0.5*(R(1,1)+R(2,2)+R(3,3)-1));
+
+if theta == 0 || theta == pi
+    r = [0;0;0];
+else
+r = 0.5*inv((sin(theta)))*[R(3,2)-R(2,3) ; R(1,3)-R(3,1) ; R(2,1)-R(1,2)];
+end
+
+end
+##### SOURCE END #####
+-->
+   </body>
+</html>

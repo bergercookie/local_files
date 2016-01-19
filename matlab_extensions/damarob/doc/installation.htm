@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+
+
+	<meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+	<title></title>
+	<meta name="GENERATOR" content="OpenOffice.org 3.1  (Linux)">
+	<meta name="AUTHOR" content="mofo">
+	<meta name="CREATED" content="20091117;12420200">
+	<meta name="CHANGEDBY" content="Marco Caputano">
+	<meta name="CHANGED" content="20091125;18014900">
+	<meta name="Info 1" content="">
+	<meta name="Info 2" content="">
+	<meta name="Info 3" content="">
+	<meta name="Info 4" content="">
+	<style type="text/css">
+	<!--
+		@page { margin: 2.01cm }
+		P { margin-bottom: 0.2cm }
+		P.western { font-family: "Arial", sans-serif }
+		TD P { margin-bottom: 0cm }
+		TD P.western { font-family: "Arial", sans-serif }
+		A:link { so-language: zxx }
+	-->
+	</style>
+</head><body dir="ltr" lang="en-GB">
+<table style="page-break-before: always;" bgcolor="#ccccff" border="0" cellpadding="0" cellspacing="0" width="100%">
+	<col width="8">
+	<col width="73">
+	<col width="86">
+	<col width="82">
+	<col width="7">
+	<tbody><tr>
+		<td bgcolor="#e7ebf7" height="21" width="3%">
+			<p class="western"><br>
+			</p>
+		</td>
+		<td bgcolor="#e7ebf7" width="28%">
+			<p class="western"><br>
+			</p>
+		</td>
+		<td bgcolor="#e7ebf7" width="34%">
+			<p class="western" align="center"><font face="Arial, sans-serif"><font size="3">Installation</font></font></p>
+		</td>
+		<td bgcolor="#e7ebf7" width="32%">
+			<p class="western" align="right"><br>
+			</p>
+		</td>
+		<td bgcolor="#e7ebf7" width="3%">
+			<p class="western"><br>
+			</p>
+		</td>
+	</tr>
+</tbody></table>
+<p class="western" style="margin-bottom: 0cm; font-style: normal; text-decoration: none;">
+<font color="#000080"><font face="Arial, sans-serif"><font size="3"><b>DAMA^{ROB}
+Toolbox: Installation</b></font></font></font></p>
+<ul src="installation_htm_79785dbc.gif" width="10" height="10" align="ABSMIDDLE">
+	<p class="western" style="margin-bottom: 0cm;"><img src="installation_files/installation_htm_79785dbc.gif" align="absmiddle" height="10" width="10">
+	UNIX and Windows Systems: just launch dama_install.m script.<br>On
+	UNIX Systems you need root privileges to install the toolbox.<br>Please
+	remark that installation script can ask you root password up to
+	three times.<br>This is a typical successful output of
+	dama_install.m script on UNIX systems:</p>
+</ul>
+<dl>
+	<dd>
+	<table border="1" bordercolor="#000000" cellpadding="4" cellspacing="0" width="756">
+		<col width="746">
+		<tbody><tr>
+			<td bgcolor="#ccccff" valign="top" width="746">
+				<pre>&gt;&gt; dama_install
+
+running install_lin.sh script 
+ this will need root privileges. 
+ Note that root password will not be stored. 
+ Please insert root password or
+ press just enter to break installation
+    . . .
+DAMA^{ROB} Toolbox Installation [UNIX SYSTEMS]
+Password: <span style="background: rgb(255, 255, 0) none repeat scroll 0% 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">INSERT PASSWORD HERE</span>
+Files copied in:/usr/local/matlabR2007a/toolbox/damarob
+...adding damarob folders to Matlab path
+ storing path: please enter root password again:
+Password: <span style="background: rgb(255, 255, 0) none repeat scroll 0% 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">INSERT PASSWORD HERE</span>
+ restoring permissions: please enter root password again:
+Password: <span style="background: rgb(255, 255, 0) none repeat scroll 0% 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">INSERT PASSWORD HERE</span>
+ 
+     DAMA^{ROB} Toolbox Installation Completed!
+ 
+ DAMA^{ROB} Toolbox: a symbolic robotics toolbox for Matlab(tm)
+ 
+ Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+ This file is part of GNU LGPLv2.1 DAMA^{ROB}
+    http://www.damarob.altervista.org</pre>
+			</td>
+		</tr>
+	</tbody></table>
+</dd></dl>
+<p class="western" style="margin-bottom: 0cm;" align="left">Note that
+the folder name may change (depending on Matlab™ versions).</p>
+<p class="western" style="margin-bottom: 0cm;"><br>
+</p>
+<ul src="installation_htm_79785dbc.gif" width="10" height="10" align="ABSMIDDLE">
+	<p class="western" style="margin-bottom: 0cm;"><img src="installation_files/installation_htm_79785dbc.gif" align="absmiddle" height="10" width="10">
+	If you have a MAC or if you encounter some trouble with automatic
+	installation, follow manual installation steps.</p>
+</ul>
+<p class="western" style="margin-bottom: 0cm;"><br>
+</p>
+<p class="western" style="margin-bottom: 0cm;"><font color="#000080"><b><span style="text-decoration: none;"><span style="font-style: normal;"><font face="Arial, sans-serif"><font size="3">MANUAL
+INSTALLATION:</font></font></span></span></b></font></p>
+<ul src="installation_htm_79785dbc.gif" width="10" height="10" align="ABSMIDDLE">
+	<p class="western" style="margin-bottom: 0cm;"><img src="installation_files/installation_htm_79785dbc.gif" align="absmiddle" height="10" width="10">
+	Copy 'damarob' folder into Matlab™ Toolbox folder:<br>– on Unix
+	systems it is something like: /usr/local/matlabR2007a/toolbox
+	(depending on Matlab™ versions)<br>– on Windows systems it
+	should be: C:\Program Files\MATLAB\R2007a\toolbox (depending on
+	Matlab versions)<br><br>note that folder name may change.<br>On Unix
+	systems, assure that you have permissions to write into destination
+	folder, and permissions to write the pathdef.m file located in:
+	TOOLBOXDIR/local. (this folder could be something like:
+	/usr/local/matlabR2007a/toolbox/local)</p>
+	<p class="western" style="margin-bottom: 0cm;"><img src="installation_files/installation_htm_79785dbc.gif" align="absmiddle" height="10" width="10">
+	Add damarob path and subfolders to Matlab™ path:<br>– menu File
+	→ Set Path → Add with Subfolders, then select the folder you
+	copied at previous step.<br>– alternatively you can use the
+	following commands:</p>
+</ul>
+<dl>
+	<dd>
+	<table border="1" bordercolor="#000000" cellpadding="4" cellspacing="0" width="756">
+		<col width="746">
+		<tbody><tr>
+			<td bgcolor="#ccccff" valign="top" width="746">
+				<pre>[ON UNIX SYSTEMS]
+addpath /usr/local/matlabR2007a/toolbox/damarob/
+addpath /usr/local/matlabR2007a/toolbox/damarob/doc/
+addpath /usr/local/matlabR2007a/toolbox/damarob/examples/
+addpath /usr/local/matlabR2007a/toolbox/damarob/mfiles/
+addpath /usr/local/matlabR2007a/toolbox/damarob/simulink/
+savepath
+
+[ON WINDOWS SYSTEMS]
+addpath 'C:\Program Files\MATLAB\R2007a\toolbox\damarob\'
+addpath 'C:\Program Files\MATLAB\R2007a\toolbox\damarob\doc\'
+addpath 'C:\Program Files\MATLAB\R2007a\toolbox\damarob\examples\'
+addpath 'C:\Program Files\MATLAB\R2007a\toolbox\damarob\mfiles\'
+addpath 'C:\Program Files\MATLAB\R2007a\toolbox\damarob\simulink\'
+savepath</pre>
+			</td>
+		</tr>
+	</tbody></table>
+</dd></dl>
+<p class="western" style="margin-bottom: 0cm;" align="left">Note that
+the folder name may change (depending on Matlab™ versions).</p>
+<p class="western" style="margin-bottom: 0cm;" align="left"><br>
+</p>
+<p class="western" style="margin-bottom: 0cm;" align="left"><img src="installation_files/getstart_html_6de3a179.jpg" name="immagini3" align="middle" border="0" height="4" width="629"></p>
+<p class="western" style="margin-bottom: 0cm; font-style: normal; text-decoration: none;" align="left">
+<font color="#000080"><font face="Arial, sans-serif"><font size="3"><b>Required
+Products:</b></font></font></font></p>
+<ul src="installation_htm_79785dbc.gif" width="10" height="10" align="ABSMIDDLE">
+	<p class="western" style="margin-bottom: 0cm;" align="left"><img src="installation_files/installation_htm_79785dbc.gif" align="absmiddle" height="10" width="10">
+	Symbolic Math Toolbox™</p>
+	<p class="western" style="margin-bottom: 0cm;" align="left"><img src="installation_files/installation_htm_79785dbc.gif" align="absmiddle" height="10" width="10">
+	Virtual Reality Toolbox™</p>
+</ul>
+<p class="western" style="margin-bottom: 0cm;"><br>
+</p>
+<p class="western" style="margin-bottom: 0cm;" align="left"><img src="installation_files/getstart_html_6de3a179.jpg" name="immagini4" align="middle" border="0" height="4" width="629"></p>
+<p class="western" style="margin-bottom: 0cm; font-style: normal; text-decoration: none;" align="left">
+<font color="#000080"><font face="Arial, sans-serif"><font size="3"><b>Recommended
+Products:</b></font></font></font></p>
+<p class="western" style="margin-bottom: 0cm;" align="left"><font color="#000000"><span style="text-decoration: none;"><font face="Arial, sans-serif"><font size="3"><span style="font-style: normal;"><span style="font-weight: normal;">Latexsyms,
+released under BSD license, is available for download at:
+<br><a href="http://www.mathworks.com/matlabcentral/fileexchange/20525" target="_blank">http://www.mathworks.com/matlabcentral/fileexchange/20525</a>
+</span></span></font></font></span></font>
+</p>
+<p class="western" style="margin-bottom: 0cm;" align="left"><br>
+</p>
+<table style="page-break-before: always;" bgcolor="#ccccff" border="0" cellpadding="0" cellspacing="0" width="100%">
+	<col width="8">
+	<col width="73">
+	<col width="86">
+	<col width="82">
+	<col width="7">
+	<tbody><tr>
+		<td bgcolor="#e7ebf7" height="21" width="3%">
+			<p class="western"><br>
+			</p>
+		</td>
+		<td bgcolor="#e7ebf7" width="28%">
+			<p class="western"><br>
+			</p>
+		</td>
+		<td bgcolor="#e7ebf7" width="34%">
+			<p class="western" align="center"><font face="Arial, sans-serif"><font size="3">Installation</font></font></p>
+		</td>
+		<td bgcolor="#e7ebf7" width="32%">
+			<p class="western" align="right"><br>
+			</p>
+		</td>
+		<td bgcolor="#e7ebf7" width="3%">
+			<p class="western"><br>
+			</p>
+		</td>
+	</tr>
+</tbody></table>
+<p class="western"><img src="installation_files/getstart_html_6de3a179.jpg" name="immagini6" align="middle" border="0" height="4" width="629"><br><font face="Arial, sans-serif"><font size="3">©
+2009 – Marco Caputano and Carmine Dario Bellicoso</font></font></p>
+</body></html>

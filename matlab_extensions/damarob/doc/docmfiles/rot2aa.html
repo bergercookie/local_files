@@ -1,0 +1,167 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>rot2aa</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-24">
+      <meta name="m-file" content="rot2aa"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content"><pre class="codeinput"><span class="keyword">function</span> [r,theta] = rot2aa(R)
+
+<span class="comment">% ROT2AA converts rotation matrix (direction cosine matrix) to axis-angle.</span>
+<span class="comment">%  syntax: [r,theta] = rot2aa(R)</span>
+<span class="comment">%</span>
+<span class="comment">%  where:</span>
+<span class="comment">%        r is a 3x1 vector</span>
+<span class="comment">%    theta is a scalar</span>
+<span class="comment">%   rtheta is a 4x1 vector</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+
+theta = acos(0.5*(R(1,1)+R(2,2)+R(3,3)-1));
+
+<span class="keyword">if</span> theta == 0
+    r = [1;1;1]/norm([1;1;1]);
+<span class="keyword">elseif</span> theta == pi || theta == -pi
+    r = [0;0;0];
+    epsilon = 0.5*[signum(R(3,2)-R(2,3))*sqrt(R(1,1)-R(2,2)-R(3,3)+1);
+        signum(R(1,3)-R(3,1))*sqrt(R(2,2)-R(3,3)-R(1,1)+1);
+        signum(R(2,1)-R(1,2))*sqrt(R(3,3)-R(1,1)-R(2,2)+1)];
+    <span class="keyword">for</span> i = 1:3
+        r(i) = epsilon(i)/sin(theta/2);
+    <span class="keyword">end</span>
+<span class="keyword">else</span>
+    r = 0.5*inv((sin(theta)))*[R(3,2)-R(2,3) ; R(1,3)-R(3,1) ; R(2,1)-R(1,2)];
+<span class="keyword">end</span>
+<span class="keyword">if</span> nargout &lt; 2
+    r = [r; theta];
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> y = signum(x)
+<span class="keyword">if</span> x == 0
+    y = 1;
+<span class="keyword">else</span>
+    y = sign(x);
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function [r,theta] = rot2aa(R)
+
+% ROT2AA converts rotation matrix (direction cosine matrix) to axis-angle.
+%  syntax: [r,theta] = rot2aa(R)
+%  
+%  where:
+%        r is a 3x1 vector
+%    theta is a scalar
+%   rtheta is a 4x1 vector
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+theta = acos(0.5*(R(1,1)+R(2,2)+R(3,3)-1));
+
+if theta == 0
+    r = [1;1;1]/norm([1;1;1]);
+elseif theta == pi || theta == -pi
+    r = [0;0;0];
+    epsilon = 0.5*[signum(R(3,2)-R(2,3))*sqrt(R(1,1)-R(2,2)-R(3,3)+1);
+        signum(R(1,3)-R(3,1))*sqrt(R(2,2)-R(3,3)-R(1,1)+1);
+        signum(R(2,1)-R(1,2))*sqrt(R(3,3)-R(1,1)-R(2,2)+1)];
+    for i = 1:3
+        r(i) = epsilon(i)/sin(theta/2);
+    end
+else
+    r = 0.5*inv((sin(theta)))*[R(3,2)-R(2,3) ; R(1,3)-R(3,1) ; R(2,1)-R(1,2)];
+end
+if nargout < 2
+    r = [r; theta];
+end
+end
+
+function y = signum(x)
+if x == 0
+    y = 1;
+else
+    y = sign(x);
+end
+end
+
+
+##### SOURCE END #####
+-->
+   </body>
+</html>

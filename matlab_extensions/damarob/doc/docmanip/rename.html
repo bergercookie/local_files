@@ -1,0 +1,195 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>rename</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-24">
+      <meta name="m-file" content="rename"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#2">subfunctions</a></li>
+            </ul>
+         </div><pre class="codeinput"><span class="keyword">function</span> manip = rename(manip,newname)
+
+<span class="comment">% RENAME renames manipulator objects.</span>
+<span class="comment">%    syntax:</span>
+<span class="comment">%          manip.rename('newname')</span>
+<span class="comment">%</span>
+<span class="comment">% Changes manipulator name to 'newname', also rename function files</span>
+<span class="comment">%</span>
+<span class="comment">%     See also manipulator</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+<span class="keyword">if</span> nargin ~=2
+    error(<span class="string">'    syntax:  manip.rename(''newname'') '</span>);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> ~isvarname(newname)
+    disp(<span class="string">' '</span>);
+    disp([<span class="string">'   The string: '''</span>,newname,<span class="string">''' is not a valid manipulator name.'</span>]);
+    disp(<span class="string">'   A valid manipulator name is a character string of letters, digits and'</span>);
+    disp(<span class="string">'   underscores, with length &lt;= namelengthmax, the first character a letter,'</span>);
+    disp(<span class="string">'   and the name is not a keyword.'</span>);
+    disp(<span class="string">' '</span>);
+    error(<span class="string">'    Please specify a valid manipulator name.'</span>);
+<span class="keyword">end</span>
+
+close(manip.vr_base)
+delete(manip.vr_base)
+
+delete_file([manip.name,<span class="string">'VR_base.wrl'</span>]);
+delete_file([manip.name,<span class="string">'_Jd_qd.m'</span>]);
+delete_file([manip.name,<span class="string">'_J_qdd.m'</span>]);
+delete_file([manip.name,<span class="string">'_Jt_he.m'</span>]);
+delete_file([manip.name,<span class="string">'_B_qdd.m'</span>]);
+delete_file([manip.name,<span class="string">'_B_matrix.m'</span>]);
+delete_file([manip.name,<span class="string">'_C_qd.m'</span>]);
+delete_file([manip.name,<span class="string">'_g.m'</span>]);
+delete_file([manip.name,<span class="string">'_nsap.m'</span>]);
+delete_file([manip.name,<span class="string">'VR_base.wrl'</span>]);
+delete_file([manip.name,<span class="string">'_3D.png'</span>]);
+
+manip.name = newname;
+manip.updateFiles;
+
+assignin(<span class="string">'caller'</span>,inputname(1),manip);
+<span class="keyword">end</span>
+</pre><h2>subfunctions<a name="2"></a></h2><pre class="codeinput"><span class="keyword">function</span> delete_file(namefile)
+<span class="keyword">if</span> exist([pwd,<span class="string">'/'</span>,namefile],<span class="string">'file'</span>)
+    delete(namefile);
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function manip = rename(manip,newname)
+
+% RENAME renames manipulator objects.
+%    syntax:
+%          manip.rename('newname')
+%
+% Changes manipulator name to 'newname', also rename function files
+%
+%     See also manipulator
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+if nargin ~=2
+    error('    syntax:  manip.rename(''newname'') ');
+end
+
+if ~isvarname(newname)
+    disp(' ');
+    disp(['   The string: ''',newname,''' is not a valid manipulator name.']);
+    disp('   A valid manipulator name is a character string of letters, digits and');
+    disp('   underscores, with length <= namelengthmax, the first character a letter,');
+    disp('   and the name is not a keyword.');
+    disp(' ');
+    error('    Please specify a valid manipulator name.');
+end
+
+close(manip.vr_base)
+delete(manip.vr_base)
+
+delete_file([manip.name,'VR_base.wrl']);
+delete_file([manip.name,'_Jd_qd.m']);
+delete_file([manip.name,'_J_qdd.m']);
+delete_file([manip.name,'_Jt_he.m']);
+delete_file([manip.name,'_B_qdd.m']);
+delete_file([manip.name,'_B_matrix.m']);
+delete_file([manip.name,'_C_qd.m']);
+delete_file([manip.name,'_g.m']);
+delete_file([manip.name,'_nsap.m']);
+delete_file([manip.name,'VR_base.wrl']);
+delete_file([manip.name,'_3D.png']);
+
+manip.name = newname;
+manip.updateFiles;
+
+assignin('caller',inputname(1),manip);
+end
+
+%% subfunctions
+function delete_file(namefile)
+if exist([pwd,'/',namefile],'file')
+    delete(namefile);
+end
+end
+##### SOURCE END #####
+-->
+   </body>
+</html>

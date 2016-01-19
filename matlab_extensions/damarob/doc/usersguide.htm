@@ -1,0 +1,659 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.1  (Linux)">
+	<META NAME="AUTHOR" CONTENT="mofo">
+	<META NAME="CREATED" CONTENT="20091117;12420200">
+	<META NAME="CHANGEDBY" CONTENT="Marco Caputano">
+	<META NAME="CHANGED" CONTENT="20091125;22155700">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2.01cm }
+		P { margin-bottom: 0.2cm }
+		P.western { font-family: "Arial", sans-serif }
+		TD P { margin-bottom: 0cm }
+		TD P.western { font-family: "Arial", sans-serif }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-GB" DIR="LTR">
+<TABLE WIDTH=100% BORDER=0 CELLPADDING=0 CELLSPACING=0 BGCOLOR="#ccccff" STYLE="page-break-before: always">
+	<COL WIDTH=5*>
+	<COL WIDTH=76*>
+	<COL WIDTH=86*>
+	<COL WIDTH=65*>
+	<COL WIDTH=24*>
+	<TR>
+		<TD WIDTH=2% HEIGHT=21 BGCOLOR="#e7ebf7">
+			<P CLASS="western"><A HREF="examples.htm"><IMG SRC="getstart_html_m68826708.png" NAME="EXAMPLES.HTM" ALIGN=BOTTOM  height="18" width="18" BORDER=0></A></P>
+		</TD>
+		<TD WIDTH=30% BGCOLOR="#e7ebf7">
+			<P CLASS="western"><A HREF="examples.htm"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Examples</FONT></FONT></A></P>
+		</TD>
+		<TD WIDTH=34% BGCOLOR="#e7ebf7">
+			<P CLASS="western" ALIGN=CENTER><FONT FACE="Arial, sans-serif"><FONT SIZE=3>User's
+			Guide</FONT></FONT></P>
+		</TD>
+		<TD WIDTH=25% BGCOLOR="#e7ebf7">
+			<P CLASS="western" ALIGN=RIGHT><BR>
+			</P>
+		</TD>
+		<TD WIDTH=9% BGCOLOR="#e7ebf7">
+			<P CLASS="western"><A HREF="functions.htm"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Functions</FONT></FONT></A><A HREF="functions.htm"><IMG SRC="getstart_html_265bcea8.png" NAME="FUNCTIONS.HTM" ALIGN=BOTTOM  height="18" width="18" BORDER=0></A></P>
+		</TD>
+	</TR>
+</TABLE>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" STYLE="margin-bottom: 0cm; font-style: normal; text-decoration: none">
+<FONT COLOR="#000080"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><B>DAMA^{ROB}
+Toolbox: User's Guide</B></FONT></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+<DL>
+	<DD>
+	<TABLE WIDTH=854 BORDER=0 CELLPADDING=0 CELLSPACING=0>
+		<COL WIDTH=294>
+		<COL WIDTH=560>
+		<TR VALIGN=TOP>
+			<TD WIDTH=294>
+				<P CLASS="western"><A HREF="#_deftraj">Defining a trajectory </A>
+				</P>
+			</TD>
+			<TD WIDTH=560>
+				<P CLASS="western" STYLE="font-style: normal; font-weight: normal; text-decoration: none">
+				<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>How
+				to define a trajectory in operational space</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=294>
+				<P CLASS="western"><FONT COLOR="#000000"><SPAN STYLE="text-decoration: none"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal"><A HREF="#_manipclass">manipulator
+				Class</A> </SPAN></SPAN></FONT></FONT></SPAN></FONT>
+				</P>
+			</TD>
+			<TD WIDTH=560>
+				<P CLASS="western" STYLE="font-style: normal; font-weight: normal; text-decoration: none">
+				<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Class
+				description</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=294>
+				<P CLASS="western"><FONT COLOR="#000000"><SPAN STYLE="text-decoration: none"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal"><A HREF="#_defmanip">Defining
+				a Manipulator</A> </SPAN></SPAN></FONT></FONT></SPAN></FONT>
+				</P>
+			</TD>
+			<TD WIDTH=560>
+				<P CLASS="western" STYLE="font-style: normal; font-weight: normal; text-decoration: none">
+				<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>How
+				to create a manipulator object</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=294>
+				<P CLASS="western"><A HREF="#_insdyn">Inserting Dynamics Data</A>
+								</P>
+			</TD>
+			<TD WIDTH=560>
+				<P CLASS="western" STYLE="font-style: normal; font-weight: normal; text-decoration: none">
+				<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>How
+				to insert dynamics data into a manipulator object</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=294>
+				<P CLASS="western"><FONT COLOR="#000000"><SPAN STYLE="text-decoration: none"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal"><A HREF="#_savmanip">Saving
+				Manipulator</A> </SPAN></SPAN></FONT></FONT></SPAN></FONT>
+				</P>
+			</TD>
+			<TD WIDTH=560>
+				<P CLASS="western" STYLE="font-style: normal; font-weight: normal; text-decoration: none">
+				<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>How
+				to save your work</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=294>
+				<P CLASS="western"><FONT COLOR="#000000"><SPAN STYLE="text-decoration: none"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal"><A HREF="#_loadmanip">Loading
+				Manipulator</A><A HREF="#_showdrive"> </A></SPAN></SPAN></FONT></FONT></SPAN></FONT>
+				</P>
+			</TD>
+			<TD WIDTH=560>
+				<P CLASS="western" STYLE="font-style: normal; font-weight: normal; text-decoration: none">
+				<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>How
+				to load your work</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=294 HEIGHT=40>
+				<P CLASS="western"><A HREF="#_concmanip">Concatenating
+				Manipulators</A></P>
+			</TD>
+			<TD WIDTH=560>
+				<P CLASS="western" STYLE="font-style: normal; font-weight: normal; text-decoration: none">
+				<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>How
+				to concatenate manipulators</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="getstart_html_6de3a179.jpg" NAME="immagini3" ALIGN=MIDDLE  BORDER=0></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; text-decoration: none"><A NAME="_deftraj"></A><A NAME="_savmanip1"></A>
+<FONT COLOR="#000080"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><B>Defining
+a trajectory in operational space:</B></FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<DL>
+	<DD>
+	<TABLE WIDTH=756 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+		<COL WIDTH=746>
+		<TR>
+			<TD WIDTH=746 VALIGN=TOP BGCOLOR="#ccccff">
+				<P CLASS="western"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>&gt;&gt;
+				path_des =
+				trajectory(Ts,startpoint,startorient,orient_type,point_1,point_2,...,point_n)</FONT></FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm">Where:</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<UL SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	Ts: sampling time 
+	</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	startpoint: three component column vector that specifies the end
+	effector's initial position in operational space</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	startorient: three (Euler angles) or four (axis/angle) component
+	column vector that specifies the end effector's initial orientation
+	in operational space</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	orient_type: char input ('ZYZ euler', 'ZYX euler', or 'aa') that
+	specifies which representation has been choosed for desired
+	orientation along the trajectory</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	point_1, point_2... : struct inputs (as many as you like) containing
+	information on how the path has to be generated.</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm">Struct
+	inputs contain:</P>
+</UL>
+<DL>
+	<DD>
+	<TABLE WIDTH=756 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+		<COL WIDTH=746>
+		<TR>
+			<TD WIDTH=746 VALIGN=TOP BGCOLOR="#ccccff">
+				<P CLASS="western" STYLE="margin-bottom: 0.5cm"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>Rectilinear
+				path<BR>input<BR>|<BR>+--g <FONT COLOR="#228b22">% goal point
+				(column vector)<BR></FONT>+--tf <FONT COLOR="#228b22">% time to
+				reach goal point (seconds)<BR></FONT>+--path_type = 'r' <FONT COLOR="#228b22">%
+				specifies the type of path (rectilinear)<BR></FONT>+--via <FONT COLOR="#228b22">%
+				point is via point (1) or not (0)<BR></FONT><FONT COLOR="#000000">+--orient</FONT><FONT COLOR="#228b22">
+				% this can be a three component vector (for ZYX or ZYZ Euler
+				angles)<BR>    or a four component one (for axis/angle
+				representation).<BR></FONT></FONT></FONT><BR><BR>
+				</P>
+				<P CLASS="western"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>Circular
+				path<BR>input<BR>|<BR>+--g <FONT COLOR="#228b22">% goal point
+				(column vector)<BR></FONT>+--tf <FONT COLOR="#228b22">% time to
+				reach goal point (seconds)<BR></FONT>+--path_type = 'c' <FONT COLOR="#228b22">%
+				specifies the type of path (circular)<BR></FONT>+--thf <FONT COLOR="#228b22">%
+				radians to be sweeped by the position vector<BR></FONT>+--c <FONT COLOR="#228b22">%
+				centre of the circle<BR></FONT>+--z <FONT COLOR="#228b22">% axis
+				of rotation<BR></FONT>+--via <FONT COLOR="#228b22">% point is via
+				point (1) or not (0)<BR></FONT><FONT COLOR="#000000">+--orient</FONT><FONT COLOR="#228b22">
+				% this can be a three component vector (for ZYX or ZYZ Euler
+				angles)<BR>    or a four component one (for axis/angle
+				representation).</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="getstart_html_6de3a179.jpg" NAME="immagini9" ALIGN=MIDDLE  BORDER=0></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; text-decoration: none"><A NAME="_manipclass"></A>
+<FONT COLOR="#000080"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><B>manipulator
+Class:</B></FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; font-weight: normal; text-decoration: none">
+<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>A
+manipulator object contains the following internal structure:</FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<DL>
+	<DD>
+	<TABLE WIDTH=804 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+		<COL WIDTH=794>
+		<TR>
+			<TD WIDTH=794 VALIGN=TOP BGCOLOR="#ccccff">
+				<P CLASS="western"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>Manipulator<BR>object<BR>|<BR><FONT COLOR="#000000">+--name
+				</FONT><FONT COLOR="#228b22">% string: manipulator name<BR></FONT>|<BR><FONT COLOR="#000000">+--DH
+				</FONT><FONT COLOR="#228b22">% struct containing: table,r,p,z<BR></FONT><FONT COLOR="#000000">|
+				+--table </FONT><FONT COLOR="#228b22">% DH table in a matrix with
+				RP flag and limits<BR></FONT><FONT COLOR="#000000">| +--r </FONT><FONT COLOR="#228b22">%
+				number of rows of DH table (number of links)<BR></FONT>| +--p<BR><FONT COLOR="#000000">|
+				| +--p0 </FONT><FONT COLOR="#228b22">% origin of 0-frame in
+				b-frame<BR></FONT><FONT COLOR="#000000">| | +--pe </FONT><FONT COLOR="#228b22">%
+				origin of e-frame in b-frame<BR></FONT><FONT COLOR="#000000">| |
+				+--p{1}..p{n} </FONT><FONT COLOR="#228b22">% origin of i-frame in
+				b-frame<BR></FONT>| +--z <BR><FONT COLOR="#000000">| | +--z0 </FONT><FONT COLOR="#228b22">%
+				z-axis of 0-frame in b-frame<BR></FONT><FONT COLOR="#000000">| |
+				+--ze </FONT><FONT COLOR="#228b22">% z-axis of e-frame in
+				b-frame<BR></FONT><FONT COLOR="#000000">| | +--z{1}..z{n} </FONT><FONT COLOR="#228b22">%
+				z-axis of i-frame in b-frame<BR></FONT>|<BR><FONT COLOR="#000000">+--jointvar
+				</FONT><FONT COLOR="#228b22">% struct (syms): q qd qdd: joint
+				variables<BR></FONT><FONT COLOR="#000000">| +--q </FONT><FONT COLOR="#228b22">%
+				symbolic variable for joint position<BR></FONT><FONT COLOR="#000000">|
+				+--qd </FONT><FONT COLOR="#228b22">% symbolic variable for joint
+				velocities<BR></FONT><FONT COLOR="#000000">| +--qdd </FONT><FONT COLOR="#228b22">%
+				symbolic variable for joint accelerations<BR></FONT>|<BR><FONT COLOR="#000000">+--kin
+				</FONT><FONT COLOR="#228b22">% struct containing kinematics data
+				<BR></FONT>| |<BR><FONT COLOR="#000000">| +--T </FONT><FONT COLOR="#228b22">%
+				homogeneous transformation matrices<BR></FONT><FONT COLOR="#000000">|
+				| +--Tb0 </FONT><FONT COLOR="#228b22">% homogeneous
+				transformation matrices from b-frame to 0-frame<BR></FONT><FONT COLOR="#000000">|
+				| +--Tne </FONT><FONT COLOR="#228b22">% homogeneous
+				transformation matrices from n-frame to e-frame<BR></FONT><FONT COLOR="#000000">|
+				| +--Tbe </FONT><FONT COLOR="#228b22">% homogeneous
+				transformation matrices from b-frame to e-frame<BR></FONT><FONT COLOR="#000000">|
+				| +--T{1}..T{n} </FONT><FONT COLOR="#228b22">% homogeneous
+				transformation matrices from 0-frame to i-frame<BR></FONT>| |<BR><FONT COLOR="#000000">|
+				+--J </FONT><FONT COLOR="#228b22">% geometric Jacobian matrix<BR></FONT><FONT COLOR="#000000">|
+				| +--J </FONT><FONT COLOR="#228b22">% geometric Jacobian matrix<BR></FONT><FONT COLOR="#000000">|
+				| +--Jd </FONT><FONT COLOR="#228b22">% time-derivative of
+				geometric Jacobian matrix<BR></FONT><FONT COLOR="#000000">| |
+				+--Jp_l{1}..Jp_l{n} </FONT><FONT COLOR="#228b22">% geometric
+				Jacobian matrix [joints' COM position]<BR></FONT><FONT COLOR="#000000">|
+				| +--Jo_l{1}..Jo_l{n} </FONT><FONT COLOR="#228b22">% geometric
+				Jacobian matrix [joints' COM orientation]<BR></FONT><FONT COLOR="#000000">|
+				| +--Jp_m{1}..Jp_m{n} </FONT><FONT COLOR="#228b22">% geometric
+				Jacobian matrix [rotors' COM position]<BR></FONT><FONT COLOR="#000000">|
+				| +--Jo_m{1}..Jo_m{n} </FONT><FONT COLOR="#228b22">% geometric
+				Jacobian matrix [rotors' COM orientation]<BR></FONT>| |<BR><FONT COLOR="#000000">|
+				+--nsap </FONT><FONT COLOR="#228b22">% orientation-position
+				matrix in a column: [n;s;a;p]<BR></FONT>| |<BR>| +--R<BR><FONT COLOR="#000000">|
+				| +--R{1}..R{n} </FONT><FONT COLOR="#228b22">% rotation matrices
+				from 0-frame to i-frame<BR></FONT>| |<BR>| +--A<BR><FONT COLOR="#000000">|
+				+--A{1}..A{r} </FONT><FONT COLOR="#228b22">% homogeneous
+				transformation matrices from (i-1)-frame to i-frame <BR></FONT>|<BR><FONT COLOR="#000000">+--dyn
+				</FONT><FONT COLOR="#228b22">% struct containing dynamics data<BR></FONT><FONT COLOR="#000000">|
+				+--B </FONT><FONT COLOR="#228b22">% manipulator inertia matrix<BR></FONT><FONT COLOR="#000000">|
+				+--C </FONT><FONT COLOR="#228b22">% Coriolis and centripetal
+				matrix (Christoffeln signs conventions)<BR></FONT><FONT COLOR="#000000">|
+				+--g </FONT><FONT COLOR="#228b22">% gravity column vector<BR></FONT><FONT COLOR="#000000">|
+				+--data </FONT><FONT COLOR="#228b22">% input data<BR></FONT><FONT COLOR="#000000">|
+				+--g0 [gx; gy; gz] </FONT><FONT COLOR="#228b22">% gravity in
+				0-frame<BR></FONT><FONT COLOR="#000000">| +--ml [1 .. r] </FONT><FONT COLOR="#228b22">%
+				links mass<BR></FONT><FONT COLOR="#000000">| +--mm [1 .. r] </FONT><FONT COLOR="#228b22">%
+				rotors mass<BR></FONT><FONT COLOR="#000000">| +--kr [1 .. r] </FONT><FONT COLOR="#228b22">%
+				motorgear ratio<BR></FONT><FONT COLOR="#000000">| +--zm {1 .. r}
+				</FONT><FONT COLOR="#228b22">% motor axes expressed in [i-frame];
+				zm{i} is a 3x1 column vector<BR></FONT><FONT COLOR="#000000">|
+				+--Il {1 .. r} </FONT><FONT COLOR="#228b22">% links' mass moment
+				of inertia [i-frame]; Il{i} is a 3x3 matrix<BR></FONT><FONT COLOR="#000000">|
+				+--Im {1 .. r} </FONT><FONT COLOR="#228b22">% motors' mass moment
+				of inertia; Im{i} is a 3x3 matrix<BR></FONT><FONT COLOR="#000000">|
+				+--Fv [rxr] </FONT><FONT COLOR="#228b22">% joints' viscous
+				friction<BR></FONT><FONT COLOR="#000000">| +--Fm [rxr] </FONT><FONT COLOR="#228b22">%
+				motors' viscous friction<BR></FONT><FONT COLOR="#000000">| +--pl
+				{1 .. r} </FONT><FONT COLOR="#228b22">% position of centres of
+				mass of the<BR></FONT><FONT COLOR="#000000">| | i-link with
+				</FONT><FONT COLOR="#228b22">%respect to i-frame; pl{i} is a 3x1
+				column vector<BR></FONT><FONT COLOR="#000000">| +--pm {1 .. r} </FONT><FONT COLOR="#228b22">%
+				position of motors with respect to the<BR></FONT><FONT COLOR="#000000">|
+				previous joint </FONT><FONT COLOR="#228b22">%axes; pm{i} is a 3x1
+				column vector <BR></FONT>|<BR><FONT COLOR="#000000">+--dyndata </FONT><FONT COLOR="#228b22">%
+				flag: 1 means dynamic dataset ready<BR></FONT>|<BR><FONT COLOR="#000000">+--evaluated
+				</FONT><FONT COLOR="#228b22">% struct: contains flags<BR></FONT><FONT COLOR="#000000">|
+				+--Direct_Kinematics </FONT><FONT COLOR="#228b22">% 1 means
+				Direct_Kinematics evaluated<BR></FONT><FONT COLOR="#000000">|
+				+--Direct_Dynamics </FONT><FONT COLOR="#228b22">% 1 means
+				Direct_Dynamics evaluated<BR></FONT>|<BR><FONT COLOR="#000000">+--func
+				</FONT><FONT COLOR="#228b22">% struct: handles of all
+				m-functions<BR></FONT><FONT COLOR="#000000">| +--x </FONT><FONT COLOR="#228b22">%
+				direct kinematics function: x position <BR></FONT><FONT COLOR="#000000">|
+				+--y </FONT><FONT COLOR="#228b22">% direct kinematics function: y
+				position <BR></FONT><FONT COLOR="#000000">| +--z </FONT><FONT COLOR="#228b22">%
+				direct kinematics function: z position <BR></FONT><FONT COLOR="#000000">|
+				+--Jd_qd </FONT><FONT COLOR="#228b22">% product: J' * q'<BR></FONT><FONT COLOR="#000000">|
+				+--Jt_he </FONT><FONT COLOR="#228b22">% product: J^T * he<BR></FONT><FONT COLOR="#000000">|
+				+--J_qdd </FONT><FONT COLOR="#228b22">% product: J * q''<BR></FONT><FONT COLOR="#000000">|
+				+--nsap </FONT><FONT COLOR="#228b22">% full direct kinematics
+				function: nsap in a column<BR></FONT><FONT COLOR="#000000">|
+				+--B_matrix </FONT><FONT COLOR="#228b22">% inertia matrix in a
+				column<BR></FONT><FONT COLOR="#000000">| +--B_qdd </FONT><FONT COLOR="#228b22">%
+				product: B * q''<BR></FONT><FONT COLOR="#000000">| +--C_qd </FONT><FONT COLOR="#228b22">%
+				product: C * q'<BR></FONT><FONT COLOR="#000000">| +--g </FONT><FONT COLOR="#228b22">%
+				gravity vector<BR></FONT>|<BR><FONT COLOR="#000000">+--vr_base </FONT><FONT COLOR="#228b22">%
+				vrworld: manipulator's wrl vr-object<BR></FONT><FONT COLOR="#000000">+--fig
+				</FONT><FONT COLOR="#228b22">% struct: handles of all figures</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm">A
+manipulator object is associated with following files:</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<UL SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	MANIP_NAME_3D.png</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	MANIP_NAME_B_matrix.m</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	MANIP_NAME_B_qdd.m</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	MANIP_NAME_C_qd.m</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	MANIP_NAME_g.m</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	MANIP_NAME_Jd_qd.m</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	MANIP_NAME_J_qdd.m</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	MANIP_NAME_Jt_he.m</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	MANIP_NAME_nsap.m</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	MANIP_NAMEVR_base.wrl</P>
+</UL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm">These are
+m-function files, a VRML model and a PNG snapshot of the modelled
+manipulator.</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="getstart_html_6de3a179.jpg" NAME="immagini7" ALIGN=MIDDLE BORDER=0></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; text-decoration: none"><A NAME="_defmanip"></A>
+<FONT COLOR="#000080"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><B>Defining
+a Manipulator:</B></FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; font-weight: normal; text-decoration: none">
+<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Use
+manipulator constructor to create manipulator objects:</FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<DL>
+	<DD>
+	<TABLE WIDTH=756 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+		<COL WIDTH=746>
+		<TR>
+			<TD WIDTH=746 VALIGN=TOP BGCOLOR="#ccccff">
+				<P CLASS="western"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>&gt;&gt;
+				manip = manipulator(DH,name,Tb0,Tne)</FONT></FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm">Where:</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<UL SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	manip: is the instance created</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	name: is a string containing the description name of the robot</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	DH: Denavit-Hartenberg table, including joint type and limits.<BR>DH
+	is a (r x 7) matrix as follows: [a alpha d theta R/P min max]<BR>Each
+	row contains a link data.<BR>R/P is a flag variable:<BR>R/P = 0
+	indicates a revolute joint<BR>R/P != 0 indicates a prismatic
+	joint<BR>if no limits (min - max) is specified, range will be [-Inf,
+	Inf]</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	Tb0: Homogeneous transformation matrix between b-frame and 0-frame</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	Tne: Homogeneous transformation matrix between n-frame and
+	e-frame<BR>If not specified, Tb0 and Tne will be assumed identities</P>
+</UL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="getstart_html_6de3a179.jpg" NAME="immagini10" ALIGN=MIDDLE BORDER=0></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><A NAME="_insdyn"></A>
+<BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; text-decoration: none">
+<FONT COLOR="#000080"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><B>Inserting
+dynamics data:</B></FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; font-weight: normal; text-decoration: none">
+<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Use
+InsertDyndata method to insert dynamics data into a manipulator
+object:</FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<DL>
+	<DD>
+	<TABLE WIDTH=756 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+		<COL WIDTH=746>
+		<TR>
+			<TD WIDTH=746 VALIGN=TOP BGCOLOR="#ccccff">
+				<P CLASS="western"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>&gt;&gt;
+				manipulator.InsertDyndata(dyndata)</FONT></FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm">Where
+dyndata is a struct containing all these fields:</P>
+<DL>
+	<DD>
+	<TABLE WIDTH=756 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+		<COL WIDTH=746>
+		<TR>
+			<TD WIDTH=746 VALIGN=TOP BGCOLOR="#ccccff">
+				<P CLASS="western"><FONT COLOR="#000000"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>dyndata<BR>|<BR>+--g0
+				[gx; gy; gz] </FONT><FONT COLOR="#228b22"><FONT SIZE=2>%gravity
+				in 0-frame<BR></FONT></FONT><FONT SIZE=2>+--ml [1 .. r] </FONT><FONT COLOR="#228b22"><FONT SIZE=2>%
+				links' masses<BR></FONT></FONT><FONT SIZE=2>+--mm [1 .. r] </FONT><FONT COLOR="#228b22"><FONT SIZE=2>%
+				rotors' masses<BR></FONT></FONT><FONT SIZE=2>+--kr [1 .. r] </FONT><FONT COLOR="#228b22"><FONT SIZE=2>%
+				motorgears' ratios<BR></FONT></FONT><FONT SIZE=2>+--zm {1 .. r} </FONT><FONT COLOR="#228b22"><FONT SIZE=2>%
+				motor axes expressed in [i-frame]<BR></FONT></FONT><FONT SIZE=2>+--Il
+				{1 .. r} </FONT><FONT COLOR="#228b22"><FONT SIZE=2>% links' mass
+				moments of inertia [i-frame]<BR></FONT></FONT><FONT SIZE=2>+--Im
+				{1 .. r} </FONT><FONT COLOR="#228b22"><FONT SIZE=2>% motors' mass
+				moments of inertia<BR></FONT></FONT><FONT SIZE=2>+--Fv [rxr] </FONT><FONT COLOR="#228b22"><FONT SIZE=2>%
+				joints' viscous frictions<BR></FONT></FONT><FONT SIZE=2>+--Fm
+				[rxr] </FONT><FONT COLOR="#228b22"><FONT SIZE=2>% motors' viscous
+				frictions<BR></FONT></FONT><FONT SIZE=2>+--pl {1 .. r} </FONT><FONT COLOR="#228b22"><FONT SIZE=2>%
+				position of center of mass of the<BR></FONT></FONT><FONT SIZE=2>|
+				</FONT><FONT COLOR="#228b22"><FONT SIZE=2>% i-link with respect
+				to i-frame<BR></FONT></FONT><FONT SIZE=2>+--pm {1 .. r} </FONT><FONT COLOR="#228b22"><FONT SIZE=2>%
+				position of motors with respect to the<BR>% previous joint
+				axes<BR><BR></FONT></FONT><FONT SIZE=2>Please note:<BR>Il{i} is a
+				3x3 matrix<BR>Im{i} is a 3x3 matrix<BR>pl{i} is a 3x1 column
+				vector<BR>pm{i} is a 3x1 column vector<BR>zm{i} is a 3x1 column
+				vector</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm">The
+following figure shows frames conventions and explains better who are
+dynamics data:<BR><IMG SRC="usersguide_htm_m25cc6970.png" NAME="immagini11" ALIGN=BOTTOM WIDTH=75 HEIGHT=38 BORDER=0></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="getstart_html_6de3a179.jpg" NAME="immagini4" ALIGN=MIDDLE BORDER=0></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; text-decoration: none"><A NAME="_savmanip"></A>
+<FONT COLOR="#000080"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><B>Saving
+Manipulator:</B></FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; font-weight: normal; text-decoration: none">
+<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Use
+standard 'save' command to save manipulator objects:</FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<DL>
+	<DD>
+	<TABLE WIDTH=756 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+		<COL WIDTH=746>
+		<TR>
+			<TD WIDTH=746 VALIGN=TOP BGCOLOR="#ccccff">
+				<P CLASS="western" STYLE="margin-bottom: 0.5cm"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>&gt;&gt;
+				save FILENAME <FONT COLOR="#228b22"><FONT FACE="lucidatypewriter, monospace">%
+				save all workspace variables in file FILENAME</FONT></FONT></FONT></FONT></P>
+				<P CLASS="western" STYLE="margin-bottom: 0.5cm"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>&gt;&gt;
+				save FILENAME M1 M2 <FONT COLOR="#228b22"><FONT FACE="lucidatypewriter, monospace">%
+				save variable 'M1' and 'M2' in file FILENAME, also if one </FONT></FONT></FONT></FONT>
+				</P>
+				<P CLASS="western"><FONT COLOR="#228b22"><FONT FACE="lucidatypewriter, monospace"><FONT SIZE=2>%
+				or more of them are manipulator objects.</FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="getstart_html_6de3a179.jpg" NAME="immagini5" ALIGN=MIDDLE BORDER=0></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; text-decoration: none"><A NAME="_loadmanip"></A>
+<FONT COLOR="#000080"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><B>Loading
+Manipulator:</B></FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; font-weight: normal; text-decoration: none">
+<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Use
+manipload function to load manipulator objects from file. This will
+automatically generate files associated with manipulator without
+evaluating specific functions:</FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<DL>
+	<DD>
+	<TABLE WIDTH=756 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+		<COL WIDTH=746>
+		<TR>
+			<TD WIDTH=746 VALIGN=TOP BGCOLOR="#ccccff">
+				<P CLASS="western" STYLE="margin-bottom: 0.5cm"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>&gt;&gt;
+				manipload FILENAME <FONT COLOR="#228b22"><FONT FACE="lucidatypewriter, monospace">%
+				load all variables stored in FILENAME</FONT></FONT></FONT></FONT></P>
+				<P CLASS="western"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>&gt;&gt;
+				manipload FILENAME x y z <FONT COLOR="#228b22"><FONT FACE="lucidatypewriter, monospace">%
+				load only x y z from FILENAME</FONT></FONT></FONT></FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="getstart_html_6de3a179.jpg" NAME="immagini8" ALIGN=MIDDLE BORDER=0></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><A NAME="_concmanip"></A>
+<BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; text-decoration: none">
+<FONT COLOR="#000080"><FONT FACE="Arial, sans-serif"><FONT SIZE=3><B>Concatenating
+Manipulators:</B></FONT></FONT></FONT></P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; font-weight: normal; text-decoration: none">
+<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Use
++ operator (plus method) to concatenate manipulator objects. <BR>This
+will automatically generate a new manipulator with:</FONT></FONT></FONT></P>
+<UL SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; font-weight: normal; text-decoration: none"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Tb0
+	of the first manipulator</FONT></FONT></FONT></P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; font-weight: normal; text-decoration: none"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>all
+	links of the first manipulator</FONT></FONT></FONT></P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; font-weight: normal; text-decoration: none"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>all
+	links of the second manipulator</FONT></FONT></FONT></P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal; font-weight: normal; text-decoration: none"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	<FONT COLOR="#000000"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Tne
+	of the second manipulator</FONT></FONT></FONT></P>
+</UL>
+<DL>
+	<DD>
+	<TABLE WIDTH=756 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+		<COL WIDTH=746>
+		<TR>
+			<TD WIDTH=746 VALIGN=TOP BGCOLOR="#ccccff">
+				<P CLASS="western"><FONT FACE="Bitstream Vera Sans Mono, monospace"><FONT SIZE=2>&gt;&gt;
+				manipC = manipA + manipB</FONT></FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm">Note that
+manipA and manipB must be both numeric or symbolic.</P>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm">Remember
+that:</P>
+<UL SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	you can create void manipulators containing just Tb0 and Tne that
+	you can use to modify these homogeneous transformations of
+	concatenated manipulators.</P>
+	<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="usersguide_htm_79785dbc.gif"  ALIGN=ABSMIDDLE>
+	you can rename manipulators with rename method</P>
+</UL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<TABLE WIDTH=100% BORDER=0 CELLPADDING=0 CELLSPACING=0 BGCOLOR="#ccccff" STYLE="page-break-before: always">
+	<COL WIDTH=5*>
+	<COL WIDTH=76*>
+	<COL WIDTH=86*>
+	<COL WIDTH=65*>
+	<COL WIDTH=24*>
+	<TR>
+		<TD WIDTH=2% HEIGHT=21 BGCOLOR="#e7ebf7">
+			<P CLASS="western"><A HREF="examples.htm"><IMG SRC="getstart_html_m68826708.png" NAME="immagini1" ALIGN=BOTTOM height="18" width="18" BORDER=0></A></P>
+		</TD>
+		<TD WIDTH=30% BGCOLOR="#e7ebf7">
+			<P CLASS="western"><A HREF="examples.htm"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Examples</FONT></FONT></A></P>
+		</TD>
+		<TD WIDTH=34% BGCOLOR="#e7ebf7">
+			<P CLASS="western" ALIGN=CENTER><FONT FACE="Arial, sans-serif"><FONT SIZE=3>User's
+			Guide</FONT></FONT></P>
+		</TD>
+		<TD WIDTH=25% BGCOLOR="#e7ebf7">
+			<P CLASS="western" ALIGN=RIGHT><BR>
+			</P>
+		</TD>
+		<TD WIDTH=9% BGCOLOR="#e7ebf7">
+			<P CLASS="western"><A HREF="functions.htm"><FONT FACE="Arial, sans-serif"><FONT SIZE=3>Functions</FONT></FONT></A><A HREF="functions.htm"><IMG SRC="getstart_html_265bcea8.png" NAME="immagini2" ALIGN=BOTTOM height="18" width="18" BORDER=0></A></P>
+		</TD>
+	</TR>
+</TABLE>
+<P CLASS="western"><IMG SRC="getstart_html_6de3a179.jpg" NAME="immagini6" ALIGN=MIDDLE BORDER=0><BR><FONT FACE="Arial, sans-serif"><FONT SIZE=3>©
+2009 – Marco Caputano and Carmine Dario Bellicoso</FONT></FONT></P>
+</BODY>
+</HTML>

@@ -1,0 +1,163 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>manipload</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-24">
+      <meta name="m-file" content="manipload"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content"><pre class="codeinput"><span class="keyword">function</span> manipload(varargin)
+
+<span class="comment">% MANIPLOAD load manipulator(s) from file</span>
+<span class="comment">%    syntax: manipload FILENAME</span>
+<span class="comment">%            manipload FILENAME x</span>
+<span class="comment">%            manipload FILENAME x y z</span>
+<span class="comment">%</span>
+<span class="comment">%    examples:</span>
+<span class="comment">%            manipload FILENAME       -- load all variables stored in FILENAME</span>
+<span class="comment">%            manipload FILENAME x y z -- load only x y z from FILENAME</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+
+<span class="keyword">if</span> nargin == 0
+    help <span class="string">manipload</span>;
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+
+list = whos(<span class="string">'-file'</span>, varargin{1});
+n = length(list);
+num = length(varargin);
+
+<span class="keyword">for</span> i=1:1:n
+    <span class="keyword">if</span> strcmp(list(i).class, <span class="string">'manipulator'</span>)
+        <span class="keyword">if</span> num == 1
+            evalin(<span class="string">'caller'</span>,[<span class="string">'load '</span>,varargin{1}, <span class="string">' '</span>,list(i).name ]);
+            evalin(<span class="string">'caller'</span>,[list(i).name,<span class="string">'.updateFiles;'</span> ]);
+        <span class="keyword">end</span>
+        <span class="keyword">for</span> j=2:1:num
+            <span class="keyword">if</span> strcmp(list(i).name, varargin{j})
+                evalin(<span class="string">'caller'</span>,[<span class="string">'load '</span>,varargin{1}, <span class="string">' '</span>,list(i).name ]);
+                evalin(<span class="string">'caller'</span>,[list(i).name,<span class="string">'.updateFiles;'</span> ]);
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">return</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function manipload(varargin)
+
+% MANIPLOAD load manipulator(s) from file
+%    syntax: manipload FILENAME
+%            manipload FILENAME x
+%            manipload FILENAME x y z
+%
+%    examples:
+%            manipload FILENAME       REPLACE_WITH_DASH_DASH load all variables stored in FILENAME
+%            manipload FILENAME x y z REPLACE_WITH_DASH_DASH load only x y z from FILENAME
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+if nargin == 0
+    help manipload;
+    return
+end
+
+list = whos('-file', varargin{1});
+n = length(list);
+num = length(varargin);
+
+for i=1:1:n    
+    if strcmp(list(i).class, 'manipulator')
+        if num == 1
+            evalin('caller',['load ',varargin{1}, ' ',list(i).name ]);
+            evalin('caller',[list(i).name,'.updateFiles;' ]);
+        end
+        for j=2:1:num
+            if strcmp(list(i).name, varargin{j})
+                evalin('caller',['load ',varargin{1}, ' ',list(i).name ]);
+                evalin('caller',[list(i).name,'.updateFiles;' ]);
+            end
+        end
+    end
+end
+
+return
+##### SOURCE END #####
+-->
+   </body>
+</html>

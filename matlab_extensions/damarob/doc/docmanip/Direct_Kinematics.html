@@ -1,0 +1,591 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>Direct_Kinematics</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-24">
+      <meta name="m-file" content="Direct_Kinematics"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#2">Evaluation of single homogeneous transformation matrices</a></li>
+               <li><a href="#3">Evaluation of T and the position of the end-effector frame</a></li>
+               <li><a href="#4">Evaluation of the geometric Jacobian matrix</a></li>
+               <li><a href="#5">Evaluation of the analytical Jacobian matrix</a></li>
+               <li><a href="#6">time-derivative of J</a></li>
+               <li><a href="#7">Rotation matrices of Frame i with respect to Frame 0</a></li>
+               <li><a href="#8">Simplify</a></li>
+            </ul>
+         </div><pre class="codeinput"><span class="keyword">function</span> Direct_Kinematics(manip)
+
+<span class="comment">% DIRECT_KINEMATICS evaluate direct kinematics of a manipulator object</span>
+<span class="comment">%    syntax: manip.Direct_Kinematics</span>
+<span class="comment">%</span>
+<span class="comment">%  Evaluates: rotation matrices, homogeneous transformation matrices,</span>
+<span class="comment">%             Jacobian matrices and stores them into manipulator as</span>
+<span class="comment">%             follows:</span>
+<span class="comment">%</span>
+<span class="comment">%  manip.kin</span>
+<span class="comment">%       |</span>
+<span class="comment">%       +--T</span>
+<span class="comment">%       |  +-- Tb0: homogeneous transformation matrices from b-frame to 0-frame</span>
+<span class="comment">%       |  +-- Tne: homogeneous transformation matrices from n-frame to e-frame</span>
+<span class="comment">%       |  +-- Tbe: homogeneous transformation matrices from b-frame to e-frame</span>
+<span class="comment">%       |  +-- T{1}..T{n}: homogeneous transformation matrices from 0-frame to i-frame</span>
+<span class="comment">%       |</span>
+<span class="comment">%       +--J</span>
+<span class="comment">%       |  +-- J: geometric Jacobian matrix</span>
+<span class="comment">%       |  +-- Jd: time-derivative of geometric Jacobian matrix</span>
+<span class="comment">%       |</span>
+<span class="comment">%       +--nsap: orientation-position matrix in a coloumn: [n;s;a;p]</span>
+<span class="comment">%       |</span>
+<span class="comment">%       +--R</span>
+<span class="comment">%       |  +-- R{1}..R{n}: rotation matrices from 0-frame to i-frame</span>
+<span class="comment">%       |</span>
+<span class="comment">%       +--A</span>
+<span class="comment">%          +-- A{1}..A{r}: homogeneous transformation matrices from</span>
+<span class="comment">%          (i-1)-frame to i-frame</span>
+<span class="comment">%</span>
+<span class="comment">%     See also manipulator</span>
+<span class="comment">%              manipulator/pose</span>
+<span class="comment">%              manipulator/Direct_Dynamics</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+
+<span class="keyword">if</span> manip.DH.r == 0
+    manip.display;
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> manip.evaluated.Direct_Kinematics == 1
+    NL = [char(13),char(10)]; <span class="comment">% 'new line' string</span>
+    disp([<span class="string">'Direct Kinematics already evaluated '</span>,NL,<span class="string">'Direct_Kinematics aborted.'</span>,NL]);
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Initialization</span>
+DH=manip.DH.table;
+r=manip.DH.r;
+q = manip.jointvar.q;
+qd = manip.jointvar.qd;
+qdd = manip.jointvar.qdd;
+
+A = cell(1,r);
+T = cell(1,r);
+
+p = cell(1,r);
+z = cell(1,r);
+
+R = cell(1,r);
+J = sym(zeros(6,r));
+
+Tb0 = manip.kin.T.Tb0;
+Tne = manip.kin.T.Tne;
+</pre><h2>Evaluation of single homogeneous transformation matrices<a name="2"></a></h2><pre class="codeinput"><span class="keyword">for</span> i=1:r
+    Ai = [cos(DH(i,4)) -sin(DH(i,4))*cos(DH(i,2))  sin(DH(i,4))*sin(DH(i,2)) DH(i,1)*cos(DH(i,4));
+        sin(DH(i,4))  cos(DH(i,4))*cos(DH(i,2)) -cos(DH(i,4))*sin(DH(i,2)) DH(i,1)*sin(DH(i,4));
+        0             sin(DH(i,2))               cos(DH(i,2))              DH(i,3)             ;
+        0             0                          0                         1                  ];
+
+    A{i} = Ai;
+<span class="keyword">end</span>
+</pre><h2>Evaluation of T and the position of the end-effector frame<a name="3"></a></h2><pre class="codeinput">T{1} = A{1};
+<span class="keyword">for</span> i=2:r
+    T{i} = T{i-1} * A{i};           <span class="comment">% T(i) = T(i-1)*A(i);</span>
+<span class="keyword">end</span>
+Tbe = Tb0 * T{r} * Tne;
+
+p0 = [0;0;0];
+pe = T{r} * Tne; pe = pe(1:3,4);
+<span class="comment">% pe = Tbe(1:3,4);</span>
+z0  = [0;0;1];
+ze = T{r} * Tne; ze = ze(1:3,3);
+
+
+<span class="keyword">for</span> i=2:r
+    <span class="comment">% Position vector of the origin of Frame i with respect to Frame 0</span>
+    p{i-1} = T{i-1}(1:3,4);
+    <span class="comment">% Unit vector z of Frame i with respect to Frame i-1</span>
+    z{i-1}  = T{i-1}(1:3,3);
+<span class="keyword">end</span>
+
+manip.DH.p.p0=sym(p0);
+manip.DH.p.pe=sym(pe);
+
+manip.DH.z.z0=sym(z0);
+manip.DH.z.ze=sym(ze);
+
+<span class="keyword">for</span> i=1:1:r-1
+    manip.DH.p.p{i} = p{i};
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> i=1:1:r-1
+    manip.DH.z.z{i} = z{i};
+<span class="keyword">end</span>
+
+manip.kin.T.Tbe = Tbe;
+nsap = Tbe([1:3,5:7,9:11,13:15]).';
+manip.kin.nsap = nsap;
+</pre><h2>Evaluation of the geometric Jacobian matrix<a name="4"></a></h2><pre class="codeinput"><span class="keyword">if</span>( DH(1,5) == 1)
+    <span class="comment">% Prismatic joint</span>
+    J(1:3,1) = z0;
+<span class="keyword">else</span>
+    <span class="comment">% Revolute joint</span>
+    J(1:3,1) = cross(z0, (pe - p0));
+    J(4:6,1) = z0;
+<span class="keyword">end</span>
+
+
+<span class="keyword">for</span> i=2:r
+    <span class="keyword">if</span>( DH(i,5) == 1)
+        <span class="comment">% Prismatic joint</span>
+        J(1:3,i) = z{i-1};
+    <span class="keyword">else</span>
+        <span class="comment">% Revolute joint</span>
+        J(1:3,i) = cross(z{i-1}, (pe - p{i-1}));
+        J(4:6,i) = z{i-1};
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% evaluation of geometric Jacobian from 0-frame to b-frame</span>
+Ru = manip.kin.T.Tb0(1:3,1:3);
+J = [Ru, zeros(3,3) ; zeros(3,3), Ru] * J;
+manip.kin.J.J=J;
+</pre><h2>Evaluation of the analytical Jacobian matrix<a name="5"></a></h2><pre class="codeinput"><span class="comment">% if ~exist('ph','var')</span>
+<span class="comment">%     syms ph;</span>
+<span class="comment">% end</span>
+<span class="comment">%</span>
+<span class="comment">% if ~exist('th','var')</span>
+<span class="comment">%     syms th;</span>
+<span class="comment">% end</span>
+<span class="comment">%</span>
+<span class="comment">% Tph_e = [0     -sin(ph)   cos(ph)*sin(ph);</span>
+<span class="comment">%     0      cos(ph)   sin(ph)*sin(th);</span>
+<span class="comment">%     1      0         cos(th)];</span>
+<span class="comment">%</span>
+<span class="comment">% Ta = [eye(3)    zeros(3);</span>
+<span class="comment">%     zeros(3)  Tph_e   ];</span>
+<span class="comment">%</span>
+<span class="comment">% Ja = inv(Ta)*J;</span>
+<span class="comment">% %    Ja = Ja(1:4,:);</span>
+<span class="comment">% manip.kin.J.Ja=Ja;</span>
+
+<span class="comment">% % ???</span>
+<span class="comment">% Ja_or = analytic_jacobian(manip);                                                          %% DOES IT WORK???</span>
+<span class="comment">% Ja = [J(1:3,:); Ja_or];</span>
+<span class="comment">% manip.kin.J.Ja = Ja;</span>
+</pre><h2>time-derivative of J<a name="6"></a></h2><pre class="codeinput">Jd = sym(zeros(6,r));
+<span class="keyword">for</span> i=1:6
+    <span class="keyword">for</span> j=1:r
+        Jd(i,j) = jacobian(manip.kin.J.J(i,j),q) * qd.';
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+manip.kin.J.Jd = Jd;
+
+<span class="comment">% Ja_d = sym(zeros(6,r));</span>
+<span class="comment">% for i=1:4</span>
+<span class="comment">%     for j=1:r</span>
+<span class="comment">%         Ja_d(i,j) = jacobian(manip.kin.J.Ja(i,j),q) * qd.';</span>
+<span class="comment">%     end</span>
+<span class="comment">% end</span>
+<span class="comment">% manip.kin.J.Ja_d = Ja_d;</span>
+
+<span class="keyword">if</span> (manip.is_sym == 0) &amp;&amp; ~strcmp(manip.name,<span class="string">'tmp'</span>)
+    name = manip.name;
+    sym_mat2func(manip.kin.J.Jd , qd, q , [name,<span class="string">'_Jd_qd'</span>],10);
+    eval([<span class="string">'manip.func.Jd_qd = @'</span>, name, <span class="string">'_Jd_qd;'</span>]);
+
+    syms <span class="string">h1</span> <span class="string">h2</span> <span class="string">h3</span> <span class="string">h4</span> <span class="string">h5</span> <span class="string">h6</span>;
+    sym_mat2func(J.' , [h1 h2 h3 h4 h5 h6] , q , [name,<span class="string">'_Jt_he'</span>],10);
+    eval([<span class="string">'manip.func.Jt_he = @'</span>, name, <span class="string">'_Jt_he;'</span>]);
+
+    sym_mat2func(J , qdd , q , [name,<span class="string">'_J_qdd'</span>],10);
+    eval([<span class="string">'manip.func.J_qdd = @'</span>, name, <span class="string">'_J_qdd;'</span>]);
+
+    syms <span class="string">u1</span> <span class="string">u2</span> <span class="string">u3</span> <span class="string">u4</span> <span class="string">u5</span> <span class="string">u6</span>;
+
+<span class="comment">%     % Transpose Jacobian m-file</span>
+<span class="comment">%     sym_mat2func(Ja.' , [u1 u2 u3 u4 u5 u6] , q , [name,'_Jat_u'],10);</span>
+<span class="comment">%     eval(['func.Jat_u = @', name, '_Jat_u;']);</span>
+
+    <span class="comment">%     % Inverse Jacobian m-file</span>
+    <span class="comment">%     sym_mat2func(inv(Ja) , [u1 u2 u3 u4 u5 u6] , robotdata.q , [robotdata.name,'_Jainv_u'],10);</span>
+    <span class="comment">%     eval(['manip.func.Jainv_u = @', name, '_Jainv_u;']);</span>
+
+<span class="comment">%     sym_mat2func(Ja , qd , q , [name,'_Ja_u'],10);</span>
+<span class="comment">%     eval(['manip.func.Ja_u = @', manip.name, '_Ja_u;']);</span>
+<span class="comment">%</span>
+<span class="comment">%     sym_mat2func(Ja_d , q , q , [name,'_Jad_u'],10);</span>
+<span class="comment">%     eval(['manip.func.Jad_u = @', name, '_Jad_u;']);</span>
+
+    sym_mat2func(manip.kin.nsap , [], q , [name,<span class="string">'_nsap'</span>],10);
+    eval([<span class="string">'manip.func.nsap = @'</span>, name, <span class="string">'_nsap;'</span>]);
+<span class="keyword">end</span>
+</pre><h2>Rotation matrices of Frame i with respect to Frame 0<a name="7"></a></h2><pre class="codeinput"><span class="keyword">for</span> i=1:r
+    R{i} = T{i}(1:3,1:3);
+<span class="keyword">end</span>
+
+manip.kin.R.R = R;
+</pre><h2>Simplify<a name="8"></a></h2><pre class="codeinput"><span class="keyword">if</span> ( isnumeric(DH) == 0)
+    <span class="keyword">for</span> i=1:r
+        manip.kin.A.A{i} = simple_(A{i});
+        manip.kin.R.R{i} = simple_(manip.kin.R.R{i});
+        manip.kin.T.T{i} = simplify(T{i});
+    <span class="keyword">end</span>
+
+    <span class="keyword">for</span> i=1:r-1
+        manip.DH.p.p{i} = simple_(p{i});
+        manip.DH.z.z{i} = simple_(z{i});
+    <span class="keyword">end</span>
+
+<span class="comment">%	manip.DH.p.p = p;</span>
+
+<span class="comment">%    manip.kin.J.Ja = simple_(manip.kin.J.Ja);</span>
+    manip.kin.J.J = simplify(manip.kin.J.J);
+    manip.DH.p.pe = simplify(pe);
+    manip.kin.T.Tbe = simplify(Tbe);
+<span class="keyword">end</span>
+
+manip.evaluated.Direct_Kinematics = 1;
+assignin(<span class="string">'caller'</span>,inputname(1),manip);
+
+<span class="keyword">return</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function Direct_Kinematics(manip)
+
+% DIRECT_KINEMATICS evaluate direct kinematics of a manipulator object
+%    syntax: manip.Direct_Kinematics
+%
+%  Evaluates: rotation matrices, homogeneous transformation matrices,
+%             Jacobian matrices and stores them into manipulator as 
+%             follows:
+%
+%  manip.kin
+%       |
+%       +REPLACE_WITH_DASH_DASHT
+%       |  +REPLACE_WITH_DASH_DASH Tb0: homogeneous transformation matrices from b-frame to 0-frame
+%       |  +REPLACE_WITH_DASH_DASH Tne: homogeneous transformation matrices from n-frame to e-frame
+%       |  +REPLACE_WITH_DASH_DASH Tbe: homogeneous transformation matrices from b-frame to e-frame
+%       |  +REPLACE_WITH_DASH_DASH T{1}..T{n}: homogeneous transformation matrices from 0-frame to i-frame
+%       |
+%       +REPLACE_WITH_DASH_DASHJ
+%       |  +REPLACE_WITH_DASH_DASH J: geometric Jacobian matrix
+%       |  +REPLACE_WITH_DASH_DASH Jd: time-derivative of geometric Jacobian matrix
+%       |
+%       +REPLACE_WITH_DASH_DASHnsap: orientation-position matrix in a coloumn: [n;s;a;p]
+%       |
+%       +REPLACE_WITH_DASH_DASHR
+%       |  +REPLACE_WITH_DASH_DASH R{1}..R{n}: rotation matrices from 0-frame to i-frame
+%       |
+%       +REPLACE_WITH_DASH_DASHA
+%          +REPLACE_WITH_DASH_DASH A{1}..A{r}: homogeneous transformation matrices from
+%          (i-1)-frame to i-frame 
+%
+%     See also manipulator
+%              manipulator/pose
+%              manipulator/Direct_Dynamics
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+if manip.DH.r == 0
+    manip.display;
+    return
+end
+
+if manip.evaluated.Direct_Kinematics == 1
+    NL = [char(13),char(10)]; % 'new line' string
+    disp(['Direct Kinematics already evaluated ',NL,'Direct_Kinematics aborted.',NL]);
+    return
+end
+
+% Initialization
+DH=manip.DH.table;
+r=manip.DH.r;
+q = manip.jointvar.q;
+qd = manip.jointvar.qd;
+qdd = manip.jointvar.qdd;
+
+A = cell(1,r);
+T = cell(1,r);
+
+p = cell(1,r);
+z = cell(1,r);
+
+R = cell(1,r);
+J = sym(zeros(6,r));
+
+Tb0 = manip.kin.T.Tb0;
+Tne = manip.kin.T.Tne;
+
+%% Evaluation of single homogeneous transformation matrices
+
+for i=1:r
+    Ai = [cos(DH(i,4)) -sin(DH(i,4))*cos(DH(i,2))  sin(DH(i,4))*sin(DH(i,2)) DH(i,1)*cos(DH(i,4));
+        sin(DH(i,4))  cos(DH(i,4))*cos(DH(i,2)) -cos(DH(i,4))*sin(DH(i,2)) DH(i,1)*sin(DH(i,4));
+        0             sin(DH(i,2))               cos(DH(i,2))              DH(i,3)             ;
+        0             0                          0                         1                  ];
+
+    A{i} = Ai;
+end
+
+%% Evaluation of T and the position of the end-effector frame
+
+T{1} = A{1};
+for i=2:r
+    T{i} = T{i-1} * A{i};           % T(i) = T(i-1)*A(i);
+end
+Tbe = Tb0 * T{r} * Tne;
+
+p0 = [0;0;0];
+pe = T{r} * Tne; pe = pe(1:3,4);
+% pe = Tbe(1:3,4);
+z0  = [0;0;1];
+ze = T{r} * Tne; ze = ze(1:3,3);
+
+
+for i=2:r
+    % Position vector of the origin of Frame i with respect to Frame 0
+    p{i-1} = T{i-1}(1:3,4);
+    % Unit vector z of Frame i with respect to Frame i-1
+    z{i-1}  = T{i-1}(1:3,3);
+end
+
+manip.DH.p.p0=sym(p0);
+manip.DH.p.pe=sym(pe);
+
+manip.DH.z.z0=sym(z0);
+manip.DH.z.ze=sym(ze);
+
+for i=1:1:r-1
+    manip.DH.p.p{i} = p{i};
+end
+
+for i=1:1:r-1
+    manip.DH.z.z{i} = z{i};
+end
+
+manip.kin.T.Tbe = Tbe;
+nsap = Tbe([1:3,5:7,9:11,13:15]).';
+manip.kin.nsap = nsap;
+
+%% Evaluation of the geometric Jacobian matrix
+
+if( DH(1,5) == 1)
+    % Prismatic joint
+    J(1:3,1) = z0;
+else
+    % Revolute joint
+    J(1:3,1) = cross(z0, (pe - p0));
+    J(4:6,1) = z0;
+end
+
+
+for i=2:r
+    if( DH(i,5) == 1)
+        % Prismatic joint
+        J(1:3,i) = z{i-1};
+    else
+        % Revolute joint
+        J(1:3,i) = cross(z{i-1}, (pe - p{i-1}));
+        J(4:6,i) = z{i-1};
+    end
+end
+
+% evaluation of geometric Jacobian from 0-frame to b-frame
+Ru = manip.kin.T.Tb0(1:3,1:3);
+J = [Ru, zeros(3,3) ; zeros(3,3), Ru] * J;
+manip.kin.J.J=J;
+
+%% Evaluation of the analytical Jacobian matrix
+
+% if ~exist('ph','var')
+%     syms ph;
+% end
+% 
+% if ~exist('th','var')
+%     syms th;
+% end
+% 
+% Tph_e = [0     -sin(ph)   cos(ph)*sin(ph);
+%     0      cos(ph)   sin(ph)*sin(th);
+%     1      0         cos(th)];
+% 
+% Ta = [eye(3)    zeros(3);
+%     zeros(3)  Tph_e   ];
+% 
+% Ja = inv(Ta)*J;
+% %    Ja = Ja(1:4,:);
+% manip.kin.J.Ja=Ja;
+
+% % ???
+% Ja_or = analytic_jacobian(manip);                                                          %% DOES IT WORK???
+% Ja = [J(1:3,:); Ja_or];
+% manip.kin.J.Ja = Ja;
+
+
+%% time-derivative of J
+
+Jd = sym(zeros(6,r));
+for i=1:6
+    for j=1:r
+        Jd(i,j) = jacobian(manip.kin.J.J(i,j),q) * qd.';
+    end
+end
+manip.kin.J.Jd = Jd;
+
+% Ja_d = sym(zeros(6,r));
+% for i=1:4
+%     for j=1:r
+%         Ja_d(i,j) = jacobian(manip.kin.J.Ja(i,j),q) * qd.';
+%     end
+% end
+% manip.kin.J.Ja_d = Ja_d;
+
+if (manip.is_sym == 0) && ~strcmp(manip.name,'tmp')
+    name = manip.name;
+    sym_mat2func(manip.kin.J.Jd , qd, q , [name,'_Jd_qd'],10);
+    eval(['manip.func.Jd_qd = @', name, '_Jd_qd;']);
+
+    syms h1 h2 h3 h4 h5 h6;
+    sym_mat2func(J.' , [h1 h2 h3 h4 h5 h6] , q , [name,'_Jt_he'],10);
+    eval(['manip.func.Jt_he = @', name, '_Jt_he;']);
+
+    sym_mat2func(J , qdd , q , [name,'_J_qdd'],10);
+    eval(['manip.func.J_qdd = @', name, '_J_qdd;']);
+
+    syms u1 u2 u3 u4 u5 u6;
+
+%     % Transpose Jacobian m-file
+%     sym_mat2func(Ja.' , [u1 u2 u3 u4 u5 u6] , q , [name,'_Jat_u'],10);
+%     eval(['func.Jat_u = @', name, '_Jat_u;']);
+
+    %     % Inverse Jacobian m-file
+    %     sym_mat2func(inv(Ja) , [u1 u2 u3 u4 u5 u6] , robotdata.q , [robotdata.name,'_Jainv_u'],10);
+    %     eval(['manip.func.Jainv_u = @', name, '_Jainv_u;']);
+
+%     sym_mat2func(Ja , qd , q , [name,'_Ja_u'],10);
+%     eval(['manip.func.Ja_u = @', manip.name, '_Ja_u;']);
+% 
+%     sym_mat2func(Ja_d , q , q , [name,'_Jad_u'],10);
+%     eval(['manip.func.Jad_u = @', name, '_Jad_u;']);
+    
+    sym_mat2func(manip.kin.nsap , [], q , [name,'_nsap'],10);
+    eval(['manip.func.nsap = @', name, '_nsap;']);
+end
+
+%% Rotation matrices of Frame i with respect to Frame 0
+
+for i=1:r
+    R{i} = T{i}(1:3,1:3);
+end
+
+manip.kin.R.R = R;
+
+
+%% Simplify
+
+if ( isnumeric(DH) == 0)
+    for i=1:r
+        manip.kin.A.A{i} = simple_(A{i});
+        manip.kin.R.R{i} = simple_(manip.kin.R.R{i});
+        manip.kin.T.T{i} = simplify(T{i});
+    end
+
+    for i=1:r-1
+        manip.DH.p.p{i} = simple_(p{i});
+        manip.DH.z.z{i} = simple_(z{i});
+    end
+    
+%	manip.DH.p.p = p;
+    
+%    manip.kin.J.Ja = simple_(manip.kin.J.Ja);
+    manip.kin.J.J = simplify(manip.kin.J.J);
+    manip.DH.p.pe = simplify(pe);
+    manip.kin.T.Tbe = simplify(Tbe);
+end
+
+manip.evaluated.Direct_Kinematics = 1;
+assignin('caller',inputname(1),manip);
+
+return
+
+##### SOURCE END #####
+-->
+   </body>
+</html>

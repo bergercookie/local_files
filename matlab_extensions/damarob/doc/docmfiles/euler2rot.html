@@ -1,0 +1,157 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>euler2rot</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-24">
+      <meta name="m-file" content="euler2rot"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content"><pre class="codeinput"><span class="keyword">function</span> R = euler2rot(angles,type)
+
+<span class="comment">% EULER2ROT converts a three component vector (angles) of Euler angles to a rotation</span>
+<span class="comment">% matrix.</span>
+<span class="comment">%  syntax: R = euler2rot(angles,type)</span>
+<span class="comment">%</span>
+<span class="comment">%  where:</span>
+<span class="comment">%       type = 'ZYZ' --&gt; ZYZ Euler angles</span>
+<span class="comment">%       type = 'ZYX' --&gt; ZYX Euler angles (roll-pitch-yaw)</span>
+<span class="comment">%             angles --&gt; vector of Euler angles</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+
+ph = angles(1);
+th = angles(2);
+ps = angles(3);
+
+<span class="keyword">if</span> strcmp(type,<span class="string">'ZYZ'</span>)
+
+R = [(cos(ph)*cos(th)*cos(ps) - sin(ph)*sin(ps)) (-cos(ph)*cos(th)*sin(ps) - sin(ph)*cos(ps))   cos(ph)*sin(th);
+     (sin(ph)*cos(th)*cos(ps) + cos(ph)*sin(ps)) (-sin(ph)*cos(th)*sin(ps) + cos(ph)*cos(ps))   sin(ph)*sin(th);
+     -sin(th)*cos(ps)                                  sin(th)*sin(ps)                                  cos(th)];
+
+<span class="keyword">elseif</span> strcmp(type,<span class="string">'ZYX'</span>)
+
+R = [(cos(ph)*cos(th))     (cos(ph)*sin(th)*sin(ps)-sin(ph)*cos(ps))   (cos(ph)*sin(th)*cos(ps)+sin(ph)*sin(ps));
+     (sin(ph)*cos(th))     (sin(ph)*sin(th)*sin(ps)+cos(ph)*cos(ps))   (sin(ph)*sin(th)*cos(ps)-cos(ph)*sin(ps));
+     -(sin(th))            (cos(th)*sin(ps))                           (cos(th)*cos(ps))];
+
+<span class="keyword">else</span>
+    disp(<span class="string">''</span>);
+    disp(<span class="string">' ERROR : second input must be ''ZYZ'' or ''ZYX'''</span>);
+    disp(<span class="string">''</span>);
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function R = euler2rot(angles,type)
+
+% EULER2ROT converts a three component vector (angles) of Euler angles to a rotation
+% matrix.
+%  syntax: R = euler2rot(angles,type)
+%
+%  where:
+%       type = 'ZYZ' REPLACE_WITH_DASH_DASH> ZYZ Euler angles
+%       type = 'ZYX' REPLACE_WITH_DASH_DASH> ZYX Euler angles (roll-pitch-yaw)
+%             angles REPLACE_WITH_DASH_DASH> vector of Euler angles
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+ph = angles(1);
+th = angles(2);
+ps = angles(3);
+
+if strcmp(type,'ZYZ')
+
+R = [(cos(ph)*cos(th)*cos(ps) - sin(ph)*sin(ps)) (-cos(ph)*cos(th)*sin(ps) - sin(ph)*cos(ps))   cos(ph)*sin(th);
+     (sin(ph)*cos(th)*cos(ps) + cos(ph)*sin(ps)) (-sin(ph)*cos(th)*sin(ps) + cos(ph)*cos(ps))   sin(ph)*sin(th);
+     -sin(th)*cos(ps)                                  sin(th)*sin(ps)                                  cos(th)];
+ 
+elseif strcmp(type,'ZYX')
+    
+R = [(cos(ph)*cos(th))     (cos(ph)*sin(th)*sin(ps)-sin(ph)*cos(ps))   (cos(ph)*sin(th)*cos(ps)+sin(ph)*sin(ps));
+     (sin(ph)*cos(th))     (sin(ph)*sin(th)*sin(ps)+cos(ph)*cos(ps))   (sin(ph)*sin(th)*cos(ps)-cos(ph)*sin(ps));
+     -(sin(th))            (cos(th)*sin(ps))                           (cos(th)*cos(ps))];
+    
+else
+    disp('');
+    disp(' ERROR : second input must be ''ZYZ'' or ''ZYX''');
+    disp('');
+    return
+end
+##### SOURCE END #####
+-->
+   </body>
+</html>

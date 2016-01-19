@@ -9,7 +9,10 @@ function man(varargin)
 % Copyright: 2015, nickkouk
 % Stockholm, Sweeden
 
-more on
+% more('on')
+nlines = 12; % num of lines to display
+
+more(nlines)
 help(varargin{1});
-more off
+more('off')
 end

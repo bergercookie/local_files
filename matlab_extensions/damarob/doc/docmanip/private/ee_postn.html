@@ -1,0 +1,214 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>ee_postn</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-25">
+      <meta name="m-file" content="ee_postn"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#2">Evaluation of single homogeneous transformation matrices</a></li>
+               <li><a href="#3">Evaluation of T and the position of the end-effector frame</a></li>
+               <li><a href="#4">Creation of function handles</a></li>
+            </ul>
+         </div><pre class="codeinput"><span class="keyword">function</span> [x y z] = ee_postn(manip)
+
+<span class="comment">% EE_POSTN creates function handles that evaluate end-effector position</span>
+<span class="comment">% through a simple forward kinematics algorithm.</span>
+<span class="comment">%    syntax: [x y z] = ee_postn(manip)</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+
+<span class="comment">% Initialization</span>
+DH=manip.DH.table;
+r=manip.DH.r;
+
+A = cell(1,r);
+T = cell(1,r);
+
+Tb0 = manip.kin.T.Tb0;
+Tne = manip.kin.T.Tne;
+</pre><h2>Evaluation of single homogeneous transformation matrices<a name="2"></a></h2><pre class="codeinput"><span class="keyword">for</span> i=1:r
+    Ai = [cos(DH(i,4)) -sin(DH(i,4))*cos(DH(i,2))  sin(DH(i,4))*sin(DH(i,2)) DH(i,1)*cos(DH(i,4));
+        sin(DH(i,4))  cos(DH(i,4))*cos(DH(i,2)) -cos(DH(i,4))*sin(DH(i,2)) DH(i,1)*sin(DH(i,4));
+        0             sin(DH(i,2))               cos(DH(i,2))              DH(i,3)             ;
+        0             0                          0                         1                  ];
+
+    A{i} = Ai;
+<span class="keyword">end</span>
+</pre><h2>Evaluation of T and the position of the end-effector frame<a name="3"></a></h2><pre class="codeinput">T{1} = A{1};
+<span class="keyword">for</span> i=2:r
+    T{i} = T{i-1} * A{i};           <span class="comment">% T(i) = T(i-1)*A(i);</span>
+<span class="keyword">end</span>
+Tbe = Tb0 * T{r} * Tne;
+pe = Tbe(1:3,4);
+</pre><h2>Creation of function handles<a name="4"></a></h2><pre class="codeinput">pe_ = cell(1,3);
+<span class="keyword">for</span> z = 1:1:3
+    pe_{z} = char(pe(z));
+    <span class="keyword">for</span> k = r:-1:1
+        <span class="keyword">if</span> DH(k,5) == 0         <span class="comment">% revolute</span>
+            var_ind = strfind(pe_{z},[<span class="string">'th'</span>,num2str(k)]);
+            shift = 1;
+        <span class="keyword">else</span>
+            var_ind = strfind(pe_{z},[<span class="string">'d'</span>,num2str(k)]);
+            shift = 2;
+        <span class="keyword">end</span>
+        <span class="keyword">for</span> j=var_ind(end:-1:1)
+            <span class="keyword">for</span> i = length(pe_{z}):-1:j
+                pe_{z}(i+shift) = pe_{z}(i);
+            <span class="keyword">end</span>
+            pe_{z}(j:j+length([<span class="string">'q('</span>,num2str(k),<span class="string">')'</span>])-1) = [<span class="string">'q('</span>,num2str(k),<span class="string">')'</span>];
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+x = eval([<span class="string">'@(q)'</span>,pe_{1}]);
+y = eval([<span class="string">'@(q)'</span>,pe_{2}]);
+z = eval([<span class="string">'@(q)'</span>,pe_{3}]);
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function [x y z] = ee_postn(manip)
+
+% EE_POSTN creates function handles that evaluate end-effector position
+% through a simple forward kinematics algorithm.
+%    syntax: [x y z] = ee_postn(manip)
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+% Initialization
+DH=manip.DH.table;
+r=manip.DH.r;
+
+A = cell(1,r);
+T = cell(1,r);
+
+Tb0 = manip.kin.T.Tb0;
+Tne = manip.kin.T.Tne;
+
+%% Evaluation of single homogeneous transformation matrices
+
+for i=1:r
+    Ai = [cos(DH(i,4)) -sin(DH(i,4))*cos(DH(i,2))  sin(DH(i,4))*sin(DH(i,2)) DH(i,1)*cos(DH(i,4));
+        sin(DH(i,4))  cos(DH(i,4))*cos(DH(i,2)) -cos(DH(i,4))*sin(DH(i,2)) DH(i,1)*sin(DH(i,4));
+        0             sin(DH(i,2))               cos(DH(i,2))              DH(i,3)             ;
+        0             0                          0                         1                  ];
+
+    A{i} = Ai;
+end
+
+%% Evaluation of T and the position of the end-effector frame
+
+T{1} = A{1};
+for i=2:r
+    T{i} = T{i-1} * A{i};           % T(i) = T(i-1)*A(i);
+end
+Tbe = Tb0 * T{r} * Tne;
+pe = Tbe(1:3,4);
+
+
+%% Creation of function handles
+pe_ = cell(1,3);
+for z = 1:1:3
+    pe_{z} = char(pe(z));    
+    for k = r:-1:1
+        if DH(k,5) == 0         % revolute
+            var_ind = strfind(pe_{z},['th',num2str(k)]);
+            shift = 1;
+        else
+            var_ind = strfind(pe_{z},['d',num2str(k)]);
+            shift = 2;
+        end
+        for j=var_ind(end:-1:1)
+            for i = length(pe_{z}):-1:j
+                pe_{z}(i+shift) = pe_{z}(i);
+            end
+            pe_{z}(j:j+length(['q(',num2str(k),')'])-1) = ['q(',num2str(k),')'];
+        end
+    end
+end
+
+x = eval(['@(q)',pe_{1}]);
+y = eval(['@(q)',pe_{2}]);
+z = eval(['@(q)',pe_{3}]);
+end
+##### SOURCE END #####
+-->
+   </body>
+</html>

@@ -1,0 +1,253 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>ex_robot</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-11-25">
+      <meta name="m-file" content="ex_robot"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#2">define an anthropomorphic robot with spherical wrist, drive it</a></li>
+               <li><a href="#3">evaluate robot's direct kinematics</a></li>
+               <li><a href="#4">define a trajectory</a></li>
+               <li><a href="#5">inverse kinematics</a></li>
+            </ul>
+         </div><pre class="codeinput"><span class="comment">% EX_ROBOT - trajectory and kinematics demo</span>
+<span class="comment">% Run this file to see an example of trajectory generation, kinematics</span>
+<span class="comment">% inversion and virtual reality simulation.</span>
+<span class="comment">%</span>
+<span class="comment">% This is a DAMA^{ROB} toolbox example.</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.</span>
+<span class="comment">% This file is part of GNU LGPLv2.1 DAMA^{ROB}</span>
+<span class="comment">%    http://www.damarob.altervista.org</span>
+<span class="comment">%</span>
+</pre><h2>define an anthropomorphic robot with spherical wrist, drive it<a name="2"></a></h2><pre class="codeinput">ex_num_anthrop_sph_wrist;
+disp(<span class="string">' Press a key to go on'</span>);
+pause;
+<span class="keyword">if</span> ishandle(manip3.fig.manmov.mainfig)
+    close(manip3.fig.manmov.mainfig)
+<span class="keyword">end</span>
+</pre><pre class="codeoutput"> Press a key to go on
+</pre><h2>evaluate robot's direct kinematics<a name="3"></a></h2><pre class="codeinput">manip3.Direct_Kinematics;
+</pre><h2>define a trajectory<a name="4"></a></h2><pre class="codeinput">startpoint = [0.2;0;0.3];    <span class="comment">% [0;0.4;0.45;0;-0.3;0]</span>
+startorient = [0;0;pi];
+Ts = 0.01;
+orient_type = <span class="string">'ZYX euler'</span>;
+
+point_1.g = [0.278;-0.433;0.509];
+point_1.orient = [0;0;pi];
+point_1.tf = 6;
+point_1.via = 1;
+point_1.path_type = <span class="string">'r'</span>;
+
+point_2.g = [0.1;0.3;0.8];
+point_2.orient = [0;0;pi];
+point_2.tf = 4;
+point_2.via = 0;
+point_2.path_type = <span class="string">'r'</span>;
+
+point_3.g = [0.1;0.5;0.8];
+point_3.orient = [0;pi/6;pi];
+point_3.tf = 4;
+point_3.via = 0;
+point_3.path_type = <span class="string">'r'</span>;
+
+point_4.c = [0;0;0.7];
+point_4.z = [0;0;1];
+point_4.thf = pi;
+point_4.orient = [0;0;pi];
+point_4.tf = 5;
+point_4.via = 1;
+point_4.path_type = <span class="string">'c'</span>;
+
+point_5.g = [0.3;-0.4;0.8];
+point_5.orient = [0;0;pi];
+point_5.tf = 4;
+point_5.via = 0;
+point_5.path_type = <span class="string">'r'</span>;
+
+point_6.g = [0.3;0;0.7];
+point_6.orient = [0;pi/8;pi];
+point_6.tf = 4;
+point_6.via = 0;
+point_6.path_type = <span class="string">'r'</span>;
+
+point_7.g = [0.3;0;0.7];
+point_7.orient = [0;-pi/8;pi];
+point_7.tf = 4;
+point_7.via = 0;
+point_7.path_type = <span class="string">'r'</span>;
+
+path_des = trajectory(Ts,startpoint,startorient,orient_type,point_1,point_2,point_3,point_4,point_5,point_6,point_7);
+</pre><img vspace="5" hspace="5" src="ex_robot_01.png"> <h2>inverse kinematics<a name="5"></a></h2><pre class="codeinput">Kp = 50*eye(3);
+Ko = 50*eye(3);
+Ts_mdl = 0.01;
+
+disp(<span class="string">' Press a key to go on'</span>);
+pause;
+
+open(<span class="string">'ex_kinematics_inversion'</span>)
+sim(<span class="string">'ex_kinematics_inversion'</span>);
+</pre><pre class="codeoutput"> Press a key to go on
+</pre><img vspace="5" hspace="5" src="ex_robot_02.png"> <p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+% EX_ROBOT - trajectory and kinematics demo
+% Run this file to see an example of trajectory generation, kinematics 
+% inversion and virtual reality simulation. 
+% 
+% This is a DAMA^{ROB} toolbox example.
+%
+% Copyright (C) 2009, by Carmine Dario Bellicoso and Marco Caputano.
+% This file is part of GNU LGPLv2.1 DAMA^{ROB}
+%    http://www.damarob.altervista.org
+%
+
+%% define an anthropomorphic robot with spherical wrist, drive it
+ex_num_anthrop_sph_wrist;
+disp(' Press a key to go on');
+pause;
+if ishandle(manip3.fig.manmov.mainfig)
+    close(manip3.fig.manmov.mainfig)
+end
+
+%% evaluate robot's direct kinematics
+manip3.Direct_Kinematics;
+
+%% define a trajectory
+startpoint = [0.2;0;0.3];    % [0;0.4;0.45;0;-0.3;0]
+startorient = [0;0;pi];
+Ts = 0.01;
+orient_type = 'ZYX euler';
+
+point_1.g = [0.278;-0.433;0.509];
+point_1.orient = [0;0;pi];
+point_1.tf = 6;
+point_1.via = 1;
+point_1.path_type = 'r';
+
+point_2.g = [0.1;0.3;0.8];
+point_2.orient = [0;0;pi];
+point_2.tf = 4;
+point_2.via = 0;
+point_2.path_type = 'r';
+
+point_3.g = [0.1;0.5;0.8];
+point_3.orient = [0;pi/6;pi];
+point_3.tf = 4;
+point_3.via = 0;
+point_3.path_type = 'r';
+
+point_4.c = [0;0;0.7];
+point_4.z = [0;0;1];
+point_4.thf = pi;
+point_4.orient = [0;0;pi];
+point_4.tf = 5;
+point_4.via = 1;
+point_4.path_type = 'c';
+
+point_5.g = [0.3;-0.4;0.8];
+point_5.orient = [0;0;pi];
+point_5.tf = 4;
+point_5.via = 0;
+point_5.path_type = 'r';
+
+point_6.g = [0.3;0;0.7];
+point_6.orient = [0;pi/8;pi];
+point_6.tf = 4;
+point_6.via = 0;
+point_6.path_type = 'r';
+
+point_7.g = [0.3;0;0.7];
+point_7.orient = [0;-pi/8;pi];
+point_7.tf = 4;
+point_7.via = 0;
+point_7.path_type = 'r';
+
+path_des = trajectory(Ts,startpoint,startorient,orient_type,point_1,point_2,point_3,point_4,point_5,point_6,point_7);
+
+%% inverse kinematics
+Kp = 50*eye(3);
+Ko = 50*eye(3);
+Ts_mdl = 0.01;
+
+disp(' Press a key to go on');
+pause;
+
+open('ex_kinematics_inversion')
+sim('ex_kinematics_inversion');
+
+##### SOURCE END #####
+-->
+   </body>
+</html>
